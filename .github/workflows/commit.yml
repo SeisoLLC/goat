@@ -9,4 +9,4 @@ jobs:
     runs-on: Ubuntu-20.04
     name: Test the project
     steps:
-      - uses: seisollc/goat@v1
+      - uses: seisollc/goat@v0.1.0
