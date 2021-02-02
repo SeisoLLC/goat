@@ -1,0 +1,5 @@
+[BASIC]
+good-names=c
+
+[MESSAGES CONTROL]
+disable=line-too-long

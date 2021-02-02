@@ -1,0 +1,11 @@
+---
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: Ubuntu-20.04
+    name: Test the project
+    steps:
+      - uses: seisollc/goat@v1
