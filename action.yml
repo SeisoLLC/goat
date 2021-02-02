@@ -1,0 +1,6 @@
+---
+name: Seiso Grand Opinionated AutoTester (GOAT)
+description: Apply Seiso's standard testing
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
