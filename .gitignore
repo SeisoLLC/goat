@@ -1,4 +1,5 @@
-super-linter.lo
+*.tar
+super-linter.log
 
 # Created by https://www.toptal.com/developers/gitignore/api/vim,emacs,vscode,python,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=vim,emacs,vscode,python,node

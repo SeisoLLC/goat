@@ -23,7 +23,7 @@ jobs:
 ```
 
 ## GOAT Development
-### Prereqs
+### Prerequisites
 ```bash
 pipenv
 ```

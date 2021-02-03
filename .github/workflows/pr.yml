@@ -9,4 +9,7 @@ jobs:
     runs-on: Ubuntu-20.04
     name: Test the project
     steps:
-      - uses: seisollc/goat@v0.1.0
+      - name: Run the goat
+        run: invoke goat
+      - name: Build the Docker images
+        run: invoke build
