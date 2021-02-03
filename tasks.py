@@ -65,7 +65,7 @@ def is_status_expected(*, expected: int, response: dict) -> bool:
 
 # Globals
 CWD = Path(".").absolute()
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 NAME = "goat"
 
 LOG_FORMAT = json.dumps(

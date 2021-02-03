@@ -4,7 +4,7 @@ The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard t
 ## Example usage
 Add this to your GitHub Actions workflows.
 ```bash
-uses: seisollc/goat@v0.1.0
+uses: seisollc/goat@v0.2.0
 ```
 
 For example, you could use the following to run the goat on each PR against `main`:
@@ -19,7 +19,7 @@ jobs:
     runs-on: Ubuntu-20.04
     name: Test the project
     steps:
-    - uses: seisollc/goat@v0.1.0
+    - uses: seisollc/goat@v0.2.0
 ```
 
 ## GOAT Development
