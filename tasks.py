@@ -4,6 +4,7 @@ Task execution tool & library
 """
 
 import json
+import os
 import sys
 from logging import basicConfig, getLogger
 from pathlib import Path
@@ -89,9 +90,9 @@ IMAGE = "seiso/" + NAME
 
 # Tasks
 @task
-def goat(c, local=False):  # pylint: disable=unused-argument
+def goat(c):  # pylint: disable=unused-argument
     """Build and run the goat"""
-    if local:
+    if not os.environ.get("GITHUB_ACTIONS") == "true":
         environment = {"RUN_LOCAL": "true"}
 
     buildargs = {"VERSION": VERSION, "COMMIT_HASH": COMMIT_HASH}
