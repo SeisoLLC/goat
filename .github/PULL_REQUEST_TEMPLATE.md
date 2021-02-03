@@ -2,7 +2,7 @@
 [Please insert a description of the change here]
 
 ## Pull Request Checklist
-Thank you for submitting a contribution to `easy_infra`!
+Thank you for submitting a contribution to `goat`!
 
 In order to streamline the review of your contribution we ask that you review and comply with the below requirements:
 - [ ] Rebase your branch against the latest commit of the target branch, which likely should be `main`
