@@ -9,6 +9,3 @@ name = "pypi"
 gitpython = "*"
 docker = "*"
 invoke = "*"
-
-[requires]
-python_version = "3.9"

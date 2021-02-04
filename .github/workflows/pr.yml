@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get install -y pipenv &&
-          pipenv install --dev &&
+          pipenv install --python ${{ matrix.python-version }} --dev &&
           echo "/home/runner/.local/bin" >> "${GITHUB_PATH}"
       - name: Build the goat
         run: invoke build
