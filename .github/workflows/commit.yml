@@ -11,6 +11,11 @@ jobs:
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          apt install pipenv &&
+          pipenv install --dev &&
+          echo "/home/runner/.local/bin" >> "${GITHUB_PATH}"
       - name: Build the goat
         run: invoke build
       - name: Goat the goat
@@ -24,6 +29,11 @@ jobs:
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          apt install pipenv &&
+          pipenv install --dev &&
+          echo "/home/runner/.local/bin" >> "${GITHUB_PATH}"
       - name: Build the goat
         run: invoke build
       - name: Login to Docker Hub
