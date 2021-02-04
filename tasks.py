@@ -156,6 +156,8 @@ def goat(c):  # pylint: disable=unused-argument
     """Run the goat"""
     if not os.environ.get("GITHUB_ACTIONS") == "true":
         environment = {"RUN_LOCAL": "true"}
+    else:
+        environment = {}
 
     working_dir = "/tmp/lint/"
     # Needs rw to write the super-linter.log
