@@ -9,7 +9,13 @@ jobs:
     runs-on: Ubuntu-20.04
     name: Test the project
     steps:
-      - name: Run the goat
-        run: invoke goat
-      - name: Build the Docker images
+      - name: Checkout the PR
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Build the goat
         run: invoke build
+      - name: Goat the goat
+        run: invoke goat
+      - name: Test the goat
+        run: invoke test

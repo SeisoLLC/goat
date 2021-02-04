@@ -184,9 +184,12 @@ def test(c):  # pylint: disable=unused-argument
 
 
 @task
-def publish(c):  # pylint: disable=unused-argument
+def publish(c, latest_only=False):  # pylint: disable=unused-argument
     """Publish the goat"""
     for tag in TAGS:
+        if latest_only and tag.split(":")[-1] != "latest":
+            continue
+
         LOG.info("Pushing %s to docker hub...", tag)
         CLIENT.images.push(repository=tag)
         LOG.info("Done publishing the %s Docker image", tag)
