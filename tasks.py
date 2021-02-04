@@ -145,7 +145,7 @@ REPO = git.Repo(CWD)
 COMMIT_HASH = REPO.head.object.hexsha
 
 # Docker
-CLIENT = docker.from_env(timeout=120)
+CLIENT = docker.from_env(timeout=300)
 IMAGE = "seiso/" + NAME
 TAGS = [IMAGE + ":latest", IMAGE + ":" + VERSION]
 
