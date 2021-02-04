@@ -119,8 +119,6 @@ def run_security_tests(*, image: str):
     # Cleanup the image file
     image_file.unlink()
 
-    LOG.info("%s passed %d security tests", image, num_tests_ran)
-
 
 # Globals
 CWD = Path(".").absolute()
@@ -173,11 +171,13 @@ def goat(c):  # pylint: disable=unused-argument
     opinionated_docker_run(
         image=IMAGE, volumes=volumes, working_dir=working_dir, environment=environment,
     )
-
-    LOG.info("The %s scan completed", IMAGE)
+    LOG.info("Linting tests passed")
 
     latest_image = IMAGE + ":latest"
     run_security_tests(image=latest_image)
+    LOG.info("Security tests passed")
+
+    LOG.info("All goat tests completed successfully!")
 
 
 @task
