@@ -25,11 +25,11 @@ jobs:
           pipenv install --python ${{ matrix.python-version }} --dev &&
           echo "/home/runner/.local/bin" >> "${GITHUB_PATH}"
       - name: Build the goat
-        run: invoke build
+        run: pipenv run invoke build
       - name: Goat the goat
-        run: invoke goat
+        run: pipenv run invoke goat
       - name: Test the goat
-        run: invoke test
+        run: pipenv run invoke test
   push:
     name: Build and push the Docker images
     runs-on: Ubuntu-20.04
@@ -43,11 +43,11 @@ jobs:
           pipenv install --dev &&
           echo "/home/runner/.local/bin" >> "${GITHUB_PATH}"
       - name: Build the goat
-        run: invoke build
+        run: pipenv run invoke build
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish the latest goat
-        run: invoke publish --latest
+        run: pipenv run invoke publish --latest

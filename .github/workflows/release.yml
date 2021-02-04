@@ -17,7 +17,7 @@ jobs:
           pipenv install --dev &&
           echo "/home/runner/.local/bin" >> "${GITHUB_PATH}"
       - name: Build the goat
-        run: invoke build
+        run: pipenv run invoke build
       - name: Create the release
         id: create_release
         uses: actions/create-release@v1
@@ -34,4 +34,4 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish the goat
-        run: invoke publish
+        run: pipenv run invoke publish
