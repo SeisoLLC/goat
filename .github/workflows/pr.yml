@@ -30,5 +30,3 @@ jobs:
         run: pipenv run invoke build
       - name: Goat the goat
         run: pipenv run invoke goat
-      - name: Test the goat
-        run: pipenv run invoke test

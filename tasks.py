@@ -176,6 +176,9 @@ def goat(c):  # pylint: disable=unused-argument
 
     LOG.info("The %s scan completed", IMAGE)
 
+    latest_image = IMAGE + ":latest"
+    run_security_tests(image=latest_image)
+
 
 @task
 def build(c):  # pylint: disable=unused-argument
@@ -185,13 +188,6 @@ def build(c):  # pylint: disable=unused-argument
     for tag in TAGS:
         LOG.info("Building %s...", tag)
         CLIENT.images.build(path=str(CWD), rm=True, tag=tag, buildargs=buildargs)
-
-
-@task
-def test(c):  # pylint: disable=unused-argument
-    """Test your goat"""
-    tag = IMAGE + ":latest"
-    run_security_tests(image=tag)
 
 
 @task
