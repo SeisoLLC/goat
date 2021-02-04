@@ -67,8 +67,6 @@ function seiso_lint() {
 }
 
 
-echo "${GITHUB_EVENT_PATH}"
-ls -al "${GITHUB_EVENT_PATH}"
 check_environment
 super_lint
 seiso_lint
