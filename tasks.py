@@ -152,6 +152,7 @@ TAGS = [IMAGE + ":latest", IMAGE + ":" + VERSION]
 @task
 def goat(c):  # pylint: disable=unused-argument
     """Run the goat"""
+    LOG.info("Baaaaaaaaaaah! (Running the goat)")
     environment = {}
 
     # Pass in all of the host environment variables starting with GITHUB_

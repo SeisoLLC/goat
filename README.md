@@ -30,7 +30,5 @@ pipenv
 
 ### Running the goat locally
 ```bash
-pipenv install --dev
-pipenv shell
-invoke goat --local
+pipenv run invoke goat
 ```
