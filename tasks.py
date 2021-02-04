@@ -161,11 +161,15 @@ def goat(c):  # pylint: disable=unused-argument
         if element.startswith("GITHUB_"):
             environment[element] = os.environ.get(element)
 
-    if not os.environ.get("GITHUB_ACTIONS") == "true":
-        environment["RUN_LOCAL"] = "true"
-
     working_dir = "/tmp/lint/"
     volumes = {CWD: {"bind": working_dir, "mode": "rw"}}
+
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        homedir = os.environ.get("HOME")
+        volumes[homedir] = {"bind": homedir, "mode": "ro"}
+    else:
+        environment["RUN_LOCAL"] = "true"
+
     opinionated_docker_run(
         image=IMAGE, volumes=volumes, working_dir=working_dir, environment=environment,
     )
