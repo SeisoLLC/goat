@@ -158,7 +158,7 @@ def goat(c):  # pylint: disable=unused-argument
 
     # Pass in all of the host environment variables starting with GITHUB_
     for element in dict(os.environ):
-        if element.startswith('GITHUB_'):
+        if element.startswith("GITHUB_"):
             environment[element] = os.environ.get(element)
 
     if not os.environ.get("GITHUB_ACTIONS") == "true":
