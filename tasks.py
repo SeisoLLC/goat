@@ -155,6 +155,7 @@ TAGS = [IMAGE + ":latest", IMAGE + ":" + VERSION]
 def goat(c):  # pylint: disable=unused-argument
     """Run the goat"""
     environment = dict(os.environ)
+    environment["LOG_LEVEL"] = "DEBUG"
 
     if not os.environ.get("GITHUB_ACTIONS") == "true":
         environment["RUN_LOCAL"] = "true"

@@ -40,7 +40,6 @@ function check_environment() {
     mainline="${GITHUB_BASE_REF-##*/}"
     if [[ "${mainline}" != "main" ]]; then
       feedback ERROR "Base branch name is not main"
-      exit 1
     fi
   fi
 }
