@@ -21,9 +21,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          sudo apt-get install -y pipenv &&
-          pipenv install --python ${{ matrix.python-version }} --dev &&
-          echo "/home/runner/.local/bin" >> "${GITHUB_PATH}"
+          python -m pip install --upgrade pipenv &&
+          pipenv install --python ${{ matrix.python-version }} --dev
       - name: Build the goat
         run: pipenv run invoke build
       - name: Goat the goat
@@ -39,9 +38,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Install dependencies
         run: |
-          sudo apt-get install -y pipenv &&
-          pipenv install --dev &&
-          echo "/home/runner/.local/bin" >> "${GITHUB_PATH}"
+          python -m pip install --upgrade pipenv &&
+          pipenv install --dev
       - name: Build the goat
         run: pipenv run invoke build
       - name: Login to Docker Hub
