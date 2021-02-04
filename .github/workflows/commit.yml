@@ -48,4 +48,4 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish the latest goat
-        run: pipenv run invoke publish --latest
+        run: pipenv run invoke publish latest

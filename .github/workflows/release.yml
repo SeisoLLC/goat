@@ -32,5 +32,5 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Publish the goat
-        run: pipenv run invoke publish
+      - name: Publish the goat's versioned tag to Docker Hub
+        run: pipenv run invoke publish version
