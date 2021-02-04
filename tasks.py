@@ -154,10 +154,10 @@ TAGS = [IMAGE + ":latest", IMAGE + ":" + VERSION]
 @task
 def goat(c):  # pylint: disable=unused-argument
     """Run the goat"""
+    environment = os.environ
+
     if not os.environ.get("GITHUB_ACTIONS") == "true":
-        environment = {"RUN_LOCAL": "true"}
-    else:
-        environment = {}
+        environment["RUN_LOCAL"] = "true"
 
     working_dir = "/tmp/lint/"
     # Needs rw to write the super-linter.log
