@@ -158,6 +158,7 @@ def goat(c):  # pylint: disable=unused-argument
         environment = {"RUN_LOCAL": "true"}
 
     working_dir = "/tmp/lint/"
+    # Needs rw to write the super-linter.log
     volumes = {CWD: {"bind": working_dir, "mode": "rw"}}
     opinionated_docker_run(
         image=IMAGE, volumes=volumes, working_dir=working_dir, environment=environment,
