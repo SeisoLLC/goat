@@ -126,8 +126,8 @@ def run_security_tests(*, image: str):
 CWD = Path(".").absolute()
 VERSION = "0.2.0"
 NAME = "goat"
-UNACCEPTABLE_VULNS = ["CRITICAL", "HIGH"]
-LOW_PRIORITY_VULNS = ["UNKNOWN", "LOW", "MEDIUM"]
+UNACCEPTABLE_VULNS = ["CRITICAL"]
+LOW_PRIORITY_VULNS = ["UNKNOWN", "LOW", "MEDIUM", "HIGH"]
 
 LOG_FORMAT = json.dumps(
     {
