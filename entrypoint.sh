@@ -23,7 +23,7 @@ function feedback() {
       ;;
     ERROR)
       >&2 echo -e "${!color}${1}:  ${2}${DEFAULT}"
-      help 1
+      exit 1
       ;;
     WARNING)
       >&2 echo -e "${!color}${1}:  ${2}${DEFAULT}"
@@ -34,8 +34,14 @@ function feedback() {
   esac
 }
 
-function setup() {
-	git fetch origin main:main
+function check_environment() {
+# Check the GITHUB_BASE_REF (PRs only)
+  if [[ "${GITHUB_ACTIONS-}" == "true" && -n "${GITHUB_BASE_REF-}" ]]; then
+    mainline="${GITHUB_BASE_REF-##*/}"
+    if [[ "${mainline}" != "main" ]]; then
+      feedback ERROR "Base branch name is not main"
+    fi
+  fi
 }
 
 function super_lint() {
@@ -43,33 +49,24 @@ function super_lint() {
 }
 
 function seiso_lint() {
+  # Check Dockerfiles
   npm install -g dockerfile_lint
-  for file_name in $(git diff --name-only "${HEAD}" main); do
-    if [[ "${file_name}" == "Dockerfile"* ]]; then
-      dockerfile_lint -f "${file_name}" -r /usr/local/etc/oci_annotations.yml
-    fi
-  done
-}
+  while read -r file; do
+    dockerfile_lint -f "${file}" -r /usr/local/etc/oci.yml
+  done < <(find . -type f -name "*Dockerfile*")
 
-function check_links() {
-  npm install -g markdown-link-check
-  for file_name in $(git diff --name-only "${HEAD}" main); do
-    if [[ "${file_name}" == *".md" ]]; then
-      npx markdown-link-check --config /usr/local/etc/links.json --verbose "${file_name}"
-    fi
-  done
-}
-
-function check_spelling() {
+  # Check .md file spelling
   npm install -g cspell
-  git diff --name-only main "${HEAD}" | xargs -L1 npx cspell -c /usr/local/etc/spelling.json -u -e /usr/local/etc/
+  npx cspell -c /usr/local/etc/spelling.json -- **/*.md
+
+  # Check .md file links
+  npm install -g markdown-link-check
+  while read -r file; do
+    npx markdown-link-check --config /usr/local/etc/links.json --verbose "${file}"
+  done < <(find . -type f -name "*.md")
 }
 
-function check_terraform() {
-  image="seiso/easy_infra:latest"
-  docker pull "${image}"
-  docker run --rm "$(pwd):/iac/" "${image}" terraform validate
-}
 
-
+check_environment
 super_lint
+seiso_lint

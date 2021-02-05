@@ -6,9 +6,6 @@ name = "pypi"
 [packages]
 
 [dev-packages]
-pyinvoke = "*"
 gitpython = "*"
 docker = "*"
-
-[requires]
-python_version = "3.9"
+invoke = "*"

@@ -4,6 +4,7 @@ Task execution tool & library
 """
 
 import json
+import os
 import sys
 from logging import basicConfig, getLogger
 from pathlib import Path
@@ -44,8 +45,6 @@ def opinionated_docker_run(
         if not is_status_expected(expected=expected_exit, response=response):
             sys.exit(response["StatusCode"])
 
-    LOG.info("The %s scan completed successfully", image)
-
 
 def is_status_expected(*, expected: int, response: dict) -> bool:
     """Check to see if the status code was expected"""
@@ -62,10 +61,71 @@ def is_status_expected(*, expected: int, response: dict) -> bool:
     return True
 
 
+def run_security_tests(*, image: str):
+    """Run the security tests"""
+    temp_dir = CWD
+
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        if os.environ.get("RUNNER_TEMP"):
+            # Update the temp_dir if a temporary directory is indicated by the
+            # environment
+            temp_dir = Path(str(os.environ.get("RUNNER_TEMP"))).absolute()
+        else:
+            LOG.warning(
+                "Unable to determine the context due to inconsistent environment variables, falling back to %s",
+                str(temp_dir),
+            )
+
+    tag = image.split(":")[-1]
+    file_name = tag + ".tar"
+    image_file = temp_dir.joinpath(file_name)
+    raw_image = CLIENT.images.get(image).save(named=True)
+    with open(image_file, "wb") as file:
+        for chunk in raw_image:
+            file.write(chunk)
+
+    working_dir = "/tmp/"
+    volumes = {temp_dir: {"bind": working_dir, "mode": "ro"}}
+
+    num_tests_ran = 0
+    scanner = "aquasec/trivy:latest"
+
+    # Provide information about low priority vulnerabilities
+    command = (
+        "--quiet image --exit-code 0 --severity "
+        + ",".join(LOW_PRIORITY_VULNS)
+        + " --format json --light --input "
+        + working_dir
+        + file_name
+    )
+    opinionated_docker_run(
+        image=scanner, command=command, working_dir=working_dir, volumes=volumes,
+    )
+    num_tests_ran += 1
+
+    # Ensure no unacceptable vulnerabilities exist in the image
+    command = (
+        "--quiet image --exit-code 1 --severity "
+        + ",".join(UNACCEPTABLE_VULNS)
+        + " --format json --light --input "
+        + working_dir
+        + file_name
+    )
+    opinionated_docker_run(
+        image=scanner, command=command, working_dir=working_dir, volumes=volumes,
+    )
+    num_tests_ran += 1
+
+    # Cleanup the image file
+    image_file.unlink()
+
+
 # Globals
 CWD = Path(".").absolute()
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 NAME = "goat"
+UNACCEPTABLE_VULNS = ["CRITICAL"]
+LOW_PRIORITY_VULNS = ["UNKNOWN", "LOW", "MEDIUM", "HIGH"]
 
 LOG_FORMAT = json.dumps(
     {
@@ -83,32 +143,64 @@ REPO = git.Repo(CWD)
 COMMIT_HASH = REPO.head.object.hexsha
 
 # Docker
-CLIENT = docker.from_env()
+CLIENT = docker.from_env(timeout=300)
 IMAGE = "seiso/" + NAME
+TAGS = [IMAGE + ":latest", IMAGE + ":" + VERSION]
 
 
 # Tasks
 @task
-def goat(c, local=False):  # pylint: disable=unused-argument
-    """Build and run the goat"""
-    if local:
-        environment = {"RUN_LOCAL": "true"}
+def goat(c):  # pylint: disable=unused-argument
+    """Run the goat"""
+    LOG.info("Baaaaaaaaaaah! (Running the goat)")
+    environment = {}
 
-    buildargs = {"VERSION": VERSION, "COMMIT_HASH": COMMIT_HASH}
+    # Pass in all of the host environment variables starting with GITHUB_
+    for element in dict(os.environ):
+        if element.startswith("GITHUB_"):
+            environment[element] = os.environ.get(element)
 
-    LOG.info("Building %s...", IMAGE)
-    CLIENT.images.build(path=str(CWD), rm=True, tag=IMAGE, buildargs=buildargs)
     working_dir = "/tmp/lint/"
-    volumes = {CWD: {"bind": working_dir, "mode": "ro"}}
+    volumes = {CWD: {"bind": working_dir, "mode": "rw"}}
+
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        homedir = os.environ.get("HOME")
+        volumes[homedir] = {"bind": homedir, "mode": "ro"}
+    else:
+        environment["RUN_LOCAL"] = "true"
+
     opinionated_docker_run(
         image=IMAGE, volumes=volumes, working_dir=working_dir, environment=environment,
     )
+    LOG.info("Linting tests passed")
+
+    latest_image = IMAGE + ":latest"
+    run_security_tests(image=latest_image)
+    LOG.info("Security tests passed")
+
+    LOG.info("All goat tests completed successfully!")
 
 
 @task
-def publish(c):  # pylint: disable=unused-argument
+def build(c):  # pylint: disable=unused-argument
+    """Build the goat"""
+    buildargs = {"VERSION": VERSION, "COMMIT_HASH": COMMIT_HASH}
+
+    for tag in TAGS:
+        LOG.info("Building %s...", tag)
+        CLIENT.images.build(path=str(CWD), rm=True, tag=tag, buildargs=buildargs)
+
+
+@task
+def publish(c, tag):  # pylint: disable=unused-argument
     """Publish the goat"""
-    repository = IMAGE
+    if tag not in ["latest", "version"]:
+        LOG.error("Please provide a tag of either latest or version")
+        sys.exit(1)
+    elif tag == "version":
+        tag = VERSION
+
+    repository = IMAGE + ":" + tag
     LOG.info("Pushing %s to docker hub...", repository)
     CLIENT.images.push(repository=repository)
-    LOG.info("Done publishing the %s Docker image", IMAGE)
+    LOG.info("Done publishing the %s Docker image", repository)

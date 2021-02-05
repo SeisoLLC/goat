@@ -12,12 +12,12 @@ LABEL org.opencontainers.image.source="https://github.com/SeisoLLC/goat"
 LABEL org.opencontainers.image.revision="${COMMIT_HASH}"
 
 WORKDIR /tmp/lint/
+
 ENV PIP_NO_CACHE_DIR=1
+COPY Pipfile.lock Pipfile.lock
+RUN pipenv install --system --deploy --ignore-pipfile
 
 COPY etc/ /usr/local/etc/
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY Pipfile.lock Pipfile.local
-
-RUN pipenv install --system --deploy --ignore-pipfile
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
