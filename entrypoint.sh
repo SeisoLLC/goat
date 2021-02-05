@@ -52,7 +52,7 @@ function seiso_lint() {
   # Check Dockerfiles
   npm install -g dockerfile_lint
   while read -r file; do
-    dockerfile_lint -f "${file}" -r /usr/local/etc/oci.yml
+    dockerfile_lint -f "${file}" -r /etc/opt/goat/oci.yml
   done < <(find . -type f -name "*Dockerfile*")
 
   # Check .md file spelling
