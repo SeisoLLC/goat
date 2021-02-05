@@ -57,12 +57,12 @@ function seiso_lint() {
 
   # Check .md file spelling
   npm install -g cspell
-  npx cspell -c /usr/local/etc/spelling.json -- **/*.md
+  npx cspell -c /etc/opt/goat/cspell.json -- **/*.md
 
   # Check .md file links
   npm install -g markdown-link-check
   while read -r file; do
-    npx markdown-link-check --config /usr/local/etc/links.json --verbose "${file}"
+    npx markdown-link-check --config /etc/opt/goat/links.json --verbose "${file}"
   done < <(find . -type f -name "*.md")
 }
 
