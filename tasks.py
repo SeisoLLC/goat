@@ -162,7 +162,10 @@ def goat(c):  # pylint: disable=unused-argument
 
     working_dir = "/tmp/lint/"
     repo_configs = CWD.joinpath(".github/etc/")
-    volumes = {CWD: {"bind": working_dir, "mode": "rw"}, repo_configs: {"bind": "/usr/local/etc/", "mode": "ro"}}
+    volumes = {
+        CWD: {"bind": working_dir, "mode": "rw"},
+        repo_configs: {"bind": "/usr/local/etc/", "mode": "ro"},
+    }
 
     if os.environ.get("GITHUB_ACTIONS") == "true":
         homedir = os.environ.get("HOME")
