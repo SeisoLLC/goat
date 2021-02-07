@@ -16,6 +16,8 @@ jobs:
     steps:
       - run: |
           find /
+          whoami
+          echo "${HOME} is my home"
           find / -type d -name ".github"
           find / -type f -name "dictionary.txt"
           echo "${GITHUB_WORKSPACE} is the workspace"
