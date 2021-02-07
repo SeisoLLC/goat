@@ -15,7 +15,6 @@ jobs:
     name: Test the project
     steps:
       - run: |
-          find /
           whoami
           echo "${HOME} is my home"
           find / -type d -name ".github"
