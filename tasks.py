@@ -162,20 +162,16 @@ def goat(c):  # pylint: disable=unused-argument
 
     if os.environ.get("GITHUB_ACTIONS") == "true":
         working_dir = os.environ.get("GITHUB_WORKSPACE")
-        repo_configs = working_dir.joinpath(".github/etc/")
         homedir = os.environ.get("HOME")
         volumes = {
             working_dir: {"bind": working_dir, "mode": "rw"},
-            repo_configs: {"bind": "/usr/local/etc/", "mode": "ro"},
             homedir: {"bind": homedir, "mode": "ro"},
         }
     else:
         environment["RUN_LOCAL"] = "true"
         working_dir = "/tmp/lint/"
-        repo_configs = CWD.joinpath(".github/etc/")
         volumes = {
             CWD: {"bind": working_dir, "mode": "rw"},
-            repo_configs: {"bind": "/usr/local/etc/", "mode": "ro"},
         }
 
     opinionated_docker_run(
