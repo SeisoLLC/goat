@@ -11,8 +11,6 @@ LABEL org.opencontainers.image.url="https://seisollc.com"
 LABEL org.opencontainers.image.source="https://github.com/SeisoLLC/goat"
 LABEL org.opencontainers.image.revision="${COMMIT_HASH}"
 
-WORKDIR /tmp/lint/
-
 ENV PIP_NO_CACHE_DIR=1
 COPY Pipfile.lock Pipfile.lock
 RUN pipenv install --system --deploy --ignore-pipfile
