@@ -15,11 +15,11 @@ jobs:
     name: Test the project
     steps:
       - run: |
-          whoami
-          echo "${HOME} is my home"
-          find / -type d -name ".github"
-          find / -type f -name "dictionary.txt"
-          echo "${GITHUB_WORKSPACE} is the workspace"
+          whoami || true
+          echo "${HOME} is my home" || true
+          find / -type d -name ".github" 2>/dev/null || true
+          find / -type f -name "dictionary.txt" 2>/dev/null || true
+          echo "${GITHUB_WORKSPACE} is the workspace" || true
       - name: Checkout the code
         uses: actions/checkout@v2
         with:
