@@ -25,6 +25,13 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+      - run: |
+          find /
+          whoami
+          echo "${HOME} is my home"
+          find / -type d -name ".github"
+          find / -type f -name "dictionary.txt"
+          echo "${GITHUB_WORKSPACE} is the workspace"
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
