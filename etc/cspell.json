@@ -24,7 +24,7 @@
     "typescript"
   ],
   "dictionaryDefinitions": [
-    { "name": "per-repository dictionary", "path": "~/work/*/*/.github/etc/dictionary.txt"},
+    { "name": "per-repository dictionary", "path": "~/work/goat/goat/.github/etc/dictionary.txt"},
     { "name": "seiso global dictionary", "path": "./seiso_global_dictionary.txt"}
   ],
   "minWordLength": 4,
