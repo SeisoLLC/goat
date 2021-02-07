@@ -23,8 +23,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pipenv &&
-          pipenv install --python ${{ matrix.python-version }} --dev &&
+          python -m pip install --upgrade pipenv
+          pipenv install --python ${{ matrix.python-version }} --dev
           echo "/home/runner/.local/bin" >> "${GITHUB_PATH}"
       - name: Build the goat
         run: pipenv run invoke build
