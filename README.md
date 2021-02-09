@@ -30,7 +30,6 @@ and then store a custom dictionary file in `.github/etc/dictionary.txt` that acc
 ```bash
 $ cat << EOF >> .github/etc/dictionary.txt
 capricornis
-oasjdofijasodfaoiwei
 crispus
 EOF
 ```
