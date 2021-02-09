@@ -68,5 +68,5 @@ function seiso_lint() {
 
 
 check_environment
-#super_lint
+super_lint
 seiso_lint
