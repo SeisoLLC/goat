@@ -57,7 +57,7 @@ function seiso_lint() {
 
   # Check .md file spelling
   npm install -g cspell
-  npx cspell -c /etc/opt/goat/cspell.json -- **/*.md
+  npx cspell -c /etc/opt/goat/cspell.config.js -- **/*.md
 
   # Check .md file links
   npm install -g markdown-link-check
