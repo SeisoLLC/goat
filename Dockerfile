@@ -12,8 +12,8 @@ LABEL org.opencontainers.image.source="https://github.com/SeisoLLC/goat"
 LABEL org.opencontainers.image.revision="${COMMIT_HASH}"
 
 ENV PIP_NO_CACHE_DIR=1
-COPY Pipfile.lock Pipfile.lock
-RUN pipenv install --system --deploy --ignore-pipfile
+COPY Pipfile Pipfile.lock ./
+RUN pipenv install --deploy --ignore-pipfile
 
 COPY etc/ /etc/opt/goat/
 COPY entrypoint.sh /opt/goat/bin/entrypoint.sh
