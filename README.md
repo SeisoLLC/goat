@@ -3,6 +3,10 @@ The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard t
 
 ## Getting Started
 1. Create a dictionary text file in `.github/etc/dictionary.txt` (relative to the root of your git repo).
+1. Ensure your code is checked out during the github action.
+```bash
+uses: actions/checkout@v2
+```
 1. Add the goat to your GitHub Actions workflows.
 ```bash
 uses: seisollc/goat@v0.2.1
@@ -23,6 +27,7 @@ jobs:
     runs-on: Ubuntu-20.04
     name: Test the project
     steps:
+    - uses: actions/checkout@v2
     - uses: seisollc/goat@v0.2.1
 ```
 
