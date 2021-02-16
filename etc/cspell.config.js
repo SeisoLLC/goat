@@ -42,7 +42,7 @@ const cspell = {
     'whitelist'
   ],
   ignoreRegExpList: [
-    "/.*pairwise master key.*/"
+    '/.*pairwise master key.*/'
   ],
   minWordLength: 4
 }
