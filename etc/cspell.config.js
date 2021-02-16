@@ -35,13 +35,16 @@ const cspell = {
       path: './seiso_global_dictionary.txt'
     }
   ],
-  minWordLength: 4,
   flagWords: [
     'blacklist',
     'master',
     'slave',
     'whitelist'
-  ]
+  ],
+  ignoreRegExpList: [
+    "/.*pairwise master key.*/"
+  ],
+  minWordLength: 4
 }
 
 module.exports = cspell
