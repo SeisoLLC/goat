@@ -1,4 +1,8 @@
 {
+  "ignorePatterns": [
+    {"pattern": "^https://github.com/SeisoLLC/"},
+    {"pattern": "^https://raw.githubusercontent.com/SeisoLLC/"}
+  ],
   "timeout": "20s",
   "retryOn429": true,
   "retryCount": 3,
