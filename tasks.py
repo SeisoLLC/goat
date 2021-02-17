@@ -174,9 +174,9 @@ def goat(c):  # pylint: disable=unused-argument
     )
     LOG.info("Linting tests passed")
 
-    latest_image = IMAGE + ":latest"
-    run_security_tests(image=latest_image)
-    LOG.info("Security tests passed")
+    # latest_image = IMAGE + ":latest"
+    # run_security_tests(image=latest_image)
+    # LOG.info("Security tests passed")
 
     LOG.info("All goat tests completed successfully!")
 
