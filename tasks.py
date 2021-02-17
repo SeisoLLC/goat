@@ -122,7 +122,7 @@ def run_security_tests(*, image: str):
 
 # Globals
 CWD = Path(".").absolute()
-VERSION = "0.2.0"
+VERSION = "0.2.1"
 NAME = "goat"
 UNACCEPTABLE_VULNS = ["CRITICAL"]
 LOW_PRIORITY_VULNS = ["UNKNOWN", "LOW", "MEDIUM", "HIGH"]
@@ -160,14 +160,19 @@ def goat(c):  # pylint: disable=unused-argument
         if element.startswith("GITHUB_"):
             environment[element] = os.environ.get(element)
 
-    working_dir = "/tmp/lint/"
-    volumes = {CWD: {"bind": working_dir, "mode": "rw"}}
-
     if os.environ.get("GITHUB_ACTIONS") == "true":
+        working_dir = os.environ.get("GITHUB_WORKSPACE")
         homedir = os.environ.get("HOME")
-        volumes[homedir] = {"bind": homedir, "mode": "ro"}
+        volumes = {
+            working_dir: {"bind": working_dir, "mode": "rw"},
+            homedir: {"bind": homedir, "mode": "ro"},
+        }
     else:
         environment["RUN_LOCAL"] = "true"
+        working_dir = "/tmp/lint/"
+        volumes = {
+            CWD: {"bind": working_dir, "mode": "rw"},
+        }
 
     opinionated_docker_run(
         image=IMAGE, volumes=volumes, working_dir=working_dir, environment=environment,

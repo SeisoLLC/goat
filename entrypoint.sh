@@ -52,17 +52,17 @@ function seiso_lint() {
   # Check Dockerfiles
   npm install -g dockerfile_lint
   while read -r file; do
-    dockerfile_lint -f "${file}" -r /usr/local/etc/oci.yml
+    dockerfile_lint -f "${file}" -r /etc/opt/goat/oci.yml
   done < <(find . -type f -name "*Dockerfile*")
 
   # Check .md file spelling
   npm install -g cspell
-  npx cspell -c /usr/local/etc/spelling.json -- **/*.md
+  npx cspell -c /etc/opt/goat/cspell.config.js -- **/*.md
 
   # Check .md file links
   npm install -g markdown-link-check
   while read -r file; do
-    npx markdown-link-check --config /usr/local/etc/links.json --verbose "${file}"
+    npx markdown-link-check --config /etc/opt/goat/links.json --verbose "${file}"
   done < <(find . -type f -name "*.md")
 }
 
