@@ -122,7 +122,7 @@ def run_security_tests(*, image: str):
 
 # Globals
 CWD = Path(".").absolute()
-VERSION = "0.2.1"
+VERSION = "0.3.0"
 NAME = "goat"
 UNACCEPTABLE_VULNS = ["CRITICAL"]
 LOW_PRIORITY_VULNS = ["UNKNOWN", "LOW", "MEDIUM", "HIGH"]
