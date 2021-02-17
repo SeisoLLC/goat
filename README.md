@@ -9,7 +9,7 @@ uses: actions/checkout@v2
 ```
 1. Add the goat to your GitHub Actions workflows.
 ```bash
-uses: seisollc/goat@v0.2.2
+uses: seisollc/goat@v0.3.0
 ```
 
 ### Example
@@ -28,7 +28,7 @@ jobs:
     name: Test the project
     steps:
     - uses: actions/checkout@v2
-    - uses: seisollc/goat@v0.2.2
+    - uses: seisollc/goat@v0.3.0
 ```
 
 and then store a custom dictionary file in `.github/etc/dictionary.txt` that accounts for your repo-specific language.  For example:
