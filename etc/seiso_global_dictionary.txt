@@ -125,6 +125,7 @@ ssids
 sysvol
 telerik
 thycotic
+tshark
 totp
 trufflehog
 typosquat
