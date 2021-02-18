@@ -127,6 +127,7 @@ telerik
 thycotic
 totp
 trufflehog
+tshark
 typosquat
 typosquatting
 unmarshal
