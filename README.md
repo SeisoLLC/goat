@@ -4,8 +4,8 @@ The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard t
 ## Getting Started
 1. Create a per-repository dictionary (relative to the root of your git repo).
 ```bash
-mkdir -p .github/etc/
-touch .github/etc/dictionary.txt
+$ mkdir -p .github/etc/
+$ touch .github/etc/dictionary.txt
 ```
 1. Ensure your code is checked out during the github action.
 ```bash
@@ -48,6 +48,15 @@ EOF
 uses: seisollc/goat@v0.4.0
 with:
   disable_terrascan: true
+```
+1. Provide a linting configuration for any of the linters `super-linter` uses.
+```bash
+$ mkdir -p .github/linters/
+$ cat << EOF >> .github/linters/.markdown-lint.yml
+---
+MD013:
+  line_length: 120
+EOF
 ```
 
 ## GOAT Development
