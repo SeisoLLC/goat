@@ -2,14 +2,18 @@
 The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard testing.
 
 ## Getting Started
-1. Create a dictionary text file in `.github/etc/dictionary.txt` (relative to the root of your git repo).
+1. Create a per-repository dictionary (relative to the root of your git repo).
+```bash
+mkdir -p .github/etc/
+touch .github/etc/dictionary.txt
+```
 1. Ensure your code is checked out during the github action.
 ```bash
 uses: actions/checkout@v2
 ```
 1. Add the goat to your GitHub Actions workflows.
 ```bash
-uses: seisollc/goat@v0.3.0
+uses: seisollc/goat@v0.4.0
 ```
 
 ### Example
@@ -28,15 +32,22 @@ jobs:
     name: Test the project
     steps:
     - uses: actions/checkout@v2
-    - uses: seisollc/goat@v0.3.0
+    - uses: seisollc/goat@v0.4.0
 ```
 
-and then store a custom dictionary file in `.github/etc/dictionary.txt` that accounts for your repo-specific language.  For example:
+#### Customizations
+1. Populate the custom dictionary file in `.github/etc/dictionary.txt` for any repo-specific language.
 ```bash
 $ cat << EOF >> .github/etc/dictionary.txt
 capricornis
 crispus
 EOF
+```
+1. Configure the goat to skip terrascan scanning.
+```bash
+uses: seisollc/goat@v0.4.0
+with:
+  disable_terrascan: true
 ```
 
 ## GOAT Development

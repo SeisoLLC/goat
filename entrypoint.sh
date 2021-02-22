@@ -35,12 +35,17 @@ function feedback() {
 }
 
 function check_environment() {
-# Check the GITHUB_BASE_REF (PRs only)
+  # Check the GITHUB_BASE_REF (PRs only)
   if [[ "${GITHUB_ACTIONS-}" == "true" && -n "${GITHUB_BASE_REF-}" ]]; then
     mainline="${GITHUB_BASE_REF-##*/}"
     if [[ "${mainline}" != "main" ]]; then
       feedback ERROR "Base branch name is not main"
     fi
+  fi
+
+  # Map select environment variables
+  if [[ "${INPUT_DISABLE_TERRASCAN}" == "true" ]]; then
+    export VALIDATE_TERRAFORM_TERRASCAN="false"
   fi
 }
 
