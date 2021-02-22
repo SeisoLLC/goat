@@ -3,7 +3,7 @@ name: Seiso Grand Opinionated AutoTester (GOAT)
 description: Apply Seiso's standard testing
 inputs:
   disable_terrascan:
-    description: 'github/super-linter terrascan environment variable'
+    description: 'Disable terrascan'
     required: false
     default: 'false'
 runs:
