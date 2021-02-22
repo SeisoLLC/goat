@@ -44,7 +44,7 @@ function check_environment() {
   fi
 
   # Map select environment variables
-  if [[ "${INPUT_DISABLE_TERRASCAN}" == "true" ]]; then
+  if [[ "${INPUT_DISABLE_TERRASCAN-}" == "true" ]]; then
     export VALIDATE_TERRAFORM_TERRASCAN="false"
   fi
 }
