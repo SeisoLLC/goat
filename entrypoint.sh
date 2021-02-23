@@ -34,6 +34,19 @@ function feedback() {
   esac
 }
 
+function setup_environment() {
+  # Set the default branch
+  export DEFAULT_BRANCH="main"
+
+  # Turn off the possum
+  export SUPPRESS_POSSUM="true"
+
+  # Map certain environment variables
+  if [[ "${INPUT_DISABLE_TERRASCAN-}" == "true" ]]; then
+    export VALIDATE_TERRAFORM_TERRASCAN="false"
+  fi
+}
+
 function check_environment() {
   # Check the GITHUB_BASE_REF (PRs only)
   if [[ "${GITHUB_ACTIONS-}" == "true" && -n "${GITHUB_BASE_REF-}" ]]; then
@@ -41,11 +54,6 @@ function check_environment() {
     if [[ "${mainline}" != "main" ]]; then
       feedback ERROR "Base branch name is not main"
     fi
-  fi
-
-  # Map select environment variables
-  if [[ "${INPUT_DISABLE_TERRASCAN-}" == "true" ]]; then
-    export VALIDATE_TERRAFORM_TERRASCAN="false"
   fi
 }
 
@@ -72,6 +80,7 @@ function seiso_lint() {
 }
 
 
+setup_environment
 check_environment
 super_lint
 seiso_lint
