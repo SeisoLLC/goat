@@ -4,8 +4,8 @@ The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard t
 ## Getting Started
 1. Create a per-repository dictionary (relative to the root of your git repo).
 ```bash
-$ mkdir -p .github/etc/
-$ touch .github/etc/dictionary.txt
+mkdir -p .github/etc/
+touch .github/etc/dictionary.txt
 ```
 1. Ensure your code is checked out during the github action.
 ```bash
