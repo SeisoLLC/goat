@@ -10,7 +10,7 @@ line_rules:
         valueRegex: /.+/
         message: "Label 'org.opencontainers.image.authors' is missing or has an invalid format"
         level: "error"
-        required: true
+        required: false
         inverse_rule: true
         reference_url:
           - "https://github.com/opencontainers/image-spec/blob/bd4f8fcb0979a663d8b97a1d4d9b030b3d2ca1fa/annotations.md"
@@ -71,7 +71,7 @@ line_rules:
         reference_url:
           - "https://github.com/opencontainers/image-spec/blob/bd4f8fcb0979a663d8b97a1d4d9b030b3d2ca1fa/annotations.md"
       org.opencontainers.image.revision:
-        valueRegex: /([0-9a-f]{5,40}|\$\{COMMIT_HASH\}|\$COMMIT_HASH)/
+        valueRegex: /([0-9a-f]{7,40}|\$\{COMMIT_HASH\}|\$COMMIT_HASH)/
         message: "Label 'org.opencontainers.image.revision' is missing or has an invalid format"
         level: "error"
         required: true
