@@ -124,6 +124,7 @@ ssid
 ssids
 sysvol
 telerik
+terrascan
 thycotic
 totp
 trufflehog

@@ -1,6 +1,11 @@
 ---
 name: Seiso Grand Opinionated AutoTester (GOAT)
 description: Apply Seiso's standard testing
+inputs:
+  disable_terrascan:
+    description: 'Disable terrascan'
+    required: false
+    default: 'false'
 runs:
   using: 'docker'
   image: 'Dockerfile'
