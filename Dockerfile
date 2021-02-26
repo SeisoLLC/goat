@@ -15,6 +15,8 @@ ENV PIP_NO_CACHE_DIR=1
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install --deploy --ignore-pipfile
 
+WORKDIR /tmp/lint/
+
 COPY etc/ /etc/opt/goat/
 COPY entrypoint.sh /opt/goat/bin/entrypoint.sh
 
