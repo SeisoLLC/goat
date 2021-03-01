@@ -20,7 +20,7 @@ def opinionated_docker_run(
     image: str,
     command: str = "",
     volumes: dict = {},
-    working_dir: str = "/tmp/lint/",
+    working_dir: str = "/goat/",
     auto_remove: bool = False,
     detach: bool = True,
     environment: dict = {},
@@ -169,7 +169,7 @@ def goat(c):  # pylint: disable=unused-argument
         }
     else:
         environment["RUN_LOCAL"] = "true"
-        working_dir = "/tmp/lint/"
+        working_dir = "/goat/"
         volumes = {
             CWD: {"bind": working_dir, "mode": "rw"},
         }
