@@ -1,6 +1,9 @@
 # Based on python:alpine as of February 2021
 FROM github/super-linter:v3.14.5
 
+# Required for the github/super-linter log (cannot be disabled)
+RUN mkdir -p /tmp/lint/
+
 LABEL org.opencontainers.image.authors="Jon Zeolla"
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL org.opencontainers.image.vendor="Seiso"
