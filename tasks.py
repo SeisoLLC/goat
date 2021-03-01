@@ -99,7 +99,10 @@ def run_security_tests(*, image: str):
         + file_name
     )
     opinionated_docker_run(
-        image=scanner, command=command, working_dir=working_dir, volumes=volumes,
+        image=scanner,
+        command=command,
+        working_dir=working_dir,
+        volumes=volumes,
     )
     num_tests_ran += 1
 
@@ -112,7 +115,10 @@ def run_security_tests(*, image: str):
         + file_name
     )
     opinionated_docker_run(
-        image=scanner, command=command, working_dir=working_dir, volumes=volumes,
+        image=scanner,
+        command=command,
+        working_dir=working_dir,
+        volumes=volumes,
     )
     num_tests_ran += 1
 
@@ -175,13 +181,16 @@ def goat(c):  # pylint: disable=unused-argument
         }
 
     opinionated_docker_run(
-        image=IMAGE, volumes=volumes, working_dir=working_dir, environment=environment,
+        image=IMAGE,
+        volumes=volumes,
+        working_dir=working_dir,
+        environment=environment,
     )
     LOG.info("Linting tests passed")
 
-    # latest_image = IMAGE + ":latest"
-    # run_security_tests(image=latest_image)
-    # LOG.info("Security tests passed")
+    latest_image = IMAGE + ":latest"
+    run_security_tests(image=latest_image)
+    LOG.info("Security tests passed")
 
     LOG.info("All goat tests completed successfully!")
 
