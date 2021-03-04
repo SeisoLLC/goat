@@ -20,6 +20,8 @@ deauthenticate
 deauthenticated
 deauthenticating
 deauthentication
+decryptor
+decryptors
 dehashed
 dialoghandler
 dmarc
