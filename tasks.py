@@ -175,6 +175,7 @@ def goat(c):  # pylint: disable=unused-argument
         }
     else:
         environment["RUN_LOCAL"] = "true"
+        environment["DEFAULT_WORKSPACE"] = "/goat"
         working_dir = "/goat/"
         volumes = {
             CWD: {"bind": working_dir, "mode": "rw"},
