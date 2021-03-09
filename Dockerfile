@@ -13,6 +13,7 @@ LABEL org.opencontainers.image.source="https://github.com/SeisoLLC/goat"
 LABEL org.opencontainers.image.revision="${COMMIT_HASH}"
 LABEL org.opencontainers.image.licenses="MIT"
 
+WORKDIR /etc/opt/goat/
 ENV PIP_NO_CACHE_DIR=1
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install --deploy --ignore-pipfile
