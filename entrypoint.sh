@@ -41,6 +41,9 @@ function setup_environment() {
   # Turn off the possum
   export SUPPRESS_POSSUM="true"
 
+  # Set workspace to /goat/ for local runs
+  export DEFAULT_WORKSPACE="/goat"
+
   # Map certain environment variables
   if [[ "${INPUT_DISABLE_TERRASCAN-}" == "true" ]]; then
     export VALIDATE_TERRAFORM_TERRASCAN="false"
