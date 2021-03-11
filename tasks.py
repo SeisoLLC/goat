@@ -92,7 +92,7 @@ def run_security_tests(*, image: str):
 
     # Provide information about low priority vulnerabilities
     command = (
-        "--quiet image --exit-code 0 --severity "
+        "--quiet image --timeout 10m0s --exit-code 0 --severity "
         + ",".join(LOW_PRIORITY_VULNS)
         + " --format json --light --input "
         + working_dir
@@ -108,7 +108,7 @@ def run_security_tests(*, image: str):
 
     # Ensure no unacceptable vulnerabilities exist in the image
     command = (
-        "--quiet image --exit-code 1 --severity "
+        "--quiet image --timeout 10m0s --exit-code 1 --severity "
         + ",".join(UNACCEPTABLE_VULNS)
         + " --format json --light --input "
         + working_dir
@@ -161,9 +161,12 @@ def goat(c):  # pylint: disable=unused-argument
     LOG.info("Baaaaaaaaaaah! (Running the goat)")
     environment = {}
 
-    # Pass in all of the host environment variables starting with GITHUB_
+    # Pass in all of the host environment variables starting with GITHUB_ or
+    # INPUT_
     for element in dict(os.environ):
         if element.startswith("GITHUB_"):
+            environment[element] = os.environ.get(element)
+        if element.startswith("INPUT_"):
             environment[element] = os.environ.get(element)
 
     if os.environ.get("GITHUB_ACTIONS") == "true":
