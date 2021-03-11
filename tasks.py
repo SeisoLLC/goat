@@ -272,3 +272,18 @@ def update(c):  # pylint: disable=unused-argument
     for image in ["github/super-linter"]:
         version = get_latest_release_from_github(repo=image)
         update_dockerfile_from(image=image, tag=version)
+
+    # Update the CI dependencies
+    image = "python:3.9"
+    working_dir = "/usr/src/app/"
+    volumes = {CWD: {"bind": working_dir, "mode": "rw"}}
+    CLIENT.images.pull(repository=image)
+    command = '/bin/bash -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"'
+    opinionated_docker_run(
+        image=image,
+        volumes=volumes,
+        working_dir=working_dir,
+        auto_remove=True,
+        detach=False,
+        command=command,
+    )
