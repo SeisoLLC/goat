@@ -6,6 +6,10 @@ inputs:
     description: 'Disable terrascan'
     required: false
     default: 'false'
+  exclude:
+    description: 'Exclude anything that matches the regular expression'
+    required: false
+    default: ''
 runs:
   using: 'docker'
   image: 'Dockerfile'

@@ -48,6 +48,10 @@ function setup_environment() {
   if [[ "${INPUT_DISABLE_TERRASCAN-}" == "true" ]]; then
     export VALIDATE_TERRAFORM_TERRASCAN="false"
   fi
+
+  if [[ -n "${INPUT_EXCLUDE+x}" ]]; then
+    export FILTER_REGEX_EXCLUDE="${INPUT_EXCLUDE}"
+  fi
 }
 
 function check_environment() {
@@ -65,21 +69,36 @@ function super_lint() {
 }
 
 function seiso_lint() {
-  # Check Dockerfiles
-  npm install -g dockerfile_lint
-  while read -r file; do
-    dockerfile_lint -f "${file}" -r /etc/opt/goat/oci.yml
-  done < <(find . -type f -name "*Dockerfile*")
+  excluded=()
+  included=()
 
-  # Check .md file spelling
-  npm install -g cspell
-  npx cspell -c /etc/opt/goat/cspell.config.js -- **/*.md
+  npm install -g dockerfile_lint \
+                 cspell \
+                 markdown-link-check
 
-  # Check .md file links
-  npm install -g markdown-link-check
   while read -r file; do
-    npx markdown-link-check --config /etc/opt/goat/links.json --verbose "${file}"
-  done < <(find . -type f -name "*.md")
+    # Apply filter with =~ to ensure it is aligned with github/super-linter
+    if [[ -n "${INPUT_EXCLUDE+x}" && "${file}" =~ ${INPUT_EXCLUDE} ]]; then
+      excluded+=("${file}")
+      continue
+    fi
+
+    included+=("${file}")
+
+    # Check Dockerfiles
+    if [[ "${file}" = *Dockerfile ]]; then
+      dockerfile_lint -f "${file}" -r /etc/opt/goat/oci.yml
+    fi
+
+    # Check .md file spelling and links
+    if [[ "${file}" = *.md ]]; then
+      npx cspell -c /etc/opt/goat/cspell.config.js -- "${file}"
+      npx markdown-link-check --config /etc/opt/goat/links.json --verbose "${file}"
+    fi
+  done < <(find . -path "./.git" -prune -or -type f)
+
+  echo "Scanned ${#included[@]} files"
+  echo "Excluded ${#excluded[@]} files"
 }
 
 
