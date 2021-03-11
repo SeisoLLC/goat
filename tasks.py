@@ -161,6 +161,10 @@ def goat(c):  # pylint: disable=unused-argument
     LOG.info("Baaaaaaaaaaah! (Running the goat)")
     environment = {}
 
+    if REPO.untracked_files or REPO.is_dirty():
+        LOG.error("Linting requires a clean git directory to function properly")
+        sys.exit(1)
+
     # Pass in all of the host environment variables starting with GITHUB_
     for element in dict(os.environ):
         if element.startswith("GITHUB_"):
