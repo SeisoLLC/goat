@@ -5,12 +5,14 @@ Task execution tool & library
 
 import json
 import os
+import re
 import sys
 from logging import basicConfig, getLogger
 from pathlib import Path
 
 import docker
 import git
+import requests
 from invoke import task
 
 
@@ -126,6 +128,42 @@ def run_security_tests(*, image: str):
     image_file.unlink()
 
 
+def get_latest_release_from_github(*, repo: str) -> str:
+    """Get the latest release of a repo on github"""
+    response = requests.get(
+        f"https://api.github.com/repos/{repo}/releases/latest"
+    ).json()
+    return response["tag_name"]
+
+
+def update_dockerfile_from(
+    *, image: str, tag: str, file_name: str = "Dockerfile"
+) -> None:
+    """Update the Dockerfile"""
+    file_object = Path(file_name)
+    pattern = re.compile(fr"^FROM.+{image}:.+$\n")
+    final_content = []
+
+    # Validate
+    if not file_object.is_file():
+        LOG.error("%s is not a valid file", file_name)
+        sys.exit(1)
+
+    # Extract
+    with open(file_object) as file:
+        file_contents = file.readlines()
+
+    # Transform
+    for line in file_contents:
+        if pattern.fullmatch(line):
+            line = f"FROM {image}:{tag}\n"
+        final_content.append(line)
+
+    # Load
+    with open(file_object, "w") as file:
+        file.writelines(final_content)
+
+
 # Globals
 CWD = Path(".").absolute()
 VERSION = "0.4.0"
@@ -226,3 +264,11 @@ def publish(c, tag):  # pylint: disable=unused-argument
     LOG.info("Pushing %s to docker hub...", repository)
     CLIENT.images.push(repository=repository)
     LOG.info("Done publishing the %s Docker image", repository)
+
+
+@task
+def update(c):  # pylint: disable=unused-argument
+    """Update the goat dependencies"""
+    for image in ["github/super-linter"]:
+        version = get_latest_release_from_github(repo=image)
+        update_dockerfile_from(image=image, tag=version)
