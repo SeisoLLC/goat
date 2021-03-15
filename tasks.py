@@ -152,11 +152,36 @@ COMMIT_HASH = REPO.head.object.hexsha
 # Docker
 CLIENT = docker.from_env(timeout=300)
 IMAGE = "seiso/" + NAME
-TAGS = [IMAGE + ":latest", IMAGE + ":" + VERSION]
 
 
 # Tasks
 @task
+def build(c):  # pylint: disable=unused-argument
+    """Build the goat"""
+    commit_hash = REPO.head.commit.hexsha
+    commit_hash_short = commit_hash[:7]
+
+    if (
+        VERSION in REPO.tags
+        and REPO.tags[VERSION].commit.hexsha == commit_hash
+    ):
+        buildargs = {"VERSION": VERSION, "COMMIT_HASH": commit_hash}
+    else:
+        buildargs = {
+            "VERSION": VERSION + "-" + commit_hash_short,
+            "COMMIT_HASH": commit_hash,
+        }
+
+    # Build and Tag
+    for tag in ["latest", buildargs["VERSION"]]:
+        tag = IMAGE + ":" + tag
+        LOG.info("Building %s...", tag)
+        CLIENT.images.build(
+            path=str(CWD), rm=True, tag=tag, buildargs=buildargs
+        )
+
+
+@task(pre=[build])
 def goat(c):  # pylint: disable=unused-argument
     """Run the goat"""
     LOG.info("Baaaaaaaaaaah! (Running the goat)")
@@ -204,19 +229,9 @@ def goat(c):  # pylint: disable=unused-argument
     LOG.info("All goat tests completed successfully!")
 
 
-@task
-def build(c):  # pylint: disable=unused-argument
-    """Build the goat"""
-    buildargs = {"VERSION": VERSION, "COMMIT_HASH": COMMIT_HASH}
-
-    for tag in TAGS:
-        LOG.info("Building %s...", tag)
-        CLIENT.images.build(path=str(CWD), rm=True, tag=tag, buildargs=buildargs)
-
-
-@task(pre=[build, goat])
+@task(pre=[goat])
 def release(c, release_type):  # pylint: disable=unused-argument
-    """Make a new release of the goat"""
+    """Release the goat"""
     if REPO.head.is_detached:
         LOG.error("In detached HEAD state, refusing to release")
         sys.exit(1)
