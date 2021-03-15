@@ -103,3 +103,9 @@ pipenv
 ```bash
 pipenv run invoke goat
 ```
+
+### Make a new goat release
+Identify whter this should be a major, minor, or a patch release and pass it to `pipenv run invoke release`, for instance:
+```bash
+pipenv run invoke release minor
+```

@@ -4,12 +4,14 @@ FROM github/super-linter:v3.15.2
 # Required for the github/super-linter log (cannot be disabled)
 RUN mkdir -p /tmp/lint/
 
-ARG VERSION
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
 ARG COMMIT_HASH
 
 LABEL org.opencontainers.image.title="goat"
 LABEL org.opencontainers.image.description="The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard testing"
-LABEL org.opencontainers.image.version="${VERSION}"
+LABEL org.opencontainers.image.version="${COMMIT_HASH}"
 LABEL org.opencontainers.image.vendor="Seiso"
 LABEL org.opencontainers.image.url="https://seisollc.com"
 LABEL org.opencontainers.image.source="https://github.com/SeisoLLC/goat"

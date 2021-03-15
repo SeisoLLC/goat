@@ -11,6 +11,7 @@ from pathlib import Path
 
 import docker
 import git
+from bumpversion.cli import main as bumpversion
 from invoke import task
 
 
@@ -211,6 +212,20 @@ def build(c):  # pylint: disable=unused-argument
     for tag in TAGS:
         LOG.info("Building %s...", tag)
         CLIENT.images.build(path=str(CWD), rm=True, tag=tag, buildargs=buildargs)
+
+
+@task(pre=[build, goat])
+def release(c, release_type):  # pylint: disable=unused-argument
+    """Make a new release of the goat"""
+    if REPO.head.is_detached:
+        LOG.error("In detached HEAD state, refusing to release")
+        sys.exit(1)
+
+    if release_type not in ["major", "minor", "patch"]:
+        LOG.error("Please provide a release type of major, minor, or patch")
+        sys.exit(1)
+
+    bumpversion([release_type])
 
 
 @task
