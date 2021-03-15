@@ -158,14 +158,15 @@ IMAGE = "seiso/" + NAME
 @task
 def build(c):  # pylint: disable=unused-argument
     """Build the goat"""
+    version = "v" + VERSION
     commit_hash = REPO.head.commit.hexsha
     commit_hash_short = commit_hash[:7]
 
-    if VERSION in REPO.tags and REPO.tags[VERSION].commit.hexsha == commit_hash:
-        buildargs = {"VERSION": VERSION, "COMMIT_HASH": commit_hash}
+    if version in REPO.tags and REPO.tags[version].commit.hexsha == commit_hash:
+        buildargs = {"VERSION": version, "COMMIT_HASH": commit_hash}
     else:
         buildargs = {
-            "VERSION": VERSION + "-" + commit_hash_short,
+            "VERSION": version + "-" + commit_hash_short,
             "COMMIT_HASH": commit_hash,
         }
 
@@ -245,7 +246,7 @@ def publish(c, tag):  # pylint: disable=unused-argument
         LOG.error("Please provide a tag of either latest or version")
         sys.exit(1)
     elif tag == "version":
-        tag = VERSION
+        tag = "v" + VERSION
 
     repository = IMAGE + ":" + tag
     LOG.info("Pushing %s to docker hub...", repository)
