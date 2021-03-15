@@ -161,10 +161,7 @@ def build(c):  # pylint: disable=unused-argument
     commit_hash = REPO.head.commit.hexsha
     commit_hash_short = commit_hash[:7]
 
-    if (
-        VERSION in REPO.tags
-        and REPO.tags[VERSION].commit.hexsha == commit_hash
-    ):
+    if VERSION in REPO.tags and REPO.tags[VERSION].commit.hexsha == commit_hash:
         buildargs = {"VERSION": VERSION, "COMMIT_HASH": commit_hash}
     else:
         buildargs = {
@@ -176,9 +173,7 @@ def build(c):  # pylint: disable=unused-argument
     for tag in ["latest", buildargs["VERSION"]]:
         tag = IMAGE + ":" + tag
         LOG.info("Building %s...", tag)
-        CLIENT.images.build(
-            path=str(CWD), rm=True, tag=tag, buildargs=buildargs
-        )
+        CLIENT.images.build(path=str(CWD), rm=True, tag=tag, buildargs=buildargs)
 
 
 @task(pre=[build])
