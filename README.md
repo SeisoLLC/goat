@@ -1,6 +1,7 @@
 # Grand Opinionated AutoTester (GOAT)
 
-The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard testing.
+The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard
+testing.
 
 ## Getting Started
 
@@ -25,9 +26,11 @@ The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard t
 
 ### Example
 
-To run the goat on each PR against `main`, create the following file as `.github/workflows/pr.yml`:
+To run the goat on each PR against `main`, create the following file as
+`.github/workflows/pr.yml`:
 
-For example, you could use the following to run the goat on each PR against `main`:
+For example, you could use the following to run the goat on each PR against
+`main`:
 
 ```yml
 ---
@@ -46,7 +49,8 @@ jobs:
 
 #### Customizations
 
-1. Populate the custom dictionary file in `.github/etc/dictionary.txt` for any repo-specific language.
+1. Populate the custom dictionary file in `.github/etc/dictionary.txt` for any
+   repo-specific language.
 
     ```bash
     $ cat << EOF >> .github/etc/dictionary.txt
@@ -101,11 +105,13 @@ pipenv
 ### Running the goat locally
 
 ```bash
+pipenv install --dev
 pipenv run invoke goat
 ```
 
 ### Make a new goat release
-Identify whter this should be a major, minor, or a patch release and pass it to `pipenv run invoke release`, for instance:
+Identify whether this should be a major, minor, or a patch release and pass it
+to `pipenv run invoke release`, for instance:
 ```bash
 pipenv run invoke release minor
 ```
