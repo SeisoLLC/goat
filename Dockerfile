@@ -20,11 +20,10 @@ WORKDIR /etc/opt/goat/
 ENV PIP_NO_CACHE_DIR=1
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install --deploy --ignore-pipfile \
- && apk add --update --no-cache npm@v7.6.3 \
+ && apk --no-cache add npm=14.16.0-r0 \
  && npm install --no-cache -g dockerfile_lint@0.3.4 \
                               cspell@5.3.8 \
-                              markdown-link-check@3.8.6 \
- && rm -rf /var/cache/apk/*
+                              markdown-link-check@3.8.6
 
 WORKDIR /goat/
 
