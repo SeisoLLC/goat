@@ -128,11 +128,9 @@ def run_security_tests(*, image: str):
 
 # Globals
 CWD = Path(".").absolute()
-VERSION = "0.4.0"
 NAME = "goat"
 UNACCEPTABLE_VULNS = ["CRITICAL"]
 LOW_PRIORITY_VULNS = ["UNKNOWN", "LOW", "MEDIUM", "HIGH"]
-
 LOG_FORMAT = json.dumps(
     {
         "timestamp": "%(asctime)s",
