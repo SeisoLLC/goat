@@ -21,7 +21,7 @@ testing.
 1. Add the goat to your GitHub Actions workflows.
 
     ```bash
-    uses: seisollc/goat@v0.4.0
+    uses: seisollc/goat@main
     ```
 
 ### Example
@@ -44,7 +44,7 @@ jobs:
     name: Test the project
     steps:
     - uses: actions/checkout@v2
-    - uses: seisollc/goat@v0.4.0
+    - uses: seisollc/goat@main
 ```
 
 #### Customizations
@@ -62,7 +62,7 @@ jobs:
 1. Configure the goat to skip terrascan scanning.
 
     ```bash
-    uses: seisollc/goat@v0.4.0
+    uses: seisollc/goat@main
     with:
       disable_terrascan: true
     ```
@@ -70,7 +70,7 @@ jobs:
 1. Exclude a file extension.
 
     ```bash
-    uses: seisollc/goat@v0.4.0
+    uses: seisollc/goat@main
     with:
       exclude: \.md$
     ```
@@ -78,7 +78,7 @@ jobs:
 1. Exclude a list of files.
 
     ```bash
-    uses: seisollc/goat@v0.4.0
+    uses: seisollc/goat@main
     with:
       exclude: ^.*/(Dockerfile|Dockerfile\.dev)$
     ```
@@ -93,6 +93,11 @@ jobs:
       line_length: 120
     EOF
     ```
+
+## Releases
+The `goat` project does not do releases, as it is intended as a minimum
+expectation that evolves over time. Please refer to `main` or, in limited
+situations, pin to the commit hash tag that is published with each commit.
 
 ## GOAT Development
 
@@ -109,9 +114,3 @@ pipenv install --dev
 pipenv run invoke goat
 ```
 
-### Make a new goat release
-Identify whether this should be a major, minor, or a patch release and pass it
-to `pipenv run invoke release`, for instance:
-```bash
-pipenv run invoke release minor
-```

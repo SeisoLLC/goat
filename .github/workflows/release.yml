@@ -40,5 +40,5 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: seiso/goat
           short-description: Seiso's Grand Opinionated AutoTester (GOAT)
-      - name: Publish the goat's versioned tag to Docker Hub
-        run: pipenv run invoke publish version
+      - name: Publish the goat's commit tag to Docker Hub
+        run: pipenv run invoke publish commit

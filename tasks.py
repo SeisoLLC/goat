@@ -11,7 +11,6 @@ from pathlib import Path
 
 import docker
 import git
-from bumpversion.cli import main as bumpversion
 from invoke import task
 
 
@@ -148,6 +147,7 @@ LOG = getLogger("seiso." + NAME)
 # git
 REPO = git.Repo(CWD)
 COMMIT_HASH = REPO.head.object.hexsha
+COMMIT_HASH_SHORT = COMMIT_HASH[:7]
 
 # Docker
 CLIENT = docker.from_env(timeout=600)
@@ -158,20 +158,11 @@ IMAGE = "seiso/" + NAME
 @task
 def build(c):  # pylint: disable=unused-argument
     """Build the goat"""
-    version = "v" + VERSION
-    commit_hash = REPO.head.commit.hexsha
-    commit_hash_short = commit_hash[:7]
 
-    if version in REPO.tags and REPO.tags[version].commit.hexsha == commit_hash:
-        buildargs = {"VERSION": version, "COMMIT_HASH": commit_hash}
-    else:
-        buildargs = {
-            "VERSION": version + "-" + commit_hash_short,
-            "COMMIT_HASH": commit_hash,
-        }
+    buildargs = {"COMMIT_HASH": COMMIT_HASH_SHORT}
 
     # Build and Tag
-    for tag in ["latest", buildargs["VERSION"]]:
+    for tag in ["latest", buildargs["COMMIT_HASH"]]:
         tag = IMAGE + ":" + tag
         LOG.info("Building %s...", tag)
         CLIENT.images.build(path=str(CWD), rm=True, tag=tag, buildargs=buildargs)
@@ -225,28 +216,14 @@ def goat(c):  # pylint: disable=unused-argument
     LOG.info("All goat tests completed successfully!")
 
 
-@task(pre=[goat])
-def release(c, release_type):  # pylint: disable=unused-argument
-    """Release the goat"""
-    if REPO.head.is_detached:
-        LOG.error("In detached HEAD state, refusing to release")
-        sys.exit(1)
-
-    if release_type not in ["major", "minor", "patch"]:
-        LOG.error("Please provide a release type of major, minor, or patch")
-        sys.exit(1)
-
-    bumpversion([release_type])
-
-
 @task
 def publish(c, tag):  # pylint: disable=unused-argument
     """Publish the goat"""
-    if tag not in ["latest", "version"]:
-        LOG.error("Please provide a tag of either latest or version")
+    if tag not in ["latest", "commit"]:
+        LOG.error("Please provide a tag of either latest or commit")
         sys.exit(1)
-    elif tag == "version":
-        tag = "v" + VERSION
+    elif tag == "commit":
+        tag = COMMIT_HASH_SHORT
 
     repository = IMAGE + ":" + tag
     LOG.info("Pushing %s to docker hub...", repository)
