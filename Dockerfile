@@ -4,6 +4,9 @@ FROM github/super-linter:v3.15.2
 # Required for the github/super-linter log (cannot be disabled)
 RUN mkdir -p /tmp/lint/
 
+ARG VERSION
+ARG COMMIT_HASH
+
 LABEL org.opencontainers.image.title="goat"
 LABEL org.opencontainers.image.description="The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard testing"
 LABEL org.opencontainers.image.version="${VERSION}"
