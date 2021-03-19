@@ -214,7 +214,7 @@ def goat(c):  # pylint: disable=unused-argument
 @task
 def publish(c):  # pylint: disable=unused-argument
     """Publish the goat"""
-    for tag in [COMMIT_HASH, "latest"]
+    for tag in [COMMIT_HASH, "latest"]:
         repository = IMAGE + ":" + tag
         LOG.info("Pushing %s to docker hub...", repository)
         CLIENT.images.push(repository=repository)
