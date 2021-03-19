@@ -156,11 +156,9 @@ IMAGE = "seiso/" + NAME
 @task
 def build(c):  # pylint: disable=unused-argument
     """Build the goat"""
+    buildargs = {"VERSION": COMMIT_HASH_SHORT, "COMMIT_HASH": COMMIT_HASH}
 
-    buildargs = {"COMMIT_HASH": COMMIT_HASH_SHORT}
-
-    # Build and Tag
-    for tag in ["latest", buildargs["COMMIT_HASH"]]:
+    for tag in ["latest", buildargs["VERSION"]]:
         tag = IMAGE + ":" + tag
         LOG.info("Building %s...", tag)
         CLIENT.images.build(path=str(CWD), rm=True, tag=tag, buildargs=buildargs)
@@ -215,15 +213,10 @@ def goat(c):  # pylint: disable=unused-argument
 
 
 @task
-def publish(c, tag):  # pylint: disable=unused-argument
+def publish(c):  # pylint: disable=unused-argument
     """Publish the goat"""
-    if tag not in ["latest", "commit"]:
-        LOG.error("Please provide a tag of either latest or commit")
-        sys.exit(1)
-    elif tag == "commit":
-        tag = COMMIT_HASH_SHORT
-
-    repository = IMAGE + ":" + tag
-    LOG.info("Pushing %s to docker hub...", repository)
-    CLIENT.images.push(repository=repository)
-    LOG.info("Done publishing the %s Docker image", repository)
+    for tag in ["latest", COMMIT_HASH_SHORT]
+        repository = IMAGE + ":" + tag
+        LOG.info("Pushing %s to docker hub...", repository)
+        CLIENT.images.push(repository=repository)
+        LOG.info("Done publishing the %s Docker image", repository)
