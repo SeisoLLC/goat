@@ -157,7 +157,7 @@ def build(c):  # pylint: disable=unused-argument
     """Build the goat"""
     buildargs = {"COMMIT_HASH": COMMIT_HASH}
 
-    for tag in ["latest", buildargs["COMMIT_HASH"]]:
+    for tag in [buildargs["COMMIT_HASH"], "latest"]:
         tag = IMAGE + ":" + tag
         LOG.info("Building %s...", tag)
         CLIENT.images.build(path=str(CWD), rm=True, tag=tag, buildargs=buildargs)
@@ -214,7 +214,7 @@ def goat(c):  # pylint: disable=unused-argument
 @task
 def publish(c):  # pylint: disable=unused-argument
     """Publish the goat"""
-    for tag in ["latest", COMMIT_HASH]
+    for tag in [COMMIT_HASH, "latest"]
         repository = IMAGE + ":" + tag
         LOG.info("Pushing %s to docker hub...", repository)
         CLIENT.images.push(repository=repository)
