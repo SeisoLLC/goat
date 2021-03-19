@@ -128,6 +128,7 @@ def run_security_tests(*, image: str):
 
 # Globals
 CWD = Path(".").absolute()
+VERSION = "0.4.0"
 NAME = "goat"
 UNACCEPTABLE_VULNS = ["CRITICAL"]
 LOW_PRIORITY_VULNS = ["UNKNOWN", "LOW", "MEDIUM", "HIGH"]
@@ -146,7 +147,6 @@ LOG = getLogger("seiso." + NAME)
 # git
 REPO = git.Repo(CWD)
 COMMIT_HASH = REPO.head.object.hexsha
-COMMIT_HASH_SHORT = COMMIT_HASH[:7]
 
 # Docker
 CLIENT = docker.from_env(timeout=300)
@@ -206,7 +206,7 @@ def goat(c):  # pylint: disable=unused-argument
 @task
 def build(c):  # pylint: disable=unused-argument
     """Build the goat"""
-    buildargs = {"VERSION": COMMIT_HASH_SHORT, "COMMIT_HASH": COMMIT_HASH}
+    buildargs = {"VERSION": VERSION, "COMMIT_HASH": COMMIT_HASH}
 
     for tag in TAGS:
         LOG.info("Building %s...", tag)
@@ -214,10 +214,15 @@ def build(c):  # pylint: disable=unused-argument
 
 
 @task
-def publish(c):  # pylint: disable=unused-argument
+def publish(c, tag):  # pylint: disable=unused-argument
     """Publish the goat"""
-    for tag in ["latest", COMMIT_HASH_SHORT]
-        repository = IMAGE + ":" + tag
-        LOG.info("Pushing %s to docker hub...", repository)
-        CLIENT.images.push(repository=repository)
-        LOG.info("Done publishing the %s Docker image", repository)
+    if tag not in ["latest", "version"]:
+        LOG.error("Please provide a tag of either latest or version")
+        sys.exit(1)
+    elif tag == "version":
+        tag = VERSION
+
+    repository = IMAGE + ":" + tag
+    LOG.info("Pushing %s to docker hub...", repository)
+    CLIENT.images.push(repository=repository)
+    LOG.info("Done publishing the %s Docker image", repository)
