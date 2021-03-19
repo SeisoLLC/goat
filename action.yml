@@ -12,4 +12,4 @@ inputs:
     default: ''
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: 'docker://hub.docker.com/seiso/goat:latest'
