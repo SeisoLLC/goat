@@ -144,8 +144,7 @@ LOG = getLogger("seiso." + NAME)
 
 # git
 REPO = git.Repo(CWD)
-COMMIT_HASH = REPO.head.object.hexsha
-COMMIT_HASH_SHORT = COMMIT_HASH[:7]
+COMMIT_HASH = REPO.head.object.hexsha[:7]
 
 # Docker
 CLIENT = docker.from_env(timeout=600)
@@ -156,9 +155,9 @@ IMAGE = "seiso/" + NAME
 @task
 def build(c):  # pylint: disable=unused-argument
     """Build the goat"""
-    buildargs = {"VERSION": COMMIT_HASH_SHORT, "COMMIT_HASH": COMMIT_HASH}
+    buildargs = {"COMMIT_HASH": COMMIT_HASH}
 
-    for tag in ["latest", buildargs["VERSION"]]:
+    for tag in ["latest", buildargs["COMMIT_HASH"]]:
         tag = IMAGE + ":" + tag
         LOG.info("Building %s...", tag)
         CLIENT.images.build(path=str(CWD), rm=True, tag=tag, buildargs=buildargs)
@@ -215,7 +214,7 @@ def goat(c):  # pylint: disable=unused-argument
 @task
 def publish(c):  # pylint: disable=unused-argument
     """Publish the goat"""
-    for tag in ["latest", COMMIT_HASH_SHORT]
+    for tag in ["latest", COMMIT_HASH]
         repository = IMAGE + ":" + tag
         LOG.info("Pushing %s to docker hub...", repository)
         CLIENT.images.push(repository=repository)
