@@ -1,5 +1,0 @@
----
-ignored:
-  # Workaround: added an environment variable of PIP_NO_CACHE_DIR=1 in the
-  # Dockerfile
-  - DL3042

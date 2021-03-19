@@ -1,0 +1,4 @@
+---
+rules:
+  # Workaround until replicatedhq/dockerfilelint#169 is resolved
+  missing_tag: off

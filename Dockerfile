@@ -20,6 +20,8 @@ RUN pipenv install --deploy --ignore-pipfile
 
 WORKDIR /goat/
 
+# LINTER_RULES_PATH is a path relative to GITHUB_WORKSPACE
+ENV LINTER_RULES_PATH=../../../../../etc/opt/goat
 COPY etc/ /etc/opt/goat/
 COPY entrypoint.sh /opt/goat/bin/entrypoint.sh
 
