@@ -144,7 +144,7 @@ LOG = getLogger("seiso." + NAME)
 
 # git
 REPO = git.Repo(CWD)
-COMMIT_HASH = REPO.head.object.hexsha[:7]
+COMMIT_HASH = REPO.git.rev_parse(REPO.head.commit.hexsha, short=True)
 
 # Docker
 CLIENT = docker.from_env(timeout=600)
