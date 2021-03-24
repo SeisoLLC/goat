@@ -72,10 +72,6 @@ function seiso_lint() {
   excluded=()
   included=()
 
-  npm install -g dockerfile_lint \
-                 cspell \
-                 markdown-link-check
-
   while read -r file; do
     # Apply filter with =~ to ensure it is aligned with github/super-linter
     if [[ -n "${INPUT_EXCLUDE+x}" && "${file}" =~ ${INPUT_EXCLUDE} ]]; then
