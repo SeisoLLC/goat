@@ -1,5 +1,5 @@
 # Based on python:alpine as of February 2021
-FROM github/super-linter:v3.15.2
+FROM github/super-linter:v3.15.5
 
 # Required for the github/super-linter log (cannot be disabled)
 RUN mkdir -p /tmp/lint/
@@ -21,11 +21,12 @@ LABEL org.opencontainers.image.licenses="MIT"
 WORKDIR /etc/opt/goat/
 ENV PIP_NO_CACHE_DIR=1
 COPY Pipfile Pipfile.lock ./
+# hadolint ignore=DL3016,DL3018
 RUN pipenv install --deploy --ignore-pipfile \
- && apk --no-cache add npm=14.16.0-r0 \
- && npm install --no-cache -g dockerfile_lint@0.3.4 \
-                              cspell@5.3.8 \
-                              markdown-link-check@3.8.6
+ && apk --no-cache add npm \
+ && npm install --no-cache -g dockerfile_lint \
+                              cspell \
+                              markdown-link-check
 
 WORKDIR /goat/
 
