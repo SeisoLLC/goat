@@ -41,7 +41,7 @@ function setup_environment() {
 
   # Create variables for the various dictionary file paths
   export GLOBAL_DICTIONARY="/etc/opt/goat/seiso_global_dictionary.txt"
-  export REPO_DICTIONARY="/goat/.github/etc/dictionary.txt"
+  export REPO_DICTIONARY="${GITHUB_WORKSPACE:-/goat}/.github/etc/dictionary.txt"
 
   # Map certain environment variables
   if [[ "${INPUT_DISABLE_TERRASCAN-}" == "true" ]]; then
