@@ -7,7 +7,6 @@ set -o pipefail
 
 # shellcheck disable=SC2034
 {
-  declare -r FATAL='\033[0;31m'
   declare -r ERROR='\033[0;31m'
   declare -r WARNING='\033[0;33m'
   declare -r INFO='\033[0m'
@@ -17,10 +16,6 @@ set -o pipefail
 function feedback() {
   color="${1:-DEFAULT}"
   case "${1}" in
-    FATAL)
-      >&2 echo -e "${!color}${1}:  ${2}${DEFAULT}"
-      exit 1
-      ;;
     ERROR)
       >&2 echo -e "${!color}${1}:  ${2}${DEFAULT}"
       exit 1
@@ -44,6 +39,10 @@ function setup_environment() {
   # Set workspace to /goat/ for local runs
   export DEFAULT_WORKSPACE="/goat"
 
+  # Create variables for the various dictionary file paths
+  export GLOBAL_DICTIONARY="/etc/opt/goat/seiso_global_dictionary.txt"
+  export REPO_DICTIONARY="/goat/.github/etc/dictionary.txt"
+
   # Map certain environment variables
   if [[ "${INPUT_DISABLE_TERRASCAN-}" == "true" ]]; then
     export VALIDATE_TERRAFORM_TERRASCAN="false"
@@ -61,6 +60,15 @@ function check_environment() {
     if [[ "${mainline}" != "main" ]]; then
       feedback ERROR "Base branch name is not main"
     fi
+  fi
+
+  # Ensure dictionaries don't have overlap
+  overlap=$(comm -12 <(sort "${GLOBAL_DICTIONARY}" | tr '[:upper:]' '[:lower:]') \
+                     <(sort "${REPO_DICTIONARY}"   | tr '[:upper:]' '[:lower:]'))
+  if [[ "${overlap}" ]]; then
+    feedback WARNING "The following words are already in the global dictionary:
+${overlap}"
+    feedback ERROR "Overlap was detected in the per-repo and global dictionaries"
   fi
 }
 
