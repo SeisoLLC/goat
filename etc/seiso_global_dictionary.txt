@@ -79,6 +79,7 @@ netlogon
 netntlm
 netntlmv
 netsparker
+nids
 nmap
 notpetya
 ntds
