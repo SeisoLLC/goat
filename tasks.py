@@ -167,11 +167,9 @@ def update_dockerfile_from(
 
 # Globals
 CWD = Path(".").absolute()
-VERSION = "0.4.0"
 NAME = "goat"
 UNACCEPTABLE_VULNS = ["CRITICAL"]
 LOW_PRIORITY_VULNS = ["UNKNOWN", "LOW", "MEDIUM", "HIGH"]
-
 LOG_FORMAT = json.dumps(
     {
         "timestamp": "%(asctime)s",
@@ -185,16 +183,26 @@ LOG = getLogger("seiso." + NAME)
 
 # git
 REPO = git.Repo(CWD)
-COMMIT_HASH = REPO.head.object.hexsha
+COMMIT_HASH = REPO.git.rev_parse(REPO.head.commit.hexsha, short=True)
 
 # Docker
-CLIENT = docker.from_env(timeout=300)
+CLIENT = docker.from_env(timeout=600)
 IMAGE = "seiso/" + NAME
-TAGS = [IMAGE + ":latest", IMAGE + ":" + VERSION]
 
 
 # Tasks
 @task
+def build(c):  # pylint: disable=unused-argument
+    """Build the goat"""
+    buildargs = {"COMMIT_HASH": COMMIT_HASH}
+
+    for tag in [buildargs["COMMIT_HASH"], "latest"]:
+        tag = IMAGE + ":" + tag
+        LOG.info("Building %s...", tag)
+        CLIENT.images.build(path=str(CWD), rm=True, tag=tag, buildargs=buildargs)
+
+
+@task(pre=[build])
 def goat(c):  # pylint: disable=unused-argument
     """Run the goat"""
     LOG.info("Baaaaaaaaaaah! (Running the goat)")
@@ -243,28 +251,13 @@ def goat(c):  # pylint: disable=unused-argument
 
 
 @task
-def build(c):  # pylint: disable=unused-argument
-    """Build the goat"""
-    buildargs = {"VERSION": VERSION, "COMMIT_HASH": COMMIT_HASH}
-
-    for tag in TAGS:
-        LOG.info("Building %s...", tag)
-        CLIENT.images.build(path=str(CWD), rm=True, tag=tag, buildargs=buildargs)
-
-
-@task
-def publish(c, tag):  # pylint: disable=unused-argument
+def publish(c):  # pylint: disable=unused-argument
     """Publish the goat"""
-    if tag not in ["latest", "version"]:
-        LOG.error("Please provide a tag of either latest or version")
-        sys.exit(1)
-    elif tag == "version":
-        tag = VERSION
-
-    repository = IMAGE + ":" + tag
-    LOG.info("Pushing %s to docker hub...", repository)
-    CLIENT.images.push(repository=repository)
-    LOG.info("Done publishing the %s Docker image", repository)
+    for tag in [COMMIT_HASH, "latest"]:
+        repository = IMAGE + ":" + tag
+        LOG.info("Pushing %s to docker hub...", repository)
+        CLIENT.images.push(repository=repository)
+        LOG.info("Done publishing the %s Docker image", repository)
 
 
 @task
