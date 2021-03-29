@@ -79,6 +79,7 @@ netlogon
 netntlm
 netntlmv
 netsparker
+nids
 nmap
 notpetya
 ntds
@@ -127,6 +128,7 @@ ssids
 sysvol
 telerik
 terrascan
+tfsec
 thycotic
 totp
 trufflehog
