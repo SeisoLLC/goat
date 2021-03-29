@@ -6,13 +6,13 @@ on:
       - main
 jobs:
   test:
+    name: Test
     runs-on: Ubuntu-20.04
     strategy:
       matrix:
         python-version:
           - '3.8'
           - '3.9'
-    name: Test the project
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
@@ -27,8 +27,8 @@ jobs:
         run: pipenv run invoke build
       - name: Goat the goat
         run: pipenv run invoke goat
-  push:
-    name: Build and push the Docker images
+  distribute:
+    name: Distribute
     runs-on: Ubuntu-20.04
     needs: test
     steps:
@@ -53,5 +53,5 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: seiso/goat
           short-description: Seiso's Grand Opinionated AutoTester (GOAT)
-      - name: Publish the latest goat
-        run: pipenv run invoke publish latest
+      - name: Publish the goat
+        run: pipenv run invoke publish

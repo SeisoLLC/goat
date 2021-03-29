@@ -1,6 +1,7 @@
 # Grand Opinionated AutoTester (GOAT)
 
-The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard testing.
+The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard
+testing.
 
 ## Getting Started
 
@@ -20,14 +21,16 @@ The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard t
 1. Add the goat to your GitHub Actions workflows.
 
     ```bash
-    uses: seisollc/goat@v0.4.0
+    uses: seisollc/goat@main
     ```
 
 ### Example
 
-To run the goat on each PR against `main`, create the following file as `.github/workflows/pr.yml`:
+To run the goat on each PR against `main`, create the following file as
+`.github/workflows/pr.yml`:
 
-For example, you could use the following to run the goat on each PR against `main`:
+For example, you could use the following to run the goat on each PR against
+`main`:
 
 ```yml
 ---
@@ -41,12 +44,13 @@ jobs:
     name: Test the project
     steps:
     - uses: actions/checkout@v2
-    - uses: seisollc/goat@v0.4.0
+    - uses: seisollc/goat@main
 ```
 
 #### Customizations
 
-1. Populate the custom dictionary file in `.github/etc/dictionary.txt` for any repo-specific language.
+1. Populate the custom dictionary file in `.github/etc/dictionary.txt` for any
+   repo-specific language.
 
     ```bash
     $ cat << EOF >> .github/etc/dictionary.txt
@@ -58,7 +62,7 @@ jobs:
 1. Configure the goat to skip terrascan scanning.
 
     ```bash
-    uses: seisollc/goat@v0.4.0
+    uses: seisollc/goat@main
     with:
       disable_terrascan: true
     ```
@@ -66,7 +70,7 @@ jobs:
 1. Exclude a file extension.
 
     ```bash
-    uses: seisollc/goat@v0.4.0
+    uses: seisollc/goat@main
     with:
       exclude: \.md$
     ```
@@ -74,7 +78,7 @@ jobs:
 1. Exclude a list of files.
 
     ```bash
-    uses: seisollc/goat@v0.4.0
+    uses: seisollc/goat@main
     with:
       exclude: ^.*/(Dockerfile|Dockerfile\.dev)$
     ```
@@ -90,6 +94,12 @@ jobs:
     EOF
     ```
 
+## Releases
+
+The `goat` project does not do releases, as it is intended as a minimum
+expectation that evolves over time. Please refer to `main` or, in limited
+situations, pin to the commit hash tag that is published with each commit.
+
 ## GOAT Development
 
 ### Prerequisites
@@ -101,5 +111,6 @@ pipenv
 ### Running the goat locally
 
 ```bash
+pipenv install --dev
 pipenv run invoke goat
 ```
