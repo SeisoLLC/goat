@@ -34,6 +34,7 @@ ept
 essid
 essids
 exploitability
+exrc
 fedramp
 ffiec
 flameshot
@@ -138,12 +139,15 @@ typosquatting
 unmarshal
 unmarshalling
 vectr
+vimrc
 vishing
 vulnerabilities
 wapt
 wardriving
 whoami
 wireshark
+workstream
+workstreams
 wpad
 wrike
 wrike's
