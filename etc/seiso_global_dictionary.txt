@@ -3,6 +3,7 @@ aireplay
 airodump
 axample
 bau
+bcrypt
 bigip
 bruteforce
 bruteforcing
@@ -15,6 +16,7 @@ cors
 crackmapexec
 csrf
 cvss
+damerau–levenshtein
 dast
 deauthenticate
 deauthenticated
@@ -27,6 +29,7 @@ dialoghandler
 dmarc
 dnsdumpster
 domainkey
+dos
 dpapi
 dss
 eaphammer
@@ -45,6 +48,7 @@ giac
 gitleaks
 gpen
 gppa
+grep
 gssp
 hashcat
 haveibeenpwned
@@ -56,6 +60,7 @@ hkey
 hmac
 hotp
 hsts
+httponly
 icanhazip
 impacket
 infra
@@ -74,6 +79,7 @@ mimikatz
 minidump
 mitm
 msa
+mysql
 nbns
 netbios
 netlogon
@@ -95,14 +101,19 @@ pci
 pentoo
 petya
 phishing
+php
+phpass
+pingback
 pipenv
 potfile
 psexec
 ptes
+pwned
 pwned's
 reauthenticating
 remediation
 remediations
+rpc
 ruleset
 runbook
 runbooks
@@ -149,7 +160,9 @@ wireshark
 workstream
 workstreams
 wpad
+wpengine
 wrike
 wrike's
+xml
 xss
 xxe
