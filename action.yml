@@ -9,7 +9,6 @@ inputs:
   exclude:
     description: 'Exclude anything that matches the regular expression'
     required: false
-    default: ''
 runs:
   using: 'docker'
   image: 'docker://docker.io/seiso/goat:latest'
