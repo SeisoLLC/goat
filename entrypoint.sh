@@ -48,14 +48,14 @@ function setup_environment() {
     export VALIDATE_TERRAFORM_TERRASCAN="false"
   fi
 
-  if [[ -n "${INPUT_EXCLUDE+x}" ]]; then
+  if [[ -n ${INPUT_EXCLUDE} ]]; then
     export FILTER_REGEX_EXCLUDE="${INPUT_EXCLUDE}"
   fi
 }
 
 function check_environment() {
   # Check the GITHUB_BASE_REF (PRs only)
-  if [[ "${GITHUB_ACTIONS-}" == "true" && -n "${GITHUB_BASE_REF-}" ]]; then
+  if [[ "${GITHUB_ACTIONS-}" == "true" && -n ${GITHUB_BASE_REF} ]]; then
     mainline="${GITHUB_BASE_REF-##*/}"
     if [[ "${mainline}" != "main" ]]; then
       feedback ERROR "Base branch name is not main"
@@ -82,7 +82,7 @@ function seiso_lint() {
 
   while read -r file; do
     # Apply filter with =~ to ensure it is aligned with github/super-linter
-    if [[ -n "${INPUT_EXCLUDE+x}" && "${file}" =~ ${INPUT_EXCLUDE} ]]; then
+    if [[ -n ${INPUT_EXCLUDE} && "${file}" =~ ${INPUT_EXCLUDE} ]]; then
       excluded+=("${file}")
       continue
     fi
