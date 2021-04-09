@@ -15,13 +15,15 @@ line_rules:
         reference_url:
           - "https://github.com/opencontainers/image-spec/blob/bd4f8fcb0979a663d8b97a1d4d9b030b3d2ca1fa/annotations.md"
       org.opencontainers.image.licenses:
-        valueRegex: /.+/
-        message: "Label 'org.opencontainers.image.licenses' is missing or has an invalid format"
+        valueRegex: /^(NONE|MIT|BSD-3-Clause)$/
+        message: "Label 'org.opencontainers.image.licenses' is invalid"
         level: "error"
         required: true
         inverse_rule: true
         reference_url:
           - "https://github.com/opencontainers/image-spec/blob/bd4f8fcb0979a663d8b97a1d4d9b030b3d2ca1fa/annotations.md"
+          - "https://spdx.org/licenses/"
+          - "https://github.com/spdx/spdx-spec/issues/49"
       org.opencontainers.image.vendor:
         valueRegex: /^Seiso$/
         message: "Label 'org.opencontainers.image.vendor' is missing or has an invalid invalid"
