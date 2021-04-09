@@ -56,7 +56,6 @@ function setup_environment() {
   fi
 }
 
-
 function check_environment() {
   # Check the GITHUB_BASE_REF (PRs only)
   if [[ "${GITHUB_ACTIONS:-false}" == "true" && -n ${GITHUB_BASE_REF:+x} ]]; then
