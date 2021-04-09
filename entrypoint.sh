@@ -30,6 +30,9 @@ function feedback() {
 }
 
 function setup_environment() {
+  # Set the preferred shell behavior
+  shopt -s globstar
+
   # Set the default branch
   export DEFAULT_BRANCH="main"
 
@@ -52,6 +55,7 @@ function setup_environment() {
     export FILTER_REGEX_EXCLUDE="${INPUT_EXCLUDE}"
   fi
 }
+
 
 function check_environment() {
   # Check the GITHUB_BASE_REF (PRs only)
