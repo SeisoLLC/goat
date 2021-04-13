@@ -72,6 +72,7 @@ kerberoasting
 llmnr
 lm
 lsass
+markdownlint
 meraki
 metasploit
 microsoft
