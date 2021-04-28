@@ -37,8 +37,8 @@ const cspell = {
   ],
   flagWords: [
     'blacklist',
-    'blacklisted',  
-    'blacklisting',  
+    'blacklisted',
+    'blacklisting',
     'master',
     'slave',
     'whitelist',
