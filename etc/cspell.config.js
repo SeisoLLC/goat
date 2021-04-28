@@ -37,12 +37,17 @@ const cspell = {
   ],
   flagWords: [
     'blacklist',
+    'blacklisted',
+    'blacklisting',
     'master',
     'slave',
-    'whitelist'
+    'whitelist',
+    'whitelisted',
+    'whitelisting'
   ],
   ignoreRegExpList: [
-    '/.*pairwise master key.*/'
+    '/.*pairwise master key.*/',
+    '/.*--ssid-whitelist.*/'
   ],
   minWordLength: 4
 }
