@@ -46,7 +46,8 @@ const cspell = {
     'whitelisting'
   ],
   ignoreRegExpList: [
-    '/.*pairwise master key.*/'
+    '/.*pairwise master key.*/',
+    '/.*--ssid-whitelist.*/'
   ],
   minWordLength: 4
 }
