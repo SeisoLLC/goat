@@ -237,7 +237,7 @@ def goat(c):  # pylint: disable=unused-argument
         }
 
     opinionated_docker_run(
-        image=IMAGE + ":" + COMMIT_HASH,
+        image=IMAGE,
         volumes=volumes,
         working_dir=working_dir,
         environment=environment,
