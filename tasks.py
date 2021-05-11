@@ -228,7 +228,7 @@ def goat(c):  # pylint: disable=unused-argument
             homedir: {"bind": homedir, "mode": "ro"},
         }
     else:
-        #environment["RUN_LOCAL"] = "true"
+        environment["RUN_LOCAL"] = "true"
         environment["DEFAULT_WORKSPACE"] = "/goat"
         environment["ACTIONS_RUNNER_DEBUG"] = "true"
         working_dir = "/goat/"
