@@ -209,7 +209,6 @@ def goat(c):  # pylint: disable=unused-argument
     environment = {}
     environment["RUN_LOCAL"] = "true"
     environment["DEFAULT_WORKSPACE"] = "/goat"
-    environment["ACTIONS_RUNNER_DEBUG"] = "true"
     working_dir = "/goat/"
 
     if REPO.untracked_files or REPO.is_dirty():
