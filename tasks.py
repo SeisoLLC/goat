@@ -227,7 +227,7 @@ def goat(c):  # pylint: disable=unused-argument
         host_dir = os.environ.get("GITHUB_WORKSPACE")
         homedir = os.environ.get("HOME")
         volumes = {
-            host_dir : {"bind": working_dir, "mode": "rw"},
+            host_dir: {"bind": working_dir, "mode": "rw"},
             homedir: {"bind": homedir, "mode": "ro"},
         }
     else:
