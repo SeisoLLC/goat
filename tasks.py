@@ -207,6 +207,9 @@ def goat(c):  # pylint: disable=unused-argument
     """Run the goat"""
     LOG.info("Baaaaaaaaaaah! (Running the goat)")
     environment = {}
+    environment["RUN_LOCAL"] = "true"
+    environment["DEFAULT_WORKSPACE"] = "/goat"
+    environment["ACTIONS_RUNNER_DEBUG"] = "true"
 
     if REPO.untracked_files or REPO.is_dirty():
         LOG.error("Linting requires a clean git directory to function properly")
@@ -228,9 +231,6 @@ def goat(c):  # pylint: disable=unused-argument
             homedir: {"bind": homedir, "mode": "ro"},
         }
     else:
-        environment["RUN_LOCAL"] = "true"
-        environment["DEFAULT_WORKSPACE"] = "/goat"
-        environment["ACTIONS_RUNNER_DEBUG"] = "true"
         working_dir = "/goat/"
         volumes = {
             CWD: {"bind": working_dir, "mode": "rw"},
