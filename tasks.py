@@ -207,6 +207,9 @@ def goat(c):  # pylint: disable=unused-argument
     """Run the goat"""
     LOG.info("Baaaaaaaaaaah! (Running the goat)")
     environment = {}
+    environment["RUN_LOCAL"] = "true"
+    environment["DEFAULT_WORKSPACE"] = "/goat"
+    working_dir = "/goat/"
 
     if REPO.untracked_files or REPO.is_dirty():
         LOG.error("Linting requires a clean git directory to function properly")
@@ -221,16 +224,13 @@ def goat(c):  # pylint: disable=unused-argument
             environment[element] = os.environ.get(element)
 
     if os.environ.get("GITHUB_ACTIONS") == "true":
-        working_dir = os.environ.get("GITHUB_WORKSPACE")
+        host_dir = os.environ.get("GITHUB_WORKSPACE")
         homedir = os.environ.get("HOME")
         volumes = {
-            working_dir: {"bind": working_dir, "mode": "rw"},
+            host_dir: {"bind": working_dir, "mode": "rw"},
             homedir: {"bind": homedir, "mode": "ro"},
         }
     else:
-        environment["RUN_LOCAL"] = "true"
-        environment["DEFAULT_WORKSPACE"] = "/goat"
-        working_dir = "/goat/"
         volumes = {
             CWD: {"bind": working_dir, "mode": "rw"},
         }

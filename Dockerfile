@@ -1,5 +1,5 @@
 # Based on python:alpine as of February 2021
-FROM github/super-linter:v3.15.5
+FROM github/super-linter:v3.16.3
 
 # Required for the github/super-linter log (cannot be disabled)
 RUN mkdir -p /tmp/lint/
@@ -23,7 +23,7 @@ ENV PIP_NO_CACHE_DIR=1
 COPY Pipfile Pipfile.lock ./
 # hadolint ignore=DL3016,DL3018
 RUN pipenv install --deploy --ignore-pipfile \
- && apk --no-cache add npm \
+ && apk --no-cache add jq npm \
  && npm install --no-cache -g dockerfile_lint \
                               cspell \
                               markdown-link-check
