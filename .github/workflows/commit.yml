@@ -54,3 +54,12 @@ jobs:
           short-description: Seiso's Grand Opinionated AutoTester (GOAT)
       - name: Publish the goat
         run: pipenv run invoke publish
+      - name: Publish the release to GitHub
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: LICENSE
+          name: latest
+          draft: false
+          prerelease: false
