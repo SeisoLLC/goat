@@ -54,12 +54,18 @@ jobs:
           short-description: Seiso's Grand Opinionated AutoTester (GOAT)
       - name: Publish the goat
         run: pipenv run invoke publish
-      - name: Publish the release to GitHub
+      - name: Delete the latest release on GitHub
+        uses: dev-drprasad/delete-tag-and-release@v0.2.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          delete_release: true
+          tag_name: latest
+      - name: Publish a latest release to GitHub
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: LICENSE
-          name: latest
+          tag_name: latest
           draft: false
           prerelease: false
