@@ -26,7 +26,7 @@ line_rules:
           - "https://github.com/spdx/spdx-spec/issues/49"
       org.opencontainers.image.vendor:
         valueRegex: /^Seiso$/
-        message: "Label 'org.opencontainers.image.vendor' is missing or has an invalid invalid"
+        message: "Label 'org.opencontainers.image.vendor' is missing or has an invalid format"
         level: "error"
         required: true
         inverse_rule: true
