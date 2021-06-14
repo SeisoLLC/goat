@@ -59,11 +59,12 @@ jobs:
     EOF
     ```
 
-1. Configure the goat to skip terrascan scanning.
+1. Configure the goat to skip terrascan and/or mypy scanning.
 
     ```bash
     uses: seisollc/goat@main
     with:
+      disable_mypy: true
       disable_terrascan: true
     ```
 
