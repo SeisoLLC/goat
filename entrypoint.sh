@@ -51,6 +51,10 @@ function setup_environment() {
     export VALIDATE_TERRAFORM_TERRASCAN="false"
   fi
 
+  if [[ "${INPUT_DISABLE_MYPY:-}" == "true" ]]; then
+    export VALIDATE_PYTHON_MYPY="false"
+  fi
+
   if [[ -n ${INPUT_EXCLUDE:+x} ]]; then
     export FILTER_REGEX_EXCLUDE="${INPUT_EXCLUDE}"
   fi
