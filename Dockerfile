@@ -1,5 +1,5 @@
 # Based on python:alpine as of February 2021
-FROM github/super-linter:v3.16.3
+FROM github/super-linter:v4.7.1
 
 # Required for the github/super-linter log (cannot be disabled)
 RUN mkdir -p /tmp/lint/
@@ -23,7 +23,9 @@ ENV PIP_NO_CACHE_DIR=1
 COPY Pipfile Pipfile.lock ./
 # hadolint ignore=DL3016,DL3018
 RUN pipenv install --deploy --ignore-pipfile \
- && apk --no-cache add jq npm \
+ && apk upgrade \
+ && apk --no-cache add tini \
+                       npm \
  && npm install --no-cache -g dockerfile_lint \
                               cspell \
                               markdown-link-check
@@ -35,4 +37,4 @@ ENV LINTER_RULES_PATH=../../../../../etc/opt/goat
 COPY etc/ /etc/opt/goat/
 COPY entrypoint.sh /opt/goat/bin/entrypoint.sh
 
-ENTRYPOINT ["/opt/goat/bin/entrypoint.sh"]
+ENTRYPOINT ["tini", "-g", "--", "/opt/goat/bin/entrypoint.sh"]
