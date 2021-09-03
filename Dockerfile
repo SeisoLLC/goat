@@ -24,8 +24,9 @@ COPY Pipfile Pipfile.lock ./
 # hadolint ignore=DL3016,DL3018
 RUN pipenv install --deploy --ignore-pipfile \
  && apk upgrade \
- && apk --no-cache add tini \
+ && apk --no-cache add jq \
                        npm \
+                       tini \
  && npm install --no-cache -g dockerfile_lint \
                               cspell \
                               markdown-link-check
