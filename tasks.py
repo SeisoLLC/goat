@@ -211,7 +211,7 @@ def goat(c):  # pylint: disable=unused-argument
     environment["DEFAULT_WORKSPACE"] = "/goat"
     working_dir = "/goat/"
 
-    if REPO.untracked_files or REPO.is_dirty():
+    if REPO.is_dirty(untracked_files=True):
         LOG.error("Linting requires a clean git directory to function properly")
         sys.exit(1)
 
