@@ -95,6 +95,17 @@ jobs:
     EOF
     ```
 
+#### Debugging
+
+To debug an issue with the goat, configure the log level to either `ERROR`,
+`WARN`, `NOTICE`, `VERBOSE`, `DEBUG`, or `TRACE`.
+
+    ```bash
+    uses: seisollc/goat@main
+    with:
+      log_level: DEBUG
+    ```
+
 ## Releases
 
 The `goat` project does not do releases, as it is intended as a minimum
