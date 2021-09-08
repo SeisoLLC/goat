@@ -192,19 +192,30 @@ IMAGE = "seiso/" + NAME
 
 # Tasks
 @task
-def build(c):  # pylint: disable=unused-argument
+def build(_c, debug=False):
     """Build the goat"""
-    buildargs = {"COMMIT_HASH": COMMIT_HASH}
+    if debug:
+        getLogger().setLevel("DEBUG")
 
-    for tag in [buildargs["COMMIT_HASH"], "latest"]:
-        tag = IMAGE + ":" + tag
-        LOG.info("Building %s...", tag)
-        CLIENT.images.build(path=str(CWD), rm=True, tag=tag, buildargs=buildargs)
+    buildargs = {"COMMIT_HASH": COMMIT_HASH}
+    tags = [buildargs["COMMIT_HASH"], "latest"]
+
+    for tag in tags:
+        if tag == tags[0]:
+            tag = IMAGE + ":" + tag
+            LOG.info("Building %s...", tag)
+            image = CLIENT.images.build(path=str(CWD), rm=True, tag=tag, buildargs=buildargs)[0]
+        else:
+            LOG.info("Tagging %s:%s...", IMAGE, tag)
+            image.tag(IMAGE, tag=tag.split(":")[-1])
 
 
 @task(pre=[build])
-def goat(c):  # pylint: disable=unused-argument
+def goat(_c, debug=False):
     """Run the goat"""
+    if debug:
+        getLogger().setLevel("DEBUG")
+
     LOG.info("Baaaaaaaaaaah! (Running the goat)")
     environment = {}
     environment["RUN_LOCAL"] = "true"
@@ -251,8 +262,11 @@ def goat(c):  # pylint: disable=unused-argument
 
 
 @task
-def publish(c):  # pylint: disable=unused-argument
+def publish(_c, debug=False):
     """Publish the goat"""
+    if debug:
+        getLogger().setLevel("DEBUG")
+
     for tag in [COMMIT_HASH, "latest"]:
         repository = IMAGE + ":" + tag
         LOG.info("Pushing %s to docker hub...", repository)
@@ -261,8 +275,11 @@ def publish(c):  # pylint: disable=unused-argument
 
 
 @task
-def update(c):  # pylint: disable=unused-argument
+def update(_c, debug=False):
     """Update the goat dependencies"""
+    if debug:
+        getLogger().setLevel("DEBUG")
+
     repo = "github/super-linter"
     version = get_latest_release_from_github(repo=repo)
     update_dockerfile_from(image=repo, tag=version)
