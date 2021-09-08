@@ -59,7 +59,7 @@ function setup_environment() {
     export FILTER_REGEX_EXCLUDE="${INPUT_EXCLUDE}"
   fi
 
-  if [[ "${INPUT_LOG_LEVEL}" =~ ^(ERROR|WARN|NOTICE|VERBOSE|DEBUG|TRACE)$ ]]; then
+  if [[ "${INPUT_LOG_LEVEL:-}" =~ ^(ERROR|WARN|NOTICE|VERBOSE|DEBUG|TRACE)$ ]]; then
     export LOG_LEVEL="${INPUT_LOG_LEVEL}"
   else
     echo "${INPUT_LOG_LEVEL} is not a valid log_level"
