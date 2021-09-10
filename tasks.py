@@ -27,18 +27,31 @@ def opinionated_docker_run(
     auto_remove: bool = False,
     detach: bool = True,
     environment: dict = {},
+    entrypoint: str = None,
     expected_exit: int = 0,
 ):
     """Perform an opinionated docker run"""
-    container = CLIENT.containers.run(
-        auto_remove=auto_remove,
-        command=command,
-        detach=detach,
-        environment=environment,
-        image=image,
-        volumes=volumes,
-        working_dir=working_dir,
-    )
+    if entrypoint:
+        container = CLIENT.containers.run(
+            auto_remove=auto_remove,
+            command=command,
+            detach=detach,
+            environment=environment,
+            entrypoint=entrypoint,
+            image=image,
+            volumes=volumes,
+            working_dir=working_dir,
+        )
+    else:
+        container = CLIENT.containers.run(
+            auto_remove=auto_remove,
+            command=command,
+            detach=detach,
+            environment=environment,
+            image=image,
+            volumes=volumes,
+            working_dir=working_dir,
+        )
 
     if not auto_remove:
         response = container.wait(condition="not-running")
@@ -204,7 +217,9 @@ def build(_c, debug=False):
         if tag == tags[0]:
             tag = IMAGE + ":" + tag
             LOG.info("Building %s...", tag)
-            image = CLIENT.images.build(path=str(CWD), rm=True, tag=tag, buildargs=buildargs)[0]
+            image = CLIENT.images.build(
+                path=str(CWD), rm=True, tag=tag, buildargs=buildargs
+            )[0]
         else:
             LOG.info("Tagging %s:%s...", IMAGE, tag)
             image.tag(IMAGE, tag=tag.split(":")[-1])
@@ -259,6 +274,34 @@ def goat(_c, debug=False):
     LOG.info("Security tests passed")
 
     LOG.info("All goat tests completed successfully!")
+
+
+@task
+def reformat(_c, debug=False):
+    """Reformat the goat"""
+    if debug:
+        getLogger().setLevel("DEBUG")
+
+    entrypoint_and_command = [
+        ("isort", ". --settings-file /action/lib/.automation/.isort.cfg"),
+        ("black", "."),
+    ]
+    image = "seiso/goat:latest"
+    working_dir = "/goat/"
+    volumes = {CWD: {"bind": working_dir, "mode": "rw"}}
+
+    LOG.info("Pulling %s...", image)
+    CLIENT.images.pull(image)
+    LOG.info("Reformatting the project...")
+    for entrypoint, command in entrypoint_and_command:
+        opinionated_docker_run(
+            image=image,
+            command=command,
+            volumes=volumes,
+            working_dir=working_dir,
+            entrypoint=entrypoint,
+            auto_remove=True,
+        )
 
 
 @task
