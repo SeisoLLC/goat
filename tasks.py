@@ -235,6 +235,7 @@ def goat(_c, debug=False):
     environment = {}
     environment["RUN_LOCAL"] = "true"
     environment["DEFAULT_WORKSPACE"] = "/goat"
+    environment["INPUT_DISABLE_MYPY"] = "true"
     working_dir = "/goat/"
 
     if REPO.untracked_files or REPO.is_dirty():
