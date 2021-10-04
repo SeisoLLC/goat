@@ -1,5 +1,5 @@
 # Based on python:alpine as of February 2021
-FROM github/super-linter:v4.7.2
+FROM github/super-linter:v4.8.1
 
 # Required for the github/super-linter log (cannot be disabled)
 RUN mkdir -p /tmp/lint/
