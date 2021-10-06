@@ -24,9 +24,9 @@ jobs:
           python -m pip install --upgrade pipenv
           pipenv install --dev
       - name: Build the goat
-        run: pipenv run invoke build
+        run: pipenv run invoke build --debug
       - name: Goat the goat
-        run: pipenv run invoke goat
+        run: pipenv run invoke goat --debug
   distribute:
     name: Distribute
     if: ${{ github.event_name == 'push' }}
@@ -43,7 +43,7 @@ jobs:
           python -m pip install --upgrade pipenv
           pipenv install --dev
       - name: Build the goat
-        run: pipenv run invoke build
+        run: pipenv run invoke build --debug
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -57,7 +57,7 @@ jobs:
           repository: seiso/goat
           short-description: Seiso's Grand Opinionated AutoTester (GOAT)
       - name: Publish the goat to Docker Hub
-        run: pipenv run invoke publish
+        run: pipenv run invoke publish --debug
       - name: Delete the latest release on GitHub
         uses: dev-drprasad/delete-tag-and-release@v0.2.0
         env:
