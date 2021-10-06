@@ -100,11 +100,11 @@ jobs:
 To debug an issue with the goat, configure the log level to either `ERROR`,
 `WARN`, `NOTICE`, `VERBOSE`, `DEBUG`, or `TRACE`.
 
-    ```bash
-    uses: seisollc/goat@main
-    with:
-      log_level: DEBUG
-    ```
+```bash
+uses: seisollc/goat@main
+with:
+  log_level: DEBUG
+```
 
 ## Releases
 
