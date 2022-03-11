@@ -101,7 +101,7 @@ def run_security_tests(*, image: str):
             file.write(chunk)
 
     working_dir = "/tmp/"
-    volumes = {temp_dir: {"bind": working_dir, "mode": "ro"}}
+    volumes = {temp_dir: {"bind": working_dir, "mode": "rw"}}
 
     num_tests_ran = 0
     scanner = "aquasec/trivy:latest"
