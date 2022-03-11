@@ -2,5 +2,5 @@
 rules:
   # Workaround until replicatedhq/dockerfilelint#169 is resolved
   missing_tag: off
-  # Permit apt-get upgrade to apply patches to prioritize component updates/maintenance over hermetically sealed, reproducable builds
+  # Permit apt-get upgrade to apply patches to prioritize component updates/maintenance over reproducable builds
   apt-get-upgrade: off
