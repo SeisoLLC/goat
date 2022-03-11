@@ -2,8 +2,5 @@
 rules:
   # Workaround until replicatedhq/dockerfilelint#169 is resolved
   missing_tag: off
-  # Two apt-get exemptions below are to prioritize component updates/maintenance over hermetically sealed, reproducable builds
-  # Permit apt-get update to be used generally
-  apt-get-update_require_install: off
-  # Permit apt-get upgrade to apply patches to runner node
+  # Permit apt-get upgrade to apply patches to prioritize component updates/maintenance over hermetically sealed, reproducable builds
   apt-get-upgrade: off
