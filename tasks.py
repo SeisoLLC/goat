@@ -110,7 +110,7 @@ def run_security_tests(*, image: str):
     command = (
         "--quiet image --timeout 10m0s --exit-code 0 --severity "
         + ",".join(LOW_PRIORITY_VULNS)
-        + " --format json --light --input "
+        + " --format json --input "
         + working_dir
         + file_name
     )
