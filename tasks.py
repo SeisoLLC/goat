@@ -106,30 +106,8 @@ def run_security_tests(*, image: str):
     num_tests_ran = 0
     scanner = "aquasec/trivy:latest"
 
-    # Provide information about low priority vulnerabilities
-    command = (
-        "--quiet image --timeout 10m0s --exit-code 0 --severity "
-        + ",".join(LOW_PRIORITY_VULNS)
-        + " --format json --input "
-        + working_dir
-        + file_name
-    )
-    opinionated_docker_run(
-        image=scanner,
-        command=command,
-        working_dir=working_dir,
-        volumes=volumes,
-    )
-    num_tests_ran += 1
-
-    # Ensure no unacceptable vulnerabilities exist in the image
-    command = (
-        "--quiet image --timeout 10m0s --exit-code 0 --severity "
-        + ",".join(UNACCEPTABLE_VULNS)
-        + " --format json --input "
-        + working_dir
-        + file_name
-    )
+    # Provide information about vulnerabilities
+    command = f"--quiet image --timeout 10m0s --exit-code 0 --format json --input {working_dir} {file_name}"
     opinionated_docker_run(
         image=scanner,
         command=command,
@@ -181,8 +159,6 @@ def update_dockerfile_from(
 # Globals
 CWD = Path(".").absolute()
 NAME = "goat"
-UNACCEPTABLE_VULNS = ["CRITICAL"]
-LOW_PRIORITY_VULNS = ["UNKNOWN", "LOW", "MEDIUM", "HIGH"]
 LOG_FORMAT = json.dumps(
     {
         "timestamp": "%(asctime)s",
