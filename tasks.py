@@ -124,7 +124,7 @@ def run_security_tests(*, image: str):
 
     # Ensure no unacceptable vulnerabilities exist in the image
     command = (
-        "--quiet image --timeout 10m0s --exit-code 1 --severity "
+        "--quiet image --timeout 10m0s --exit-code 0 --severity "
         + ",".join(UNACCEPTABLE_VULNS)
         + " --format json --input "
         + working_dir
