@@ -14,9 +14,7 @@ on:
 jobs:
   analyze:
     name: CodeQL
-    runs-on: Ubuntu-latest
-    strategy:
-      fail-fast: false
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
