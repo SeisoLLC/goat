@@ -58,6 +58,12 @@ function setup_environment() {
   if [[ -n ${INPUT_EXCLUDE:+x} ]]; then
     export FILTER_REGEX_EXCLUDE="${INPUT_EXCLUDE}"
   fi
+
+  if [[ "${INPUT_LOG_LEVEL:-}" =~ ^(ERROR|WARN|NOTICE|VERBOSE|DEBUG|TRACE)$ ]]; then
+    export LOG_LEVEL="${INPUT_LOG_LEVEL}"
+  else
+    echo "The provided LOG_LEVEL of ${INPUT_LOG_LEVEL:-null or unset} is not valid"
+  fi
 }
 
 function check_environment() {
