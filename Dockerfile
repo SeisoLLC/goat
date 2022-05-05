@@ -22,7 +22,8 @@ WORKDIR /etc/opt/goat/
 ENV PIP_NO_CACHE_DIR=1
 COPY Pipfile Pipfile.lock ./
 # hadolint ignore=DL3016,DL3018
-RUN pipenv install --deploy --ignore-pipfile \
+RUN pip install pipenv  \
+ && pipenv install --deploy --ignore-pipfile \
  && apk upgrade \
  && apk --no-cache add jq \
                        npm \
