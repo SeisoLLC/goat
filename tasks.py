@@ -133,7 +133,7 @@ def update_dockerfile_from(
 ) -> None:
     """Update the Dockerfile"""
     file_object = Path(file_name)
-    pattern = re.compile(fr"^FROM.+{image}:.+$\n")
+    pattern = re.compile(rf"^FROM.+{image}:.+$\n")
     final_content = []
 
     # Validate
