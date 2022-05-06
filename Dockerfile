@@ -1,5 +1,5 @@
 # Based on python:alpine as of February 2021
-FROM github/super-linter:v4.8.1
+FROM github/super-linter:v4.9.2
 
 # Required for the github/super-linter log (cannot be disabled)
 RUN mkdir -p /tmp/lint/
@@ -21,8 +21,9 @@ LABEL org.opencontainers.image.licenses="MIT"
 WORKDIR /etc/opt/goat/
 ENV PIP_NO_CACHE_DIR=1
 COPY Pipfile Pipfile.lock ./
-# hadolint ignore=DL3016,DL3018
-RUN pipenv install --deploy --ignore-pipfile \
+# hadolint ignore=DL3016,DL3018,DL3013
+RUN pip install pipenv \
+ && pipenv install --deploy --ignore-pipfile \
  && apk upgrade \
  && apk --no-cache add jq \
                        npm \

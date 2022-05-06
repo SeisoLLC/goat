@@ -12,7 +12,7 @@ testing.
     touch .github/etc/dictionary.txt
     ```
 
-1. Ensure your code is checked out during the github action.
+1. Ensure your code is checked out during the GitHub action.
 
     ```bash
     uses: actions/checkout@v2

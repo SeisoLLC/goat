@@ -107,7 +107,7 @@ def run_security_tests(*, image: str):
     scanner = "aquasec/trivy:latest"
 
     # Provide information about vulnerabilities
-    command = f"--quiet image --timeout 10m0s --exit-code 0 --format json --input {working_dir}{file_name}"
+    command = f"--quiet image --timeout 30m0s --exit-code 0 --format json --input {working_dir}{file_name}"
     opinionated_docker_run(
         image=scanner,
         command=command,
@@ -133,7 +133,7 @@ def update_dockerfile_from(
 ) -> None:
     """Update the Dockerfile"""
     file_object = Path(file_name)
-    pattern = re.compile(fr"^FROM.+{image}:.+$\n")
+    pattern = re.compile(rf"^FROM.+{image}:.+$\n")
     final_content = []
 
     # Validate
@@ -175,7 +175,7 @@ REPO = git.Repo(CWD)
 COMMIT_HASH = REPO.git.rev_parse(REPO.head.commit.hexsha, short=True)
 
 # Docker
-CLIENT = docker.from_env(timeout=600)
+CLIENT = docker.from_env(timeout=1200)
 IMAGE = "seiso/" + NAME
 
 
