@@ -107,7 +107,7 @@ def run_security_tests(*, image: str):
     scanner = "aquasec/trivy:latest"
 
     # Provide information about vulnerabilities
-    command = f"--quiet image --timeout 30m0s --exit-code 0 --format json --input {working_dir}{file_name}"
+    command = f"-   -quiet image --timeout 30m0s --exit-code 0 --format json --input {working_dir}{file_name}"
     opinionated_docker_run(
         image=scanner,
         command=command,
