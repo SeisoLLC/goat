@@ -64,6 +64,11 @@ function setup_environment() {
   else
     echo "The provided LOG_LEVEL of ${INPUT_LOG_LEVEL:-null or unset} is not valid"
   fi
+
+  if [[ -n ${GITHUB_WORKSPACE:-} ]]; then
+    echo "Setting ${GITHUB_WORKSPACE} as safe directory"
+    git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+  fi
 }
 
 function check_environment() {
