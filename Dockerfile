@@ -25,7 +25,8 @@ COPY Pipfile Pipfile.lock ./
 RUN pip install pipenv \
  && pipenv install --deploy --ignore-pipfile \
  && apk upgrade \
- && apk --no-cache add jq \
+ && apk --no-cache add go \
+                       jq \
                        npm \
                        tini \
  && npm install --no-cache -g dockerfile_lint \
