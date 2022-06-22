@@ -1,3 +1,5 @@
+FROM gcr.io/openssf/scorecard:v4.4.0 AS scorecard
+
 # Based on python:alpine as of February 2021
 FROM github/super-linter:v4.9.2
 
@@ -29,6 +31,7 @@ RUN pip install pipenv \
                        jq \
                        npm \
                        tini \
+                       curl \
  && npm install --no-cache -g dockerfile_lint \
                               cspell \
                               markdown-link-check
@@ -39,5 +42,6 @@ WORKDIR /goat/
 ENV LINTER_RULES_PATH=../../../../../etc/opt/goat
 COPY etc/ /etc/opt/goat/
 COPY entrypoint.sh /opt/goat/bin/entrypoint.sh
+COPY --from=scorecard /scorecard /opt/goat/bin/scorecard
 
 ENTRYPOINT ["tini", "-g", "--", "/opt/goat/bin/entrypoint.sh"]

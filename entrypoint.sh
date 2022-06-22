@@ -65,6 +65,11 @@ function setup_environment() {
     echo "The provided LOG_LEVEL of ${INPUT_LOG_LEVEL:-null or unset} is not valid"
   fi
 
+  export ENABLE_SCORECARD="false"
+  if [[ "${INPUT_ENABLE_SCORECARD:-}" == "true" ]]; then
+      export ENABLE_SCORECARD="true"
+  fi
+
   if [[ -n ${GITHUB_WORKSPACE:-} ]]; then
     echo "Setting ${GITHUB_WORKSPACE} as safe directory"
     git config --global --add safe.directory "${GITHUB_WORKSPACE}"
@@ -123,8 +128,22 @@ function seiso_lint() {
   echo "Excluded ${#excluded[@]} files"
 }
 
+function run_scorecard() {
+  if [[ $ENABLE_SCORECARD == "false" ]]; then
+      echo "OSSF Scorecard not enabled!"
+      return
+  fi
+
+  echo "OSSF Scorecard enabled!"
+  export ENABLE_SARIF=1
+  export SCORECARD_BIN=/opt/goat/bin/scorecard
+
+  $SCORECARD_BIN version
+
+}
 
 setup_environment
 check_environment
 super_lint
 seiso_lint
+run_scorecard
