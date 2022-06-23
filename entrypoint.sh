@@ -138,6 +138,48 @@ function run_scorecard() {
   export ENABLE_SARIF=1
   export SCORECARD_BIN=/opt/goat/bin/scorecard
 
+  # Pseudo Code Tasks 1 & 2 (used {} because we dont have env variables in our script for first two)
+  if [[ -z "${GITHUB_AUTH_TOKEN:-}" ]]; then
+    echo "Please follow the instructions at https://github.com/ossf/scorecard-action#authentication to create the read-only PAT token."
+    return
+  fi
+
+  if ! [[ -z "${INPUT_SCORECARD_POLICY_FILE:-}" ]]; then
+    export SCORECARD_POLICY_FILE=${GITHUB_WORKSPACE:-/goat}/$INPUT_SCORECARD_POLICY_FILE
+  else
+    export SCORECARD_POLICY_FILE="/etc/opt/goat/seiso_scorecard_policy.yml"  
+  fi
+
+  status_code=$(curl -s -H "Authorization: Bearer $GITHUB_AUTH_TOKEN" https://api.github.com/repos/"$GITHUB_REPOSITORY" -o repo_info.json -w '%{http_code}')
+  if [[ $status_code -lt 200 ]] || [[ $status_code -ge 300 ]]; then
+      error_msg=$(jq -r .message repo_info.json 2>/dev/null || echo 'unknown error')
+      echo "Failed to get repository information from GitHub, response $status_code: $error_msg"
+      echo "$(<repo_info.json)"
+      rm repo_info.json
+      exit 1;
+  fi
+   
+  # if repo is private
+  #   handle private repo options
+  export SCORECARD_PRIVATE_REPOSITORY="$(cat repo_info.json | jq -r '.private')"
+
+  if [[ "$SCORECARD_PRIVATE_REPOSITORY" == "true" ]]; then
+    export SCORECARD_PUBLISH_RESULTS="false"
+  fi
+
+  # Use scorecard's help option
+  # handle results format 
+  if [[ "$SCORECARD_RESULTS_FORMAT" != "sarif" ]]; then
+    unset SCORECARD_POLICY_FILE
+  fi
+
+  # Pseudo task 3
+  # if GITHUB_EVENT_NAME is "x" 
+  #   return
+  # else
+  #   return
+  # fi
+
   $SCORECARD_BIN version
 
 }
