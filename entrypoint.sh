@@ -70,6 +70,14 @@ function setup_environment() {
       export ENABLE_SCORECARD="true"
   fi
 
+  export GITHUB_AUTH_TOKEN=$INPUT_REPO_PAT
+
+  export SCORECARD_RESULTS_FILE="$INPUT_SCORECARD_RESULTS_FILE"
+  
+  export SCORECARD_RESULTS_FORMAT="$INPUT_SCORECARD_RESULTS_FORMAT"
+  
+  export SCORECARD_PUBLISH_RESULTS="$INPUT_SCORECARD_PUBLISH_RESULTS"
+
   if [[ -n ${GITHUB_WORKSPACE:-} ]]; then
     echo "Setting ${GITHUB_WORKSPACE} as safe directory"
     git config --global --add safe.directory "${GITHUB_WORKSPACE}"
@@ -129,6 +137,7 @@ function seiso_lint() {
 }
 
 function run_scorecard() {
+
   if [[ $ENABLE_SCORECARD == "false" ]]; then
       echo "OSSF Scorecard not enabled!"
       return
@@ -139,18 +148,18 @@ function run_scorecard() {
   export SCORECARD_BIN=/opt/goat/bin/scorecard
 
   # Pseudo Code Tasks 1 & 2 (used {} because we dont have env variables in our script for first two)
-  if [[ -z "${GITHUB_AUTH_TOKEN:-}" ]]; then
-    echo "Please follow the instructions at https://github.com/ossf/scorecard-action#authentication to create the read-only PAT token."
-    return
-  fi
-
   if ! [[ -z "${INPUT_SCORECARD_POLICY_FILE:-}" ]]; then
     export SCORECARD_POLICY_FILE=${GITHUB_WORKSPACE:-/goat}/$INPUT_SCORECARD_POLICY_FILE
   else
     export SCORECARD_POLICY_FILE="/etc/opt/goat/seiso_scorecard_policy.yml"  
   fi
 
-  status_code=$(curl -s -H "Authorization: Bearer $GITHUB_AUTH_TOKEN" https://api.github.com/repos/"$GITHUB_REPOSITORY" -o repo_info.json -w '%{http_code}')
+  if [[ -z $GITHUB_AUTH_TOKEN ]]; then
+    echo "Please provide a personal access token for you repo with the correct access."
+    return
+  fi
+
+  status_code=$(curl -s -H "Authorization: Bearer ${GITHUB_AUTH_TOKEN}" https://api.github.com/repos/"$GITHUB_REPOSITORY" -o repo_info.json -w '%{http_code}')
   if [[ $status_code -lt 200 ]] || [[ $status_code -ge 300 ]]; then
       error_msg=$(jq -r .message repo_info.json 2>/dev/null || echo 'unknown error')
       echo "Failed to get repository information from GitHub, response $status_code: $error_msg"
@@ -158,11 +167,17 @@ function run_scorecard() {
       rm repo_info.json
       exit 1;
   fi
-   
+
+  export SCORECARD_PRIVATE_REPOSITORY="$(cat repo_info.json | jq -r '.private')"
+  export SCORECARD_DEFAULT_BRANCH="refs/heads/$(cat repo_info.json | jq -r '.default_branch')"
+
+  if [[ -z $SCORECARD_RESULTS_FILE ]]; then
+    echo "Please provide a scorecard results file."
+    return
+  fi
+
   # if repo is private
   #   handle private repo options
-  export SCORECARD_PRIVATE_REPOSITORY="$(cat repo_info.json | jq -r '.private')"
-
   if [[ "$SCORECARD_PRIVATE_REPOSITORY" == "true" ]]; then
     export SCORECARD_PUBLISH_RESULTS="false"
   fi
@@ -173,14 +188,21 @@ function run_scorecard() {
     unset SCORECARD_POLICY_FILE
   fi
 
-  # Pseudo task 3
-  # if GITHUB_EVENT_NAME is "x" 
-  #   return
-  # else
-  #   return
-  # fi
+  if [[ "$GITHUB_EVENT_NAME" != "pull_request"* ]] && [[ "$GITHUB_REF" != "$SCORECARD_DEFAULT_BRANCH" ]]; then
+    echo "$GITHUB_REF not supported with '$GITHUB_EVENT_NAME' event."
+    echo "Only the default branch '$SCORECARD_DEFAULT_BRANCH' is supported"
+    exit 1
+  fi
 
-  $SCORECARD_BIN version
+  if [ -z ${SCORECARD_POLICY_FILE+x} ]; then
+    $SCORECARD_BIN --local . --format "$SCORECARD_RESULTS_FORMAT" --show-details > "$SCORECARD_RESULTS_FILE"
+  else
+    $SCORECARD_BIN --local . --format "$SCORECARD_RESULTS_FORMAT" --show-details --policy "$SCORECARD_POLICY_FILE" > "$SCORECARD_RESULTS_FILE"
+  fi
+
+  if [[ "$SCORECARD_RESULTS_FORMAT" != "default" ]]; then
+    jq '.' "$SCORECARD_RESULTS_FILE"
+  fi
 
 }
 
