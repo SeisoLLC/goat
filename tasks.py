@@ -104,7 +104,7 @@ def run_security_tests(*, image: str):
     volumes = {temp_dir: {"bind": working_dir, "mode": "rw"}}
 
     num_tests_ran = 0
-    scanner = "aquasec/trivy:latest"
+    scanner = "aquasec/trivy:0.28.1"
 
     # Provide information about vulnerabilities
     command = f"--quiet image --timeout 30m0s --exit-code 0 --format json --input {working_dir}{file_name}"
