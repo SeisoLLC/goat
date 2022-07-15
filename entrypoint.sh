@@ -147,7 +147,6 @@ function run_scorecard() {
   export ENABLE_SARIF=1
   export SCORECARD_BIN=/opt/goat/bin/scorecard
 
-  # Pseudo Code Tasks 1 & 2 (used {} because we dont have env variables in our script for first two)
   if ! [[ -z "${INPUT_SCORECARD_POLICY_FILE:-}" ]]; then
     export SCORECARD_POLICY_FILE=${GITHUB_WORKSPACE:-/goat}/$INPUT_SCORECARD_POLICY_FILE
   else
@@ -176,14 +175,10 @@ function run_scorecard() {
     return
   fi
 
-  # if repo is private
-  #   handle private repo options
   if [[ "$SCORECARD_PRIVATE_REPOSITORY" == "true" ]]; then
     export SCORECARD_PUBLISH_RESULTS="false"
   fi
 
-  # Use scorecard's help option
-  # handle results format 
   if [[ "$SCORECARD_RESULTS_FORMAT" != "sarif" ]]; then
     unset SCORECARD_POLICY_FILE
   fi
