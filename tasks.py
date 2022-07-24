@@ -148,7 +148,7 @@ def update_dockerfile_from(
     # Transform
     for line in file_contents:
         if pattern.fullmatch(line):
-            line = f"FROM {image}:{tag}-slim\n"
+            line = f"FROM {image}:slim-{tag}\n"
         final_content.append(line)
 
     # Load
