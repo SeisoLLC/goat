@@ -36,7 +36,7 @@ jobs:
       - name: Build the goat
         run: pipenv run invoke build
       - name: Goat the goat
-        run: pipenv run invoke goat
+        run: pipenv run invoke goat --debug
   distribute:
     name: Distribute
     if: ${{ github.event_name == 'push' }}
