@@ -46,6 +46,7 @@ gcwn
 getuserspns
 giac
 gitleaks
+gitpython
 gpen
 gppa
 grep
@@ -111,6 +112,7 @@ psexec
 ptes
 pwned
 pwned's
+pyenv
 reauthenticating
 remediation
 remediations
