@@ -4,7 +4,8 @@
         "consoleFull"
     ],
     "ignore": [
-        "**/.github/workflows/**"
+        ".github/workflows/commit.yml",
+        ".github/workflows/security.yml"
     ],
     "absolute": true
 }
