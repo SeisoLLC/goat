@@ -1,0 +1,11 @@
+{
+    "threshold": 0,
+    "reporters": [
+        "consoleFull"
+    ],
+    "ignore": [
+        ".github/workflows/commit.yml",
+        ".github/workflows/security.yml"
+    ],
+    "absolute": true
+}
