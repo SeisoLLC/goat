@@ -34,6 +34,7 @@ jobs:
             ${{ runner.os }}-python-
       - name: Install the dependencies
         run: |
+          export SETUPTOOLS_USE_DISTUTILS=stdlib
           python -m pip install --upgrade pipenv
           pipenv install --python ${{ env.python_version }} --deploy --ignore-pipfile --dev
           echo "CODEQL_PYTHON=$(pipenv run which python)" >> "${GITHUB_ENV}"
