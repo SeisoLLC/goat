@@ -34,9 +34,7 @@ jobs:
             ${{ runner.os }}-python-
       - name: Install the dependencies
         run: |
-          ls /home/runner/.local/share/virtualenvs/goat-pjkM6siY/bin/
-          python -m pip install --upgrade pipenv
-          pipenv install --deploy --ignore-pipfile --dev
+          pipenv install --python ${{ env.python_version }} --deploy --ignore-pipfile --dev
           echo "CODEQL_PYTHON=$(pipenv run which python)" >> "${GITHUB_ENV}"
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
