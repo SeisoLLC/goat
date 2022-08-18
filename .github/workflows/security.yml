@@ -34,8 +34,6 @@ jobs:
             ${{ runner.os }}-python-
       - name: Install the dependencies
         run: |
-          python -m pip uninstall -y setuptools
-          python -m pip install setuptools==58.1.0
           python -m pip install --upgrade pipenv
           pipenv install --python ${{ env.python_version }} --deploy --ignore-pipfile --dev
           echo "CODEQL_PYTHON=$(pipenv run which python)" >> "${GITHUB_ENV}"
