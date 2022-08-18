@@ -32,8 +32,8 @@ jobs:
       - name: Install the dependencies
         run: |
           python -m pip install --upgrade pipenv
-          pipenv uninstall setuptools
-          pipenv install setuptools==58.1.0
+          python -m pip uninstall setuptools
+          python -m pip  setuptools==58.1.0
           pipenv install --python ${{ env.python_version }} --deploy --ignore-pipfile --dev
       - name: Build the goat
         run: pipenv run invoke build
