@@ -4,7 +4,7 @@
         "consoleFull"
     ],
     "ignore": [
-        ".github/workflows/**"
+        "**/.github/workflows/**"
     ],
     "absolute": true
 }
