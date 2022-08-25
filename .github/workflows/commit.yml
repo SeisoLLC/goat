@@ -36,10 +36,7 @@ jobs:
       - name: Build the goat
         run: pipenv run invoke build
       - name: Goat the goat
-        run: |
-          # Exclude the commit.yml due to jscpd flag
-          export INPUT_EXCLUDE=".github/workflows/commit.yml"
-          pipenv run invoke goat --debug
+        run: pipenv run invoke goat --debug
   distribute:
     name: Distribute
     if: ${{ github.event_name == 'push' }}
