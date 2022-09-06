@@ -11,6 +11,7 @@ bssid
 bssids
 casp
 cissp
+cmmc
 connstring
 cors
 crackmapexec
