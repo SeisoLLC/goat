@@ -49,6 +49,7 @@ gitleaks
 gitpython
 gpen
 gppa
+grafana
 grep
 gssp
 hashcat
