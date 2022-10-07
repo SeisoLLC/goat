@@ -6,9 +6,6 @@ name = "pypi"
 [packages]
 
 
-
-
-
 [dev-packages]
 docker = "*"
 gitpython = "*"
