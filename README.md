@@ -1,11 +1,10 @@
 # Grand Opinionated AutoTester (GOAT)
 
-The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard
-testing.
+The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard testing.
 
 ## Getting Started
 
-1. Create a per-repository dictionary (relative to the root of your git repo).
+1. Create a per-repository dictionary (relative to the root of your git repository).
 
     ```bash
     mkdir -p .github/etc/
@@ -26,11 +25,9 @@ testing.
 
 ### Example
 
-To run the goat on each PR against `main`, create the following file as
-`.github/workflows/pr.yml`:
+To run the goat on each PR against `main`, create the following file as `.github/workflows/pr.yml`:
 
-For example, you could use the following to run the goat on each PR against
-`main`:
+For example, you could use the following to run the goat on each PR against `main`:
 
 ```yml
 ---
@@ -49,8 +46,7 @@ jobs:
 
 #### Customizations
 
-1. Populate the custom dictionary file in `.github/etc/dictionary.txt` for any
-   repo-specific language.
+1. Populate the custom dictionary file in `.github/etc/dictionary.txt` for any repository-specific language.
 
     ```bash
     $ cat << EOF >> .github/etc/dictionary.txt
@@ -97,8 +93,7 @@ jobs:
 
 #### Debugging
 
-To debug an issue with the goat, configure the log level to either `ERROR`,
-`WARN`, `NOTICE`, `VERBOSE`, `DEBUG`, or `TRACE`.
+To debug an issue with the goat, configure the log level to either `ERROR`, `WARN`, `NOTICE`, `VERBOSE`, `DEBUG`, or `TRACE`.
 
 ```bash
 uses: seisollc/goat@main
@@ -108,8 +103,7 @@ with:
 
 ## Releases
 
-The `goat` project does not do releases, as it is intended as a minimum
-expectation that evolves over time. Please refer to `main` or, in limited
+The `goat` project does not do releases, as it is intended as a minimum expectation that evolves over time. Please refer to `main` or, in limited
 situations, pin to the commit hash tag that is published with each commit.
 
 ## GOAT Development
