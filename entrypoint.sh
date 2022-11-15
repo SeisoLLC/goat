@@ -61,6 +61,7 @@ function setup_environment() {
 
   if [[ "${INPUT_LOG_LEVEL:-}" =~ ^(ERROR|WARN|NOTICE|VERBOSE|DEBUG|TRACE)$ ]]; then
     export LOG_LEVEL="${INPUT_LOG_LEVEL}"
+    export ACTIONS_RUNNER_DEBUG="true"
   else
     echo "The provided LOG_LEVEL of ${INPUT_LOG_LEVEL:-null or unset} is not valid"
   fi
