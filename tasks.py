@@ -218,8 +218,7 @@ def goat(_c, debug=False):
         LOG.error("Linting requires a clean git directory to function properly")
         sys.exit(1)
 
-    # Pass in all of the host environment variables starting with GITHUB_ or
-    # INPUT_
+    # Pass in all of the host environment variables starting with GITHUB_ or INPUT_
     for element in dict(os.environ):
         if element.startswith("GITHUB_"):
             environment[element] = os.environ.get(element)
