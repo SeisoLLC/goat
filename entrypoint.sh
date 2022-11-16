@@ -76,7 +76,7 @@ function setup_environment() {
 
   # Move per-repo configurations into the right location at runtime so super-linter finds them, overwriting the defaults. This will handle hidden and
   # non-hidden files, as well as sym links
-  cp -p "${GITHUB_WORKSPACE}/.github/linters/"* "${GITHUB_WORKSPACE}/.github/linters/".* /etc/opt/goat/
+  cp -p "${GITHUB_WORKSPACE}/.github/linters/"* "${GITHUB_WORKSPACE}/.github/linters/".* /etc/opt/goat/ || true
 }
 
 function check_environment() {
