@@ -80,7 +80,7 @@ jobs:
       exclude: ^.*/(Dockerfile|Dockerfile\.dev)$
     ```
 
-1. Provide a linting configuration for any of the linters `super-linter` uses.
+1. Provide a linting configuration for any of the linters supported by `super-linter` in the `.github/linters/` directory of your repository.
 
     ```bash
     $ mkdir -p .github/linters/
