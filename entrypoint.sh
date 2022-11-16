@@ -43,7 +43,7 @@ function setup_environment() {
   export DEFAULT_WORKSPACE="/goat"
 
   # Update which config files the super-linter uses
-  export PYTHON_ISORT_CONFIG_FILE="pyproject.toml"
+  export PYTHON_ISORT_CONFIG_FILE="/etc/opt/goat/pyproject.toml"
 
   # Create variables for the various dictionary file paths
   export GLOBAL_DICTIONARY="/etc/opt/goat/seiso_global_dictionary.txt"
