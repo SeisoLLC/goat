@@ -13,6 +13,9 @@ inputs:
   exclude:
     description: 'Exclude anything that matches the regular expression'
     required: false
+  log_level:
+    description: 'Set the logging verbosity'
+    required: false
 runs:
   using: 'docker'
   image: 'docker://docker.io/seiso/goat:latest'
