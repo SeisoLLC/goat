@@ -42,9 +42,6 @@ function setup_environment() {
   # Set workspace to /goat/ for local runs
   export DEFAULT_WORKSPACE="/goat"
 
-  # Update which config files the super-linter uses
-  export PYTHON_ISORT_CONFIG_FILE="pyproject.toml"
-
   # Create variables for the various dictionary file paths
   export GLOBAL_DICTIONARY="/etc/opt/goat/seiso_global_dictionary.txt"
   export REPO_DICTIONARY="${GITHUB_WORKSPACE:-/goat}/.github/etc/dictionary.txt"
