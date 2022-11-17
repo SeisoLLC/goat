@@ -38,7 +38,7 @@ WORKDIR /goat/
 # LINTER_RULES_PATH is a path relative to GITHUB_WORKSPACE
 ENV LINTER_RULES_PATH=../../../../../etc/opt/goat
 # Workaround until https://github.com/github/super-linter/issues/3477#issuecomment-1317763372 is addressed
-RUN ln -s /etc/opt/goat/.isort.cfg /action/lib/.automation/.isort.cfg
+RUN ln -f -s /etc/opt/goat/.isort.cfg /action/lib/.automation/.isort.cfg
 COPY etc/ /etc/opt/goat/
 COPY entrypoint.sh /opt/goat/bin/entrypoint.sh
 
