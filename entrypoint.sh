@@ -73,10 +73,11 @@ function setup_environment() {
     echo "Setting ${GITHUB_WORKSPACE} as safe directory"
     git config --global --add safe.directory "${GITHUB_WORKSPACE}"
 
-    # When run in a pipeline, move per-repo configurations into the right location at runtime so super-linter finds them, overwriting the defaults.
-    # This will handle hidden and non-hidden files, as well as sym links
-    cp -p "${GITHUB_WORKSPACE}/.github/linters/"* "${GITHUB_WORKSPACE}/.github/linters/".* /etc/opt/goat/ || true
   fi
+
+  # When run in a pipeline, move per-repo configurations into the right location at runtime so super-linter finds them, overwriting the defaults.
+  # This will handle hidden and non-hidden files, as well as sym links
+  cp -p "${GITHUB_WORKSPACE:-.}/.github/linters/"* "${GITHUB_WORKSPACE:-.}/.github/linters/".* /etc/opt/goat/ || true
 }
 
 function check_environment() {
