@@ -5,6 +5,7 @@ axample
 bau
 bcrypt
 bigip
+bottlerocket
 bruteforce
 bruteforcing
 bssid
@@ -27,6 +28,7 @@ decryptor
 decryptors
 dehashed
 dialoghandler
+disa
 dmarc
 dnsdumpster
 domainkey
@@ -37,6 +39,7 @@ eaphammer
 ept
 essid
 essids
+eventbridge
 exploitability
 exrc
 fedramp
