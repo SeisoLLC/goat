@@ -1,0 +1,53 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  IMAGE_NAME: null
+  VERSION: null
+  PYTHON_VERSION: null
+
+tasks:
+  lint:
+    preconditions:
+      - sh: test `git ls-files -z -o --exclude-standard | wc -w` = "0"
+        msg: "There are untracked files, please commit before linting."
+    cmds:
+      - docker run --rm -v ${PWD}:/goat -e RUN_LOCAL=true -e EXCLUDE="/goat" seiso/goat:latest
+
+  test:
+    preconditions:
+      - sh: test `git symbolic-ref -q HEAD`
+        msg: "In detached HEAD state."
+    cmds:
+      - pipenv run pytest tests 2>&1 >/dev/null
+
+  build:
+    cmds:
+      - docker build -t {{.IMAGE_NAME}}:latest -t {{.IMAGE_NAME}}:{{.VERSION}} .
+
+  reformat:
+    cmds:
+      - >
+        docker run --rm -v ${PWD}:/goat -e RUN_LOCAL=true
+        --entrypoint isort seiso/goat:latest .
+        --settings-file /action/lib/.automation/.isort.cfg
+      - >
+        docker run --rm -v ${PWD}:/goat -e RUN_LOCAL=true
+        --entrypoint black seiso/goat:latest .
+
+  update:
+    cmds:
+      - >
+        docker run  --rm -v ${PWD}:/usr/src/app -w /usr/src/app python:{{.PYTHON_VERSION}} /bin/bash
+        -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
+    
+
+  clean:
+    cmds:
+      - rm -rf **/.DS_Store
+      - rm -rf **/.Thumbs.db
+      - rm -rf **/.mypy_cache
+      - rm -rf **/*.pyc
+      - rm -rf super-linter.log
+      - rm -rf .pytest-cache/
