@@ -29,9 +29,13 @@ RUN pip install pipenv \
                        jq \
                        npm \
                        tini \
+                       ruby \
+ && gem install \
+                       rubocop \
+                       rubocop-github \
  && npm install --no-cache -g dockerfile_lint \
-                              cspell \
-                              markdown-link-check
+                       cspell \
+                       markdown-link-check
 
 WORKDIR /goat/
 
