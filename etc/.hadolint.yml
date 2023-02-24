@@ -3,3 +3,4 @@ ignored:
   # Issue when using pipenv, which is our standard. Able to workaround with an
   # environment variable of PIP_NO_CACHE_DIR=1
   - DL3042
+  - DL3028
