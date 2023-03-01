@@ -13,7 +13,7 @@ tasks:
       - sh: test `git ls-files -z -o --exclude-standard | wc -w` = "0"
         msg: "There are untracked files, please commit before linting."
     cmds:
-      - docker run --rm -v ${PWD}:/goat -e RUN_LOCAL=true -e EXCLUDE="/goat" seiso/goat:latest
+      - docker run --rm -v "${PWD}:/goat" -e RUN_LOCAL=true -e EXCLUDE="/goat" seiso/goat:latest
 
   test:
     preconditions:
@@ -29,19 +29,18 @@ tasks:
   reformat:
     cmds:
       - >
-        docker run --rm -v ${PWD}:/goat -e RUN_LOCAL=true
+        docker run --rm -v "${PWD}:/goat" -e RUN_LOCAL=true
         --entrypoint isort seiso/goat:latest .
         --settings-file /action/lib/.automation/.isort.cfg
       - >
-        docker run --rm -v ${PWD}:/goat -e RUN_LOCAL=true
+        docker run --rm -v "${PWD}:/goat" -e RUN_LOCAL=true
         --entrypoint black seiso/goat:latest .
 
   update:
     cmds:
       - >
-        docker run  --rm -v ${PWD}:/usr/src/app -w /usr/src/app python:{{.PYTHON_VERSION}} /bin/bash
+        docker run  --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}} /bin/bash
         -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
-    
 
   clean:
     cmds:
