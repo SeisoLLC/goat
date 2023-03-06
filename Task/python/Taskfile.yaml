@@ -29,7 +29,7 @@ tasks:
       - sh: test `git symbolic-ref -q HEAD`
         msg: "In detached HEAD state."
     cmds:
-      - pipenv run pytest tests 2>&1 >/dev/null
+      - pipenv run pytest tests
 
   build:
     vars:
