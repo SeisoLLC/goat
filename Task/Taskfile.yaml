@@ -6,7 +6,8 @@ tasks:
   clean:
     cmds:
       - |
-        pipenv run python -c '
+        docker run --rm -v "${PWD}:/goat" -w /goat python:3.11-slim python -c '
+        import shutil
         from pathlib import Path
         CWD = Path(".").absolute()
         cleanup_list = []

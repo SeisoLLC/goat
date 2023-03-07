@@ -9,12 +9,10 @@ includes:
 
 vars:
   IMAGE_NAME: null
-  VERSION: null
   PYTHON_VERSION: null
-  REPO_TAGS: null
-  TAG_COMMIT_HASH: null
-  COMMIT_HASH: null
-  COMMIT_HASH_SHORT: null
+  PROJEC_SLUG: null
+  REPO_TAGS:
+    sh: git tag -l
 
 tasks:
   lint:
@@ -33,6 +31,14 @@ tasks:
 
   build:
     vars:
+      VERSION:
+        sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
+      TAG_COMMIT_HASH:
+        sh: git rev-list -1 v{{.VERSION}}
+      COMMIT_HASH:
+        sh: git rev-parse HEAD
+      COMMIT_HASH_SHORT:
+        sh: git rev-parse --short HEAD
       BUILD_VERSION:
         sh: |
           pipenv run python -c '
@@ -70,12 +76,10 @@ tasks:
       - sh: test `git status -s | wc -w` = "0"
         msg: "There are untracked files, please commit before creating a release."
     vars:
-      REPO_TAGS:
-        sh: git tag -l
       DATE_INFO: '{{now | date "2006.01"}}'
       RELEASE_VERSION:
         sh: |
-          pipenv run python -c '
+          docker run --rm -v "${PWD}:/goat" python:{{.PYTHON_VERSION}}-slim python -c '
           import re
           pattern = re.compile(r"v2[0-1][0-9]{2}.(0[0-9]|1[0-2]).[0-9]{2}")
           repo_tags = []
@@ -115,13 +119,14 @@ tasks:
     cmds:
       - task: base:clean
       - |
-        pipenv run python -c '
+        docker run --rm -v "${PWD}:/goat" -w /goat python:{{.PYTHON_VERSION}}-slim python -c '
+        import shutil
         from pathlib import Path
         CWD = Path(".").absolute()
         cleanup_list = []
         cleanup_list.extend(list(CWD.glob("**/.mypy_cache")))
         cleanup_list.extend(list(CWD.glob("**/*.pyc")))
-        cleanup_list.extend(list(CWD.glob("**/.pytest-cache")))
+        cleanup_list.extend(list(CWD.glob("**/.pytest_cache")))
         for item in cleanup_list:
             if item.is_dir():
                 shutil.rmtree(item)
