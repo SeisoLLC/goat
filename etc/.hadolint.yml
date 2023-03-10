@@ -3,4 +3,5 @@ ignored:
   # Issue when using pipenv, which is our standard. Able to workaround with an
   # environment variable of PIP_NO_CACHE_DIR=1
   - DL3042
+  # This requires version pinning in Dockerfile
   - DL3028
