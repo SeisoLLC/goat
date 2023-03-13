@@ -116,7 +116,10 @@
                 "sha256:f9d0c5c045a3ca9bedfc35dca8526798eb91a07aa7a2c0fee134c6c6f321cbd7",
                 "sha256:ff6f3db31555657f3163b15a6b7c6938d08df7adbfc9dd13d9d19edad678f1e8"
             ],
-            "version": "==3.0.1"
+
+
+            "markers": "python_version >= '3.6'",
+            "version": "==2.1.1"
         },
         "docker": {
             "hashes": [
@@ -136,11 +139,14 @@
         },
         "gitpython": {
             "hashes": [
+
                 "sha256:8ce3bcf69adfdf7c7d503e78fd3b1c492af782d58893b650adb2ac8912ddd573",
                 "sha256:f04893614f6aa713a60cbbe1e6a97403ef633103cdd0ef5eb6efe0deb98dbe8d"
             ],
             "index": "pypi",
             "version": "==3.1.31"
+
+
         },
         "idna": {
             "hashes": [
