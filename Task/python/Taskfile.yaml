@@ -3,7 +3,7 @@
 version: '3'
 
 includes:
-  base: 
+  base:
     taskfile: ../Taskfile.yaml
     internal: true
 
@@ -13,6 +13,8 @@ vars:
   PROJECT_SLUG: null
   REPO_TAGS:
     sh: git tag -l
+  VERSIONING:
+    sh: grep versioning setup.cfg | cut -d '"' -f 2
 
 tasks:
   lint:
@@ -74,11 +76,12 @@ tasks:
         docker run  --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}} /bin/bash
         -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
 
-  release-calver:
+  release:
     preconditions:
       - sh: test `git status -s | wc -w` = "0"
         msg: "There are untracked files, please commit before creating a release."
     vars:
+      RELEASE_TYPE: '{{.CLI_ARGS}}'
       DATE_INFO: '{{now | date "2006.01"}}'
       RELEASE_VERSION:
         sh: |
@@ -102,16 +105,7 @@ tasks:
           new_version = f"{{.DATE_INFO}}.{increment}"
           print(new_version)'
     cmds:
-      - pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}} unusedpart
-
-  release-semver:
-    preconditions:
-      - sh: test `git status -s | wc -w` = "0"
-        msg: "There are untracked files, please commit before creating a release."
-    vars:
-      RELEASE_TYPE: '{{.CLI_ARGS}}'
-    cmds:
-      - pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}
+      - '{{if eq .VERSIONING "CalVer"}}pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}} unusedpart{{else if eq .VERSIONING "SemVer"}}pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}{{end}}'
 
   publish:
     cmds:
@@ -120,9 +114,9 @@ tasks:
   clean:
     cmds:
       - task: base:clean
-      - find . -type d -name '__pycache__' -exec rm -rf {} +
-      - find . -type d -name '.mypy_cache' -exec rm -rf {} +
-      - find . -type d -name '.pytest_cache' -exec rm -rf {} +
-      - find . -type f -name '*.pyc' -delete
-      - find . -type d -name 'coverage-reports' -exec rm -rf {} +
-      - find . -type f -name '.coverage' -delete
+      - find {{.ROOT_DIR}} -type d -name '__pycache__' -exec rm -rf {} +
+      - find {{.ROOT_DIR}} -type d -name '.mypy_cache' -exec rm -rf {} +
+      - find {{.ROOT_DIR}} -type d -name '.pytest_cache' -exec rm -rf {} +
+      - find {{.ROOT_DIR}} -type f -name '*.pyc' -delete
+      - find {{.ROOT_DIR}} -type d -name 'coverage-reports' -exec rm -rf {} +
+      - find {{.ROOT_DIR}} -type f -name '.coverage' -delete
