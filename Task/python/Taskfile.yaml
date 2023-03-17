@@ -120,17 +120,9 @@ tasks:
   clean:
     cmds:
       - task: base:clean
-      - |
-        docker run --rm -v "${PWD}:/goat" -w /goat python:{{.PYTHON_VERSION}}-slim python -c '
-        import shutil
-        from pathlib import Path
-        CWD = Path(".").absolute()
-        cleanup_list = []
-        cleanup_list.extend(list(CWD.glob("**/.mypy_cache")))
-        cleanup_list.extend(list(CWD.glob("**/*.pyc")))
-        cleanup_list.extend(list(CWD.glob("**/.pytest_cache")))
-        for item in cleanup_list:
-            if item.is_dir():
-                shutil.rmtree(item)
-            elif item.is_file():
-                item.unlink()'
+      - find . -type d -name '__pycache__' -exec rm -rf {} +
+      - find . -type d -name '.mypy_cache' -exec rm -rf {} +
+      - find . -type d -name '.pytest_cache' -exec rm -rf {} +
+      - find . -type f -name '*.pyc' -delete
+      - find . -type d -name 'coverage-reports' -exec rm -rf {} +
+      - find . -type f -name '.coverage' -delete

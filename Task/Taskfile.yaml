@@ -5,17 +5,6 @@ version: '3'
 tasks:
   clean:
     cmds:
-      - |
-        docker run --rm -v "${PWD}:/goat" -w /goat python:3.11-slim python -c '
-        import shutil
-        from pathlib import Path
-        CWD = Path(".").absolute()
-        cleanup_list = []
-        cleanup_list.extend(list(CWD.glob("**/.DS_Store")))
-        cleanup_list.extend(list(CWD.glob("**/.Thumbs.db")))
-        cleanup_list.extend(list(CWD.glob("**/super-linter.log")))
-        for item in cleanup_list:
-            if item.is_dir():
-                shutil.rmtree(item)
-            elif item.is_file():
-                item.unlink()'
+      - find . -type f -name '.DS_Store' -delete
+      - find . -type f -name '.Thumbs.db' -delete
+      - find . -type f -name 'super-linter.log' -delete
