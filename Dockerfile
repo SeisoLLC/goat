@@ -1,5 +1,5 @@
 # Based on python:alpine as of February 2021
-FROM github/super-linter:slim-v4.9.7
+FROM github/super-linter:slim-v4.10.1
 
 # Required for the github/super-linter log (cannot be disabled)
 RUN mkdir -p /tmp/lint/
@@ -29,9 +29,13 @@ RUN pip install pipenv \
                        jq \
                        npm \
                        tini \
+                       ruby \
+ && gem install \
+                       rubocop \
+                       rubocop-github \
  && npm install --no-cache -g dockerfile_lint \
-                              cspell \
-                              markdown-link-check
+                       cspell \
+                       markdown-link-check
 
 WORKDIR /goat/
 
