@@ -18,6 +18,7 @@ vars:
 
 tasks:
   lint:
+    preconditions:
       - sh: docker pull seiso/goat:latest || echo "Failed to pull the latest goat, continuing anyway..."
     cmds:
       - docker run --rm -v "${PWD}:/goat" -e RUN_LOCAL=true seiso/goat:latest
