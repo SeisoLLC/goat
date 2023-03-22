@@ -18,9 +18,6 @@ vars:
 
 tasks:
   lint:
-    preconditions:
-      - sh: test `git status -s | wc -w` = "0"
-        msg: "There are untracked files, please commit before linting."
       - sh: docker pull seiso/goat:latest || echo "Failed to pull the latest goat, continuing anyway..."
     cmds:
       - docker run --rm -v "${PWD}:/goat" -e RUN_LOCAL=true seiso/goat:latest
