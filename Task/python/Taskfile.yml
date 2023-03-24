@@ -1,0 +1,121 @@
+# https://taskfile.dev
+
+version: '3'
+
+includes:
+  base:
+    taskfile: ../Taskfile.yaml
+    internal: true
+
+vars:
+  IMAGE_NAME: null
+  PYTHON_VERSION: null
+  PROJECT_SLUG: null
+  REPO_TAGS:
+    sh: git tag -l
+  VERSIONING:
+    sh: grep versioning setup.cfg | cut -d '"' -f 2
+
+tasks:
+  lint:
+    preconditions:
+      - sh: docker pull seiso/goat:latest || echo "Failed to pull the latest goat, continuing anyway..."
+    cmds:
+      - docker run --rm -v "${PWD}:/goat" -e RUN_LOCAL=true seiso/goat:latest
+
+  test:
+    preconditions:
+      - sh: test `git symbolic-ref -q HEAD`
+        msg: "In detached HEAD state."
+    cmds:
+      - pipenv run pytest --cov={{.PROJECT_SLUG}} tests
+
+  build:
+    vars:
+      VERSION:
+        sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
+      TAG_COMMIT_HASH:
+        sh: git rev-list -1 v{{.VERSION}}
+      COMMIT_HASH:
+        sh: git rev-parse HEAD
+      COMMIT_HASH_SHORT:
+        sh: git rev-parse --short HEAD
+      BUILD_VERSION:
+        sh: |
+          pipenv run python -c '
+          version_string = f"v{{.VERSION}}"
+          repo_tags = []
+          {{range $tag := .REPO_TAGS | splitLines -}}
+          repo_tags.append("{{$tag}}")
+          {{end}}
+          if (version_string in repo_tags and "{{.TAG_COMMIT_HASH}}" == "{{.COMMIT_HASH}}"):
+              build_version = "{{.VERSION}}"
+          else:
+              build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
+          print(build_version)'
+    cmds:
+      - docker buildx build --build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" --tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} .
+
+  reformat:
+    preconditions:
+      - sh: docker pull seiso/goat:latest || echo "Failed to pull the latest goat, continuing anyway..."
+    cmds:
+      - >
+        docker run --rm -v "${PWD}:/goat" -e RUN_LOCAL=true
+        --entrypoint isort seiso/goat:latest .
+        --settings-file /action/lib/.automation/.isort.cfg
+      - >
+        docker run --rm -v "${PWD}:/goat" -e RUN_LOCAL=true
+        --entrypoint black seiso/goat:latest .
+
+  update:
+    cmds:
+      - git submodule update --init --recursive
+      - >
+        docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}} /bin/bash
+        -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
+
+  release:
+    preconditions:
+      - sh: test `git status -s | wc -w` = "0"
+        msg: "There are untracked files, please commit before creating a release."
+    vars:
+      RELEASE_TYPE: '{{.CLI_ARGS}}'
+      DATE_INFO: '{{now | date "2006.01"}}'
+      RELEASE_VERSION:
+        sh: |
+          docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}}-slim python -c '
+          import re
+          pattern = re.compile(r"v2[0-1][0-9]{2}.(0[0-9]|1[0-2]).[0-9]{2}")
+          repo_tags = []
+          {{range $tag := .REPO_TAGS | splitLines -}}
+          repo_tags.append("{{$tag}}")
+          {{end}}
+          for tag in reversed(repo_tags):
+              if pattern.fullmatch(tag):
+                  latest_release = tag
+                  break
+              else:
+                  latest_release = None
+          if latest_release and "{{.DATE_INFO}}" == latest_release[1:8]:
+              increment = str(int(latest_release[9:]) + 1).zfill(2)
+          else:
+              increment = "01"
+          new_version = f"{{.DATE_INFO}}.{increment}"
+          print(new_version)'
+    cmds:
+      - '{{if eq .VERSIONING "CalVer"}}pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}} unusedpart{{else if eq .VERSIONING "SemVer"}}pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}{{end}}'
+
+  publish:
+    cmds:
+      - docker push --all-tags {{.IMAGE_NAME}}
+
+  clean:
+    cmds:
+      - task: base:clean
+      - find {{.ROOT_DIR}} -type d -name '__pycache__' -exec rm -rf {} +
+      - find {{.ROOT_DIR}} -type d -name '.mypy_cache' -exec rm -rf {} +
+      - find {{.ROOT_DIR}} -type d -name '.pytest_cache' -exec rm -rf {} +
+      - find {{.ROOT_DIR}} -type f -name '*.pyc' -delete
+      - find {{.ROOT_DIR}} -type d -name 'coverage-reports' -exec rm -rf {} +
+      - find {{.ROOT_DIR}} -type f -name '.coverage' -delete

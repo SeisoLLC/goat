@@ -146,6 +146,7 @@ sshkeys
 ssid
 ssids
 sysvol
+taskfiles
 telerik
 terrascan
 tfsec
