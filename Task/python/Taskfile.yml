@@ -54,7 +54,7 @@ tasks:
               build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
           print(build_version)'
     cmds:
-      - docker buildx build --tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} .
+      - docker buildx build --build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" --tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} .
 
   reformat:
     preconditions:
@@ -72,7 +72,7 @@ tasks:
     cmds:
       - git submodule update --init --recursive
       - >
-        docker run  --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}} /bin/bash
+        docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}} /bin/bash
         -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
 
   release:
