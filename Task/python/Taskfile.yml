@@ -54,7 +54,7 @@ tasks:
               build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
           print(build_version)'
     cmds:
-      - docker buildx build --build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" --tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} .
+      - docker buildx build -o type=oci --build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" --tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} .
 
   reformat:
     preconditions:
