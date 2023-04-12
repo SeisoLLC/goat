@@ -129,8 +129,13 @@ function seiso_lint() {
   echo "Excluded ${#excluded[@]} files"
 }
 
+function lint_loop() {
+  input="/etc/opt/goat/linter-list.txt"
+  while IFS= read -r line; do $line &; done < "$input"
+}
 
 setup_environment
 check_environment
 super_lint
 seiso_lint
+lint_loop

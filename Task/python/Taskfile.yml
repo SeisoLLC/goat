@@ -1,6 +1,7 @@
+---
 # https://taskfile.dev
 
-version: '3'
+version: "3"
 
 includes:
   base:
@@ -54,7 +55,8 @@ tasks:
               build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
           print(build_version)'
     cmds:
-      - docker buildx build --build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" --tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} .
+      - docker buildx build --build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" --tag \
+        {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} .
 
   reformat:
     preconditions:
@@ -80,7 +82,7 @@ tasks:
       - sh: test `git status -s | wc -w` = "0"
         msg: "There are untracked files, please commit before creating a release."
     vars:
-      RELEASE_TYPE: '{{.CLI_ARGS}}'
+      RELEASE_TYPE: "{{.CLI_ARGS}}"
       DATE_INFO: '{{now | date "2006.01"}}'
       RELEASE_VERSION:
         sh: |
@@ -104,7 +106,8 @@ tasks:
           new_version = f"{{.DATE_INFO}}.{increment}"
           print(new_version)'
     cmds:
-      - '{{if eq .VERSIONING "CalVer"}}pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}} unusedpart{{else if eq .VERSIONING "SemVer"}}pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}{{end}}'
+      - '{{if eq .VERSIONING "CalVer"}}pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}} \
+        unusedpart{{else if eq .VERSIONING "SemVer"}}pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}{{end}}'
 
   publish:
     cmds:
