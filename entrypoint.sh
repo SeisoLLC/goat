@@ -142,7 +142,7 @@ function lint_loop() {
   for i in "${!linters[@]}"
   do
     echo "key  : $i"
-    echo "value: ${array[$i]}"
+    echo "value: ${linters[$i]}"
   done
 
   #shed --refactor --py310-plus $(find . -name "*py" -type f)
