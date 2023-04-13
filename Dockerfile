@@ -24,7 +24,7 @@ COPY Pipfile Pipfile.lock ./
 # hadolint ignore=DL3016,DL3018,DL3013
 RUN pip install pipenv \
     && pipenv install --deploy --ignore-pipfile \
-    && pipenv install shed \
+    && pip install shed \
     && apk upgrade \
     && apk --no-cache add go \
     jq \
