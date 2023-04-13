@@ -141,8 +141,9 @@ function lint_loop() {
   
   for i in "${!linters[@]}"
   do
-    /bin/bash -c "$i"
-    #echo "value: ${linters[$i]}"
+    while read -r file; do
+      bash -c "$i ${linters[$i]}"
+    done < <(find . -path "./.git" -prune -or -type f)
   done
 
   #shed --refactor --py310-plus $(find . -name "*py" -type f)
