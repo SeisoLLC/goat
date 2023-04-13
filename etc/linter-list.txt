@@ -1,1 +1,0 @@
-shed --refactor --py310-plus $(find . -name "*py" -type f)

@@ -130,8 +130,22 @@ function seiso_lint() {
 }
 
 function lint_loop() {
-  input="/etc/opt/goat/linter-list.txt"
-  while IFS= read -r line; do $line &; done < "$input"
+  input="/etc/opt/goat/linters.txt"
+
+  declare -A linters 
+  
+  while IFS="=" read -d $'\n' -r k v
+  do 
+    linters[$k]="$v"
+  done < $input
+  
+  for i in "${!linters[@]}"
+  do
+    echo "key  : $i"
+    echo "value: ${array[$i]}"
+  done
+
+  #shed --refactor --py310-plus $(find . -name "*py" -type f)
 }
 
 setup_environment
