@@ -141,8 +141,8 @@ function lint_loop() {
   
   for i in "${!linters[@]}"
   do
-    echo "key  : $i"
-    echo "value: ${linters[$i]}"
+    bash -c "$i"
+    #echo "value: ${linters[$i]}"
   done
 
   #shed --refactor --py310-plus $(find . -name "*py" -type f)
