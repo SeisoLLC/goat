@@ -141,7 +141,7 @@ function lint_loop() {
   
   for i in "${!linters[@]}"
   do
-    $i
+    /bin/bash -c "$i"
     #echo "value: ${linters[$i]}"
   done
 
