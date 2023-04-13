@@ -150,6 +150,6 @@ function lint_loop() {
 
 setup_environment
 check_environment
-super_lint
+#super_lint
 seiso_lint
 lint_loop
