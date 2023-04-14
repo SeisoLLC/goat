@@ -138,7 +138,7 @@ function lint_loop() {
   do 
     linters[$k]="$v"
   done < $input
-  
+  bash -c "echo \"print (\"Done\") >> test.py"
   bash -c "cat $(find . -type f -name \"test.py\")"
   
   for i in "${!linters[@]}"
