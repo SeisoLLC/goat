@@ -133,7 +133,7 @@ function lint_loop() {
   input="/etc/opt/goat/linters.txt"
 
   declare -A linters 
-
+  cat /etc/opt/goat/test.py
   while IFS="=" read -d $'\n' -r k v
   do 
     linters[$k]="$v"
@@ -145,6 +145,8 @@ function lint_loop() {
       bash -c "$i ${linters[$i]}"
     done < <(find . -path "./.git" -prune -or -type f)
   done
+
+  cat /etc/opt/goat/test.py
 }
 
 setup_environment
