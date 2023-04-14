@@ -146,7 +146,7 @@ function lint_loop() {
       bash -c "$i ${linters[$i]}"
     done < <(find . -path "./.git" -prune -or -type f)
 
-    echo "$i" 
+    echo "$i has completed successfully." 
   done
 }
 
