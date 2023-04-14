@@ -133,13 +133,11 @@ function lint_loop() {
   input="/etc/opt/goat/linters.txt"
 
   declare -A linters 
-  
+  bash -c "cat $(find / -name \"test.py\" -type f)"
   while IFS="=" read -d $'\n' -r k v
   do 
     linters[$k]="$v"
   done < $input
-  bash -c 'echo \"print \(\"Done\"\)\" >> test.py\'
-  bash -c 'cat $(find . -type f -name \"test.py\")'
   
   for i in "${!linters[@]}"
   do
@@ -147,10 +145,6 @@ function lint_loop() {
       bash -c "$i ${linters[$i]}"
     done < <(find . -path "./.git" -prune -or -type f)
   done
-  
-  bash -c "cat $(find . -type f -name \"test.py\")"
-
-  #shed --refactor --py310-plus $(find . -name "*py" -type f)
 }
 
 setup_environment
