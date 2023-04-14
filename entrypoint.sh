@@ -139,12 +139,16 @@ function lint_loop() {
     linters[$k]="$v"
   done < $input
   
+  bash -c "cat $(find . -type f -name \"test.py\")"
+  
   for i in "${!linters[@]}"
   do
     while read -r file; do
       bash -c "$i ${linters[$i]}"
     done < <(find . -path "./.git" -prune -or -type f)
   done
+  
+  bash -c "cat $(find . -type f -name \"test.py\")"
 
   #shed --refactor --py310-plus $(find . -name "*py" -type f)
 }
