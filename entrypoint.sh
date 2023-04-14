@@ -133,7 +133,8 @@ function lint_loop() {
   input="/etc/opt/goat/linters.txt"
 
   declare -A linters 
-
+  # TODO: Work out how to specify filetypes for linters
+  # Shed auto determines filetypes to lint when run in a git repo
   while IFS="=" read -d $'\n' -r k v
   do 
     linters[$k]="$v"
@@ -144,11 +145,13 @@ function lint_loop() {
     while read -r file; do
       bash -c "$i ${linters[$i]}"
     done < <(find . -path "./.git" -prune -or -type f)
+
+    echo "$i" 
   done
 }
 
 setup_environment
 check_environment
-#super_lint
-seiso_lint
 lint_loop
+super_lint
+seiso_lint
