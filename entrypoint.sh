@@ -131,7 +131,7 @@ function seiso_lint() {
 
 function lint_loop() {
   input="/etc/opt/goat/linters.txt"
-
+  pip install shed
   declare -A linters 
 
   while IFS="=" read -d $'\n' -r k v
