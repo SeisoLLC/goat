@@ -131,7 +131,7 @@ function seiso_lint() {
 
 function lint_loop() {
   input="/etc/opt/goat/linters.txt"
-  pip install shed
+
   declare -A linters 
 
   while IFS="=" read -d $'\n' -r k v
@@ -142,7 +142,7 @@ function lint_loop() {
   for i in "${!linters[@]}"
   do
     while read -r file; do
-      $i ${linters[$i]}
+      bash -c "$i ${linters[$i]}"
     done < <(find . -path "./.git" -prune -or -type f)
   done
 }
