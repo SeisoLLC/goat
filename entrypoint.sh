@@ -133,7 +133,7 @@ function lint_loop() {
   input="/etc/opt/goat/linters.txt"
 
   declare -A linters 
-  bash -c "cat $(find / -name \"test.py\" -type f)"
+
   while IFS="=" read -d $'\n' -r k v
   do 
     linters[$k]="$v"
