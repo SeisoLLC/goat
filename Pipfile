@@ -5,12 +5,12 @@ name = "pypi"
 
 [packages]
 
-[dev-packages]
+[dev - packages]
 docker = "*"
 gitpython = "*"
 invoke = "*"
 requests = "*"
-pre-commit = "*"
+pre - commit = "*"
 
 [requires]
 python_version = "3.10"

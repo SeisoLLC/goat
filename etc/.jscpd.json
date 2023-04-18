@@ -1,10 +1,6 @@
 {
     "threshold": 0,
-    "reporters": [
-        "consoleFull"
-    ],
-    "ignore": [
-        "**/.github/workflows/**"
-    ],
-    "absolute": true
+    "reporters": ["consoleFull"],
+    "ignore": ["**/.github/workflows/**"],
+    "absolute": true,
 }
