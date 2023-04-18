@@ -141,11 +141,11 @@ function lint_loop() {
   done < $input
   
   for i in "${!linters[@]}"
-  bash -c "$i ${linters[$i]} &"
+  bash -c "$i ${linters[$i]}" &
   wait
   do
     while read -r file; do
-      bash -c "echo $i ${linters[$i]} &"
+      bash -c "echo $i ${linters[$i]}"
     done < <(find . -path "./.git" -prune -or -type f)
     wait
     echo "Linter $i has completed." 
