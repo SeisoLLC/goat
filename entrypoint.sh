@@ -143,9 +143,9 @@ function lint_loop() {
   for i in "${!linters[@]}"
   do
     while read -r file; do
-      bash -c "$i ${linters[$i]} &"
+      bash -c "$i ${linters[$i]}"
     done < <(find . -path "./.git" -prune -or -type f)
-    wait
+
     echo "Linter $i has completed." 
   done
 }
@@ -153,5 +153,5 @@ function lint_loop() {
 setup_environment
 check_environment
 lint_loop
-#super_lint
+super_lint
 seiso_lint
