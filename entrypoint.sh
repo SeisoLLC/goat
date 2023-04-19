@@ -174,7 +174,7 @@ function lint_loop() {
       echo "Running ${linter[name]}"
       # If filetype is "all" just run the linter with args, else get a list 
       if [[ "${linter[filetype]}" = "all" ]]; then
-        "${linter[name]}""${linter[args]}"
+        "${linter[name]}" "${linter[args]}"
       else
         matching_files=$(get_matching_files "${included[@]}" "${linter[filetype]}")
 
