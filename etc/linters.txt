@@ -1,1 +1,4 @@
-"shed" = "--refactor"
+"name"="shed","args"="--refactor","filetype"="all","installer"="pip"
+"name"="cspell","args"="-c /etc/opt/goat/cspell.config.js -- \"${file}\"","filetype"="md","installer"="npm","executor"="npx"
+"name"="markdown-link-check","args"="--config /etc/opt/goat/links.json --verbose \"${file}\"","filetype"="md","installer"="npm","executor"="npx"
+"name"="dockerfile_lint","args"="-f \"${file}\" -r /etc/opt/goat/oci.yml",filetype="Dockerfile","installer"="npm"

@@ -129,29 +129,74 @@ function seiso_lint() {
   echo "Excluded ${#excluded[@]} files"
 }
 
+function get_matching_files() {
+  # Dynamically get a list of files to lint based on filetype
+  local files=("$@")
+  local key="$1"
+  local matching_files()
+
+  for file in "${files[@]}"; do
+    if [[ "$file" == *"$key"* ]]; then
+      matching_files+=("$file")
+    fi
+  done
+  echo "${matching_files[@]}"
+}
+
 function lint_loop() {
+  excluded=()
+  included=()
+
+  while read -r file; do
+    # Build a base list of files to lint
+    if [[ -n ${INPUT_EXCLUDE:+x} && "${file}" =~ ${INPUT_EXCLUDE} ]]; then
+      excluded+=("${file}")
+      continue
+    fi
+
+    included+=("${file}")
+  done < <(find . -path "./.git" -prune -or -type f)
+
   input="/etc/opt/goat/linters.txt"
 
-  declare -A linters 
-  # TODO: Work out how to specify filetypes for linters and how to handle multiple command line switches
-  # Shed auto determines filetypes to lint when run in a git repo
-  while IFS="=" read -d $'\n' -r k v
-  do 
-    linters[$k]="$v"
+  while read line; do
+    # Split the line into KVP using the "," separator
+    IFS="," read -ra pairs <<< "$line"
+
+    # Create an associative array for each KVP and launch the linter 
+    declare -A linter
+    for pair in "${pairs[@]}"; do
+      IFS="=" read -r key value <<< "$pair"
+      linter["$key"]="$value"
+    done
+    
+    {
+      # If filetype is "all" just run the linter with args, else get a list 
+      if [[ ${linter[filetype]} = "all" ]]; then
+        "${linter[name]}""${linter[args]}"
+      else
+        matching_files=$(get_matching_files "${included[@]}" "${linter[filetype]}")
+
+        for file in "${matching_file[@]}"; do
+          # If linter has an executor, append the linter call with that executor, else just run the linter
+          if [ -v linter["executor"] ]; then
+            "${linter[executor]}" "${linter[name]}" "${linter[args]}"
+          else
+            "${linter[name]}" "${linter[args]}"
+          fi
+        done
+      fi
+    } &
   done < $input
   
-  for i in "${!linters[@]}"
-  do
-    while read -r file; do
-      bash -c "$i ${linters[$i]} \&"
-    done < <(find . -path "./.git" -prune -or -type f)
-    
-    echo "Linter $i has completed." 
-  done
+  wait
+
+  echo "Scanned ${#included[@]} files"
+  echo "Excluded ${#excluded[@]} files"
 }
 
 setup_environment
 check_environment
 lint_loop
-super_lint
-seiso_lint
+#super_lint
+#seiso_lint
