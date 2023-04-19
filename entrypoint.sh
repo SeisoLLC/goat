@@ -133,7 +133,7 @@ function get_matching_files() {
   # Dynamically get a list of files to lint based on filetype
   local files=("$@")
   local key="$1"
-  local matching_files()
+  local matching_files=()
 
   for file in "${files[@]}"; do
     if [[ "$file" == *"$key"* ]]; then
