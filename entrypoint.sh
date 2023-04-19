@@ -171,6 +171,7 @@ function lint_loop() {
     done
     
     {
+      echo "Running ${linter[name]}"
       # If filetype is "all" just run the linter with args, else get a list 
       if [[ "${linter[filetype]}" = "all" ]]; then
         "${linter[name]}""${linter[args]}"
