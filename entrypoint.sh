@@ -154,7 +154,7 @@ function lint_loop() {
       excluded+=("${file}")
       continue
     fi
-
+    echo $file
     included+=("${file}")
   done < <(find . -path "./.git" -prune -or -type f)
 
@@ -173,8 +173,6 @@ function lint_loop() {
     
     {
       echo "Running ${linter[name]}"
-      echo "${included[@]}"
-      echo "${linter[filetype]}"
       # If filetype is "all" just run the linter with args, else get a list 
       if [[ ${linter[filetype]} = "all" ]]; then
         bash -c "${linter[name]} ${linter[args]}"
