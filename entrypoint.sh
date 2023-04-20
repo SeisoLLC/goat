@@ -182,9 +182,9 @@ function lint_loop() {
         for file in "${matching_file[@]}"; do
           # If linter has an executor, append the linter call with that executor, else just run the linter
           if [ -v "${linter[executor]}" ]; then
-            bash -c "${linter[executor]} ${linter[name]} ${linter[args]}"
+            bash -c "${linter[executor]} ${linter[name]} ${linter[args]} $file"
           else
-            bash -c "${linter[name]} ${linter[args]}"
+            bash -c "${linter[name]} ${linter[args]} $file"
           fi
         done
       fi
@@ -198,4 +198,4 @@ setup_environment
 check_environment
 lint_loop
 #super_lint
-seiso_lint
+#seiso_lint
