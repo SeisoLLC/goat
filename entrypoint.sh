@@ -169,31 +169,28 @@ function lint_loop() {
       IFS="=" read -r key value <<< "$pair"
       linter["$key"]="$value"
     done
-    echo "{$linter[@]}"
-    # {
-    #   echo "Running ${linter[name]}"
-    #   # If filetype is "all" just run the linter with args, else get a list 
-    #   if [[ ${linter[filetype]} = "all" ]]; then
-    #     "${linter[name]} ${linter[args]}"
-    #   else
-    #     matching_files=$(get_matching_files "${included[@]}" "${linter[filetype]}")
+    
+    {
+      echo "Running ${linter[name]}"
+      # If filetype is "all" just run the linter with args, else get a list 
+      if [[ ${linter[filetype]} = "all" ]]; then
+        bash -c "${linter[name]} ${linter[args]}"
+      else
+        matching_files=$(get_matching_files "${included[@]}" "${linter[filetype]}")
 
-    #     for file in "${matching_file[@]}"; do
-    #       # If linter has an executor, append the linter call with that executor, else just run the linter
-    #       if [ -v "${linter[executor]}" ]; then
-    #         "${linter[executor]} ${linter[name]} ${linter[args]}"
-    #       else
-    #         "${linter[name]} ${linter[args]}"
-    #       fi
-    #     done
-    #   fi
-    # } &
-  # done < $input
+        for file in "${matching_file[@]}"; do
+          # If linter has an executor, append the linter call with that executor, else just run the linter
+          if [ -v "${linter[executor]}" ]; then
+            bash -c "${linter[executor]} ${linter[name]} ${linter[args]}"
+          else
+            bash -c "${linter[name]} ${linter[args]}"
+          fi
+        done
+      fi
+    } &
+  done < $input
   
-  # wait
-
-  echo "Scanned ${#included[@]} files"
-  echo "Excluded ${#excluded[@]} files"
+  wait
 }
 
 setup_environment
