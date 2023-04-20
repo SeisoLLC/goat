@@ -171,19 +171,19 @@ function lint_loop() {
     done
     
     {
-      echo "Running ${linter['name']}"
+      echo "Running ${linter[name]}"
       # If filetype is "all" just run the linter with args, else get a list 
-      if [[ "${linter['filetype']}" = "all" ]]; then
-        "${linter['name']}" "${linter['args']}"
+      if [[ ${linter[filetype]} = "all" ]]; then
+        "${linter[name]} ${linter[args]}"
       else
-        matching_files=$(get_matching_files "${included[@]}" "${linter['filetype']}")
+        matching_files=$(get_matching_files "${included[@]}" "${linter[filetype]}")
 
         for file in "${matching_file[@]}"; do
           # If linter has an executor, append the linter call with that executor, else just run the linter
-          if [ -v "${linter['executor']}" ]; then
-            "${linter['executor']}" "${linter['name']}" "${linter['args']}"
+          if [ -v "${linter[executor]}" ]; then
+            "${linter[executor]} ${linter[name]} ${linter[args]}"
           else
-            "${linter['name']}" "${linter['args']}"
+            "${linter[name]} ${linter[args]}"
           fi
         done
       fi
