@@ -131,6 +131,7 @@ function seiso_lint() {
 
 function get_matching_files() {
   # Dynamically get a list of files to lint based on filetype
+  # TODO: add better handling for extensions that might appear within a filename
   local files=("$@")
   local key="$1"
   local matching_files=()
@@ -197,4 +198,4 @@ setup_environment
 check_environment
 lint_loop
 #super_lint
-#seiso_lint
+seiso_lint
