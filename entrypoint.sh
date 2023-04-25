@@ -131,13 +131,15 @@ function seiso_lint() {
 
 function get_matching_files() {
   # Dynamically get a list of files to lint based on filetype
-  # TODO: add better handling for extensions that might appear within a filename
-  local files=("$@")
-  local key="$1"
-  local matching_files=()
 
-  for file in "${files[@]}"; do
-    if [[ "$file" == *"$key"* ]]; then
+  local matching_files=()
+  local filenames=("${@:2}")
+  local key=$1
+
+  for file in "${filenames[@]}"; do
+    filename=$(basename "$file")
+
+    if [[ "$filename" == *"$key" ]]; then
       matching_files+=("$file")
     fi
   done
@@ -147,6 +149,7 @@ function get_matching_files() {
 function lint_loop() {
   excluded=()
   included=()
+  linter_failed=false
 
   while read -r file; do
     # Build a base list of files to lint
@@ -154,17 +157,23 @@ function lint_loop() {
       excluded+=("${file}")
       continue
     fi
-    echo $file
+
     included+=("${file}")
   done < <(find . -path "./.git" -prune -or -type f)
-
+  
+  declare -A linter_exit_codes
+  logpath="/etc/opt/goat/logs"
   input="/etc/opt/goat/linters.txt"
 
   while read line; do
+    if [[ $line == \#* ]]; then
+      continue
+    fi
+
     # Split the line into KVP using the "," separator
     IFS="," read -ra pairs <<< "$line"
 
-    # Create an associative array for each KVP and launch the linter 
+    # Create an associative array adding each KVP and launch the linter 
     declare -A linter
     for pair in "${pairs[@]}"; do
       IFS="=" read -r key value <<< "$pair"
@@ -172,26 +181,35 @@ function lint_loop() {
     done
     
     {
-      echo "Running ${linter[name]}"
-      # If filetype is "all" just run the linter with args, else get a list 
+      # If filetype is "all" just run the linter with args, else get a list of files to lint based on filetype
       if [[ ${linter[filetype]} = "all" ]]; then
-        bash -c "${linter[name]} ${linter[args]}"
-      # else
-      #   matching_files=$(get_matching_files "${included[@]}" "${linter[filetype]}")
+        echo "Running command: ${linter[name]} ${linter[args]}"
+        bash -c "${linter[name]} ${linter[args]} &>> $logpath/${linter[name]}.log"
+        return=$?
+        if [[ "${return:-1}" != 0 ]];then
+        else
+          linter_exit_codes["${linter[name]}"]="${return}"
+          continue
+      else
+        matching_files=$(get_matching_files "${linter[filetype]}" "${included[@]}")
 
-      #   for file in "${matching_files[@]}"; do
-      #     # If linter has an executor, append the linter call with that executor, else just run the linter
-      #     if [ -v "${linter[executor]}" ]; then
-      #       bash -c "${linter[executor]} ${linter[name]} ${linter[args]} $file"
-      #     else
-      #       bash -c "${linter[name]} ${linter[args]} $file"
-      #     fi
-      #   done
+        for file in "${matching_files[@]}"; do 
+          # If linter has an executor, append the linter call with that executor, else just run the linter
+          if [[ "${linter[executor]+x}" ]]; then
+            echo "Running command: ${linter[executor]} ${linter[name]} ${linter[args]} $file"
+            bash -c "${linter[executor]} ${linter[name]} ${linter[args]} $file &>> $logpath/${linter[name]}.log"
+          else
+            echo "Running command: ${linter[name]} ${linter[args]} $file"
+            bash -c "${linter[name]} ${linter[args]} $file &>> $logpath/${linter[name]}.log"
+          fi
+        done
       fi
     } &
   done < $input
-  
+
   wait
+
+  cat /etc/opt/goat/logs/*
 }
 
 setup_environment
