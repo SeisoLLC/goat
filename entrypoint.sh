@@ -186,7 +186,7 @@ function lint_loop() {
     {
       # If filetype is "all" just run the linter with args, else get a list of files to lint based on filetype
       if [[ ${linter[filetype]} = "all" ]]; then
-        echo "Running command: ${linter[name]} ${linter[args]}" 
+        echo "Running linter: ${linter[name]} ${linter[args]}" 
         bash -c "${linter[name]} ${linter[args]} 2>&1 >> $logpath/${linter[name]}.log"
       else
         matching_files=$(get_matching_files "${linter[filetype]}" "${included[@]}")
@@ -194,10 +194,10 @@ function lint_loop() {
         for file in "${matching_files[@]}"; do 
           # If linter has an executor, append the linter call with that executor, else just run the linter
           if [[ "${linter[executor]+x}" ]]; then
-            echo "Running command: ${linter[executor]} ${linter[name]} ${linter[args]} $file" 
+            echo "Running linter: ${linter[executor]} ${linter[name]} ${linter[args]} $file" 
             bash -c "${linter[executor]} ${linter[name]} ${linter[args]} $file 2>&1 >> $logpath/${linter[name]}.log"
           else
-            echo "Running command: ${linter[name]} ${linter[args]} $file"
+            echo "Running linter: ${linter[name]} ${linter[args]} $file"
             bash -c "${linter[name]} ${linter[args]} $file 2>&1 >> $logpath/${linter[name]}.log"
           fi
         done
