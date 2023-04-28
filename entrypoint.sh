@@ -128,7 +128,7 @@ function lint_files() {
   exec &>> "${linter[logfile]}"
   if [[ "${linter[filetype]}" = "all" ]]; then
     cmd="${linter[name]} ${linter[args]}"
-    eval $cmd
+    eval "$cmd"
     linter_failed $?
   else
     for file in $(get_files_matching_filetype "${linter[filetype]}" "${included[@]}"); do 
@@ -137,7 +137,7 @@ function lint_files() {
       else
         cmd="${linter[name]} ${linter[args]} ${file}"
       fi
-      eval $cmd;
+      eval "$cmd"
       linter_failed $?
     done
   fi
@@ -181,7 +181,6 @@ function seiso_lint() {
     echo "${linter[name]^^}" >>"${linter[logfile]}"
     
     lint_files & 
-    pid=$!
     
     echo "-------------------------------" >> "${linter[logfile]}"
   done < $input
