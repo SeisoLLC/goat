@@ -126,7 +126,7 @@ function linter_failed() {
 
 function lint_files() {
   if [[ "${linter[filetype]}" = "all" ]]; then
-    bash -c "${linter[name]} ${linter[args]}" &>> "${linter[logfile]}"
+    bash -c "${linter[name]} ${linter[args]} &>> ${linter[logfile]}"
     linter_failed $?
   else
     for file in $(get_files_matching_filetype "${linter[filetype]}" "${included[@]}"); do 
@@ -134,7 +134,7 @@ function lint_files() {
         bash -c "${linter[executor]} ${linter[name]} ${linter[args]} ${file} &>> ${linter[logfile]}"
         linter_failed $?
       else
-        bash -c "${linter[name]} ${linter[args]} ${file}" &>> "${linter[logfile]}"
+        bash -c "${linter[name]} ${linter[args]} ${file} &>> ${linter[logfile]}"
         linter_failed $?
       fi
     done
