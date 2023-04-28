@@ -37,11 +37,6 @@ repos:
       - id: shed
         args: [--refactor]
         types_or: [python, pyi, markdown, rst]
-  - repo: https://github.com/pylint-dev/pylint
-    rev: v3.0.0a6
-    hooks:
-      - id: pylint
-        args: [--errors-only]
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.30.0
     hooks:
@@ -51,3 +46,8 @@ repos:
     rev: v1.52.2
     hooks:
       - id: golangci-lint
+  - repo: https://github.com/tcort/markdown-link-check
+    rev: v3.11.1
+    hooks:
+      - id: markdown-link-check
+        args: [-q]

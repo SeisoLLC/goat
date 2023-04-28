@@ -1,5 +1,5 @@
 # Based on python:alpine as of February 2021
-FROM github/super-linter:slim-v4.10.1
+FROM github/super-linter:slim-v5.0.0
 
 # Required for the github/super-linter log (cannot be disabled)
 RUN mkdir -p /tmp/lint/
@@ -24,7 +24,7 @@ COPY Pipfile Pipfile.lock ./
 # hadolint ignore=DL3016,DL3018,DL3013
 RUN pip install pipenv \
     && pipenv install --deploy --ignore-pipfile \
-    && pip install shed \
+    && pip install shed ruff \
     && apk upgrade \
     && apk --no-cache add go \
     jq \

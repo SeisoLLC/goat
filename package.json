@@ -1,1 +1,5 @@
-{"dependencies": {"dockerfile_lint": "^0.3.4"}}
+{
+    "dependencies": {
+        "dockerfile_lint": "^0.3.4"
+    }
+}

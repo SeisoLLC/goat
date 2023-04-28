@@ -18,7 +18,6 @@ function feedback() {
   case "${1}" in
     ERROR)
       >&2 echo -e "${!color}${1}:  ${2}${DEFAULT}"
-      exit 1
       ;;
     WARNING)
       >&2 echo -e "${!color}${1}:  ${2}${DEFAULT}"
@@ -100,119 +99,127 @@ function super_lint() {
   /action/lib/linter.sh
 }
 
-function seiso_lint() {
-  excluded=()
-  included=()
-
-  while read -r file; do
-    # Apply filter with =~ to ensure it is aligned with github/super-linter
-    if [[ -n ${INPUT_EXCLUDE:+x} && "${file}" =~ ${INPUT_EXCLUDE} ]]; then
-      excluded+=("${file}")
-      continue
-    fi
-
-    included+=("${file}")
-
-    # Check Dockerfiles
-    if [[ "${file}" = *Dockerfile ]]; then
-      dockerfile_lint -f "${file}" -r /etc/opt/goat/oci.yml
-    fi
-
-    # Check .md file spelling and links
-    if [[ "${file}" = *.md ]]; then
-      npx cspell -c /etc/opt/goat/cspell.config.js -- "${file}"
-      npx markdown-link-check --config /etc/opt/goat/links.json --verbose "${file}"
-    fi
-  done < <(find . -path "./.git" -prune -or -type f)
-
-  echo "Scanned ${#included[@]} files"
-  echo "Excluded ${#excluded[@]} files"
-}
-
-function get_matching_files() {
-  # Dynamically get a list of files to lint based on filetype
-
+function get_files_matching_filetype() {
   local matching_files=()
   local filenames=("${@:2}")
-  local key=$1
+  local filetype=$1
 
   for file in "${filenames[@]}"; do
     filename=$(basename "$file")
 
-    if [[ "$filename" == *"$key" ]]; then
+    if [[ "$filename" == *"$filetype" ]]; then
       matching_files+=("$file")
     fi
   done
   echo "${matching_files[@]}"
 }
 
-function lint_loop() {
+function linter_failed() {
+  return=$1
+
+  if [[ -z "${return}" || "${return}" != 0 ]]; then
+    linter_exit_codes+=(["${linter[name]}"]="${return}")
+  else
+    return "${return}"
+  fi
+}
+
+function lint_files() {
+  if [[ "${linter[filetype]}" = "all" ]]; then
+    bash -c "${linter[name]} ${linter[args]}" &>> "${linter[logfile]}"
+    linter_failed $?
+  else
+    for file in $(get_files_matching_filetype "${linter[filetype]}" "${included[@]}"); do 
+      if [[ "${linter[executor]+x}" ]]; then
+        bash -c "${linter[executor]} ${linter[name]} ${linter[args]} ${file} &>> ${linter[logfile]}"
+        linter_failed $?
+      else
+        bash -c "${linter[name]} ${linter[args]} ${file}" &>> "${linter[logfile]}"
+        linter_failed $?
+      fi
+    done
+  fi
+}
+
+function seiso_lint() {
+  echo -e "\nRunning Seiso Linter\n--------------------------\n"
+
   excluded=()
   included=()
-  linter_failed=false
 
   while read -r file; do
-    # Build a base list of files to lint
     if [[ -n ${INPUT_EXCLUDE:+x} && "${file}" =~ ${INPUT_EXCLUDE} ]]; then
       excluded+=("${file}")
       continue
     fi
-
     included+=("${file}")
   done < <(find . -path "./.git" -prune -or -type f)
   
-  declare -A linter_exit_codes
-  logpath="/etc/opt/goat/logs"
+  declare -gA linter_exit_codes
   input="/etc/opt/goat/linters.txt"
 
-  while read line; do
+  while read -r line; do
     if [[ $line == \#* ]]; then
       continue
     fi
 
-    # Split the line into KVP using the "," separator
     IFS="," read -ra pairs <<< "$line"
+ 
+    unset linter
+    declare -gA linter
 
-    # Create an associative array adding each KVP and launch the linter 
-    declare -A linter
     for pair in "${pairs[@]}"; do
       IFS="=" read -r key value <<< "$pair"
       linter["$key"]="$value"
     done
     
-    echo "-------------------------------" >> "$logpath/${linter[name]}.log"
-    echo "${linter[name]}" >> "$logpath/${linter[name]}.log" 
+    linter+=([logfile]="/etc/opt/goat/logs/${linter[name]}.log")
+    echo "===============================" >> "${linter[logfile]}"
+    echo "Running linter: ${linter[name]}"
+    echo "${linter[name]^^}" >>"${linter[logfile]}"
+    
+    lint_files &
 
-    {
-      # If filetype is "all" just run the linter with args, else get a list of files to lint based on filetype
-      if [[ ${linter[filetype]} = "all" ]]; then
-        echo "Running linter: ${linter[name]} ${linter[args]}" 
-        bash -c "${linter[name]} ${linter[args]} 2>&1 >> $logpath/${linter[name]}.log"
-      else
-        matching_files=$(get_matching_files "${linter[filetype]}" "${included[@]}")
-
-        for file in "${matching_files[@]}"; do 
-          # If linter has an executor, append the linter call with that executor, else just run the linter
-          if [[ "${linter[executor]+x}" ]]; then
-            echo "Running linter: ${linter[executor]} ${linter[name]} ${linter[args]} $file" 
-            bash -c "${linter[executor]} ${linter[name]} ${linter[args]} $file 2>&1 >> $logpath/${linter[name]}.log"
-          else
-            echo "Running linter: ${linter[name]} ${linter[args]} $file"
-            bash -c "${linter[name]} ${linter[args]} $file 2>&1 >> $logpath/${linter[name]}.log"
-          fi
-        done
-      fi
-      echo "-------------------------------" >> "$logpath/${linter[name]}.log"
-    } &
+    echo "-------------------------------" >> "${linter[logfile]}"
   done < $input
 
   wait
 
   cat /etc/opt/goat/logs/*
+  
+  echo -e "\nScanned ${#included[@]} files"
+  echo "Excluded ${#excluded[@]} files"
+
+  linter_failed="false"
+
+  for lint in "${!linter_exit_codes[@]}"; do
+    if [[ "${linter_exit_codes[${lint}]}" -gt 0 ]]; then
+      feedback_label="ERROR"
+      linter_failed="true"
+    else
+      feedback_label="DEBUGGING"
+    fi
+    exit_code="${linter_exit_codes[${lint}]}"
+    feedback "${feedback_label}" "${lint} resulted in an exit code of ${exit_code}"
+  done
+
+  if [[ "${linter_failed:-false}" == "true" ]]; then
+    feedback "ERROR" "Linter errors found!"
+    exit 1
+  fi
 }
 
 setup_environment
 check_environment
-lint_loop
-#super_lint
-#seiso_lint
+# set +e
+# super_linter_result=$(super_lint >/dev/null; echo $?) || true
+# set -e
+seiso_lint
+
+if [ "${super_linter_result}" -ne 0 ]; then
+  feedback "ERROR" "Super-Linter resulted in an exit code of ${super_linter_result}"
+  exit 1
+else
+  feedback "INFO" "Super-Linter found no errors."
+  exit 0
+fi
