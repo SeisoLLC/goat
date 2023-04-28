@@ -117,7 +117,7 @@ function get_files_matching_filetype() {
 function linter_failed() {
   return=$1
 
-  if [[ -z "${return}" || "${return}" != 0 ]]; then
+  if [[ "${return:-1}" != 0 ]]; then
     linter_exit_codes+=(["${linter[name]}"]="${return}")
   else
     return "${return}"
@@ -125,18 +125,20 @@ function linter_failed() {
 }
 
 function lint_files() {
+  exec &>> "${linter[logfile]}"
   if [[ "${linter[filetype]}" = "all" ]]; then
-    bash -c "${linter[name]} ${linter[args]} &>> ${linter[logfile]}"
+    cmd="${linter[name]} ${linter[args]}"
+    eval $cmd
     linter_failed $?
   else
     for file in $(get_files_matching_filetype "${linter[filetype]}" "${included[@]}"); do 
       if [[ "${linter[executor]+x}" ]]; then
-        bash -c "${linter[executor]} ${linter[name]} ${linter[args]} ${file} &>> ${linter[logfile]}"
-        linter_failed $?
+        cmd="${linter[executor]} ${linter[name]} ${linter[args]} ${file}"
       else
-        bash -c "${linter[name]} ${linter[args]} ${file} &>> ${linter[logfile]}"
-        linter_failed $?
+        cmd="${linter[name]} ${linter[args]} ${file}"
       fi
+      eval $cmd;
+      linter_failed $?
     done
   fi
 }
@@ -178,8 +180,9 @@ function seiso_lint() {
     echo "Running linter: ${linter[name]}"
     echo "${linter[name]^^}" >>"${linter[logfile]}"
     
-    lint_files &
-
+    lint_files & 
+    pid=$!
+    
     echo "-------------------------------" >> "${linter[logfile]}"
   done < $input
 
@@ -211,9 +214,11 @@ function seiso_lint() {
 
 setup_environment
 check_environment
-# set +e
-# super_linter_result=$(super_lint >/dev/null; echo $?) || true
-# set -e
+
+set +e
+super_linter_result=$(super_lint >/dev/null; echo $?) || true
+set -e
+
 seiso_lint
 
 if [ "${super_linter_result}" -ne 0 ]; then
