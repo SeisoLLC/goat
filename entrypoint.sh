@@ -133,7 +133,7 @@ function lint_files() {
   else
     for file in $(get_files_matching_filetype "${linter[filetype]}" "${included[@]}"); do 
       if [[ "${linter[executor]+x}" ]]; then
-        cmd="${linter[executor]} ${linter[name]} ${linter[args]} ${file}"
+        cmd="${linter[executor]} -c \"${linter[name]} ${linter[args]} ${file}\""
       else
         cmd="${linter[name]} ${linter[args]} ${file}"
       fi
