@@ -103,6 +103,8 @@ function get_files_matching_filetype() {
   local matching_files=()
   local filenames=("${@:2}")
   local filetype=$1
+  shift
+  local filenames=("$@")
 
   for file in "${filenames[@]}"; do
     filename=$(basename "$file")
