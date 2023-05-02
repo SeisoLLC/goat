@@ -110,13 +110,11 @@ situations, pin to the commit hash tag that is published with each commit.
 
 ### Prerequisites
 
-```bash
-pipenv
-```
+`pipenv` and `docker`.
 
-### Running the goat locally
+### Running the goat against the goat project locally
 
 ```bash
-pipenv install --dev
+pipenv install --deploy --ignore-pipfile --dev
 pipenv run invoke goat
 ```
