@@ -108,7 +108,7 @@ function get_files_matching_filetype() {
   for file in "${filenames[@]}"; do
     filename=$(basename "$file")
 
-    if [[ "$filename" =~ .*${filetype}$ ]]; then
+    if [[ "$filename" == *"$filetype" ]]; then
       matching_files+=("$file")
     fi
   done
