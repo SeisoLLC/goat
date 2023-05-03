@@ -9,3 +9,4 @@ tasks:
       - find . -type f -name '.DS_Store' -delete
       - find . -type f -name '.Thumbs.db' -delete
       - find . -type f -name 'super-linter.log' -delete
+      - find . -type d -name '.ruff_cache' -exec rm -r "{}" \;

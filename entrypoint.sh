@@ -100,14 +100,14 @@ function super_lint() {
 }
 
 function get_files_matching_filetype() {
-  local matching_files=()
   local filetype=$1
   shift
-  local filenames=("$@")
 
-  for file in "${filenames[@]}"; do
+  matching_files=()
+
+  for file in "$@"; do
     filename=$(basename "$file")
-
+    
     if [[ "$filename" == *"$filetype" ]]; then
       matching_files+=("$file")
     fi
@@ -117,9 +117,11 @@ function get_files_matching_filetype() {
 
 function linter_failed() {
   return=$1
+  shift 
+  name=$1
 
   if [[ "${return:-1}" != 0 ]]; then
-    linter_exit_codes+=(["${linter[name]}"]="${return}")
+    linter_exit_codes+=(["$name"]="${return}")
   else
     return "${return}"
   fi
@@ -130,7 +132,6 @@ function lint_files() {
   if [[ "${linter[filetype]}" = "all" ]]; then
     cmd="${linter[name]} ${linter[args]}"
     eval "$cmd"
-    linter_failed $?
   else
     for file in $(get_files_matching_filetype "${linter[filetype]}" "${included[@]}"); do 
       if [[ "${linter[executor]+x}" ]]; then
@@ -139,7 +140,6 @@ function lint_files() {
         cmd="${linter[name]} ${linter[args]} ${file}"
       fi
       eval "$cmd"
-      linter_failed $?
     done
   fi
 }
@@ -159,50 +159,48 @@ function seiso_lint() {
   done < <(find . -path "./.git" -prune -or -type f)
   
   declare -gA linter_exit_codes
-  input="/etc/opt/goat/linters.txt"
+  declare -gA pids
+
+  input="/etc/opt/goat/linters.json"
 
   while read -r line; do
     if [[ $line == \#* ]]; then
       continue
     fi
-
-    IFS="," read -ra pairs <<< "$line"
- 
+    
     unset linter
     declare -gA linter
-
-    for pair in "${pairs[@]}"; do
-      IFS="=" read -r key value <<< "$pair"
-      linter["$key"]="$value"
-    done
-    
+ 
+    while IFS='=' read -r key value; do
+      value=$(echo "$value" | tr -d "'")
+      linter["$key"]=$value
+    done < <(echo "$line" | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]')
+        
     linter+=([logfile]="/etc/opt/goat/logs/${linter[name]}.log")
+
     echo "===============================" >> "${linter[logfile]}"
     echo "Running linter: ${linter[name]}"
     echo "${linter[name]^^}" >>"${linter[logfile]}"
-    
-    lint_files & 
-    
-    echo "-------------------------------" >> "${linter[logfile]}"
-  done < $input
 
-  wait
+    lint_files & 
+    pid=$!
+    pids["$pid"]+="${linter[name]}"
+
+    echo "-------------------------------" >> "${linter[logfile]}"
+  done < <(jq -c '.[]' $input)
+
+  for p in "${!pids[@]}"; do
+    set +e
+    wait "$p"
+    exit_code=$?
+    linter_failed "$exit_code" "${pids[${p}]}"
+    set -e
+  done
 
   cat /etc/opt/goat/logs/*
   
   echo -e "\nScanned ${#included[@]} files"
-  echo "Excluded ${#excluded[@]} files"
-
-  for lint in "${!linter_exit_codes[@]}"; do
-    if [[ "${linter_exit_codes[${lint}]}" -gt 0 ]]; then
-      feedback_label="ERROR"
-      linter_failed="true"
-    else
-      feedback_label="DEBUGGING"
-    fi
-    exit_code="${linter_exit_codes[${lint}]}"
-    feedback "${feedback_label}" "${lint} resulted in an exit code of ${exit_code}"
-  done
+  echo -e "Excluded ${#excluded[@]} files\n"
 }
 
 linter_failed="false"
@@ -211,13 +209,27 @@ setup_environment
 check_environment
 
 set +e
-super_linter_result=$(super_lint >/dev/null; echo $?) || true
+super_linter_result=$(super_lint >/dev/null; echo $?)
+if [ "${super_linter_result}" -ne 0 ]; then
+  linter_failed="true"
+fi
 set -e
 
 seiso_lint
 
-if [ "${super_linter_result}" -ne 0 ] || [ "${linter_failed:-false}" == "true" ]; then
-  feedback "ERROR" "Linting resulted in an exit code of ${super_linter_result}"
+for lint in "${!linter_exit_codes[@]}"; do
+  if [[ "${linter_exit_codes[${lint}]}" -gt 0 ]]; then
+    feedback_label="ERROR"
+    linter_failed="true"
+  else
+    feedback_label="DEBUGGING"
+  fi
+
+  feedback "${feedback_label}" "${lint} discovered errors."
+done
+
+if [ "${linter_failed:-false}" == "true" ]; then
+  feedback "ERROR" "Linting failed."
   exit 1
 else
   feedback "INFO" "Linters found no errors."
