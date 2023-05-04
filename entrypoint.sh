@@ -134,6 +134,7 @@ function lint_files() {
 
 linter_failed="false"
 linter_failures=()
+linter_successes=()
 
 function seiso_lint() {
   echo -e "\nRunning Seiso Linter\n--------------------------\n"
@@ -186,7 +187,7 @@ function seiso_lint() {
       linter_failures+=("${pids[$p]}")
       linter_failed="true"
     else
-      feedback INFO "${pids[$p]} completed successfully"
+      linter_successes+=("${pids[$p]}")
     fi
   done
   
@@ -219,13 +220,18 @@ fi
 
 seiso_lint
 
+for success in "${linter_successes[@]}"; do
+  feedback INFO "$success completed successfully"
+done
+
 if [ "${linter_failed:-true}" == "true" ]; then
-  for lint in "${linter_failures[@]}"; do
-    feedback ERROR "$lint found errors"
-    feedback ERROR "Linting failed"
+  for failure in "${linter_failures[@]}"; do
+    feedback ERROR "$failure found errors"
   done
+  feedback ERROR "Linting failed"
   exit 1
 else
   feedback INFO "Linters found no errors."
   exit 0
 fi
+  
