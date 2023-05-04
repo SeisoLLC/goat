@@ -117,8 +117,7 @@ function get_files_matching_filetype() {
 
 function check_linter_exit_code() {
   local return="$1"
-  shift 
-  local name="$1"
+  local name="$2"
 
   if [[ "${return:-1}" != 0 ]]; then
     linter_exit_codes+=(["$name"]="${return}")
