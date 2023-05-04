@@ -115,7 +115,7 @@ function get_files_matching_filetype() {
   echo "${matching_files[@]}"
 }
 
-function linter_failed() {
+function check_linter_exit_code() {
   local return="$1"
   shift 
   local name="$1"
@@ -192,7 +192,7 @@ function seiso_lint() {
     set +e
     wait "$p"
     exit_code=$?
-    linter_failed "$exit_code" "${pids[$p]}"
+    check_linter_exit_code "$exit_code" "${pids[$p]}"
     set -e
   done
   
@@ -215,8 +215,7 @@ set -e
 
 echo "-------------------------------" >> "$superlinter_logfile"
 
-linter_failed "$super_linter_result" "super-linter"
-
+check_linter_exit_code "$super_linter_result" "super-linter"
 seiso_lint
 
 linter_failed="false"
