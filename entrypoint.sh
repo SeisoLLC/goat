@@ -115,32 +115,25 @@ function get_files_matching_filetype() {
   echo "${matching_files[@]}"
 }
 
-function check_linter_exit_code() {
-  local return="$1"
-  local name="$2"
-
-  if [[ "${return:-1}" != 0 ]]; then
-    linter_exit_codes+=(["$name"]="${return}")
-  else
-    feedback INFO "$name completed successfully" 
-  fi
-}
-
 function lint_files() {
   if [[ "${linter[filetype]}" = "all" ]]; then
     cmd="${linter[name]} ${linter[args]}"
     eval "$cmd" >> "${linter[logfile]}" 2>&1
-  else
-    for file in $(get_files_matching_filetype "${linter[filetype]}" "${included[@]}"); do 
-      if [[ "${linter[executor]+x}" ]]; then
-        cmd="${linter[executor]} ${linter[name]} ${linter[args]} ${file}"
-      else
-        cmd="${linter[name]} ${linter[args]} ${file}"
-      fi
-      eval "$cmd" >> "${linter[logfile]}" 2>&1
-    done
+    return
   fi
+  
+  for file in $(get_files_matching_filetype "${linter[filetype]}" "${included[@]}"); do 
+    if [[ "${linter[executor]+x}" ]]; then
+      cmd="${linter[executor]} ${linter[name]} ${linter[args]} ${file}"
+    else
+      cmd="${linter[name]} ${linter[args]} ${file}"
+    fi
+    eval "$cmd" >> "${linter[logfile]}" 2>&1
+  done
 }
+
+linter_failed="false"
+linter_failures=()
 
 function seiso_lint() {
   echo -e "\nRunning Seiso Linter\n--------------------------\n"
@@ -156,16 +149,11 @@ function seiso_lint() {
     included+=("${file}")
   done < <(find . -path "./.git" -prune -o -type f)
   
-  declare -gA linter_exit_codes
   declare -gA pids
 
   input="/etc/opt/goat/linters.json"
 
-  while read -r line; do
-    if [[ $line == \#* ]]; then
-      continue
-    fi
-    
+  while read -r line; do  
     unset linter
     declare -gA linter
  
@@ -182,7 +170,7 @@ function seiso_lint() {
 
     lint_files & 
     pid=$!
-    pids["$pid"]+="${linter[name]}"
+    pids["$pid"]="${linter[name]}"
 
     echo "-------------------------------" >> "${linter[logfile]}"
   done < <(jq -c '.[]' $input)
@@ -191,8 +179,15 @@ function seiso_lint() {
     set +e
     wait "$p"
     exit_code=$?
-    check_linter_exit_code "$exit_code" "${pids[$p]}"
     set -e
+
+    if [ "$exit_code" -gt 0 ]; then
+      cat "/opt/goat/log/${pids[$p]}.log"
+      linter_failures+=("${pids[$p]}")
+      linter_failed="true"
+    else
+      feedback INFO "${pids[$p]} completed successfully"
+    fi
   done
   
   echo -e "\nScanned ${#included[@]} files"
@@ -209,27 +204,26 @@ echo "===============================" >> "$superlinter_logfile"
 echo "SUPER-LINTER" >> "$superlinter_logfile"
 
 set +e
-super_linter_result=$(super_lint >> "$superlinter_logfile" 2>&1; echo $?)
+superlinter_result=$(super_lint >> "$superlinter_logfile" 2>&1; echo $?)
 set -e
 
 echo "-------------------------------" >> "$superlinter_logfile"
 
-check_linter_exit_code "$super_linter_result" "super-linter"
+if [ "$superlinter_result" -gt 0 ]; then
+  cat "$superlinter_logfile"
+  linter_failed="true"
+  linter_failures+=("super-linter")
+else
+  feedback INFO "Super-linter completed successfully"
+fi
+
 seiso_lint
 
-linter_failed="false"
-
-for lint in "${!linter_exit_codes[@]}"; do
-  if [[ "${linter_exit_codes[$lint]}" -gt 0 ]]; then
-    linter_failed="true"
-    cat "/opt/goat/log/$lint.log"
-    message="discovered errors"
-  fi
-  feedback ERROR "$lint $message"
-done
-
-if [ "${linter_failed:-false}" == "true" ]; then
-  feedback ERROR "Linting failed."
+if [ "${linter_failed:-true}" == "true" ]; then
+  for lint in "${linter_failures[@]}"; do
+    feedback ERROR "$lint found errors"
+    feedback ERROR "Linting failed"
+  done
   exit 1
 else
   feedback INFO "Linters found no errors."
