@@ -1,7 +1,7 @@
 [
     {
         "name": "cspell",
-        "args": "-c /etc/opt/goat/cspell.config.js --",
+        "args": "-c /etc/opt/goat/cspell.config.js -v --no-must-find-files --",
         "filetype": ".md",
         "installer": "npm",
         "executor": "npx"

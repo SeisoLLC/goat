@@ -36,7 +36,8 @@ RUN pip install pipenv \
     rubocop-github \
     && npm install --no-cache -g dockerfile_lint \
     cspell \
-    markdown-link-check
+    markdown-link-check \
+    && mkdir -p /opt/goat/log
 
 WORKDIR /goat/
 
