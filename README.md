@@ -103,7 +103,7 @@ with:
 
 ## Releases
 
-The `goat` project does not do releases, as it is intended as a minimum expectation that evolves over time. Please refer to `main` or, in limited  
+The `goat` project does not do releases, as it is intended as a minimum expectation that evolves over time. Please refer to `main` or, in limited
 situations, pin to the commit hash tag that is published with each commit.
 
 ## GOAT Development
