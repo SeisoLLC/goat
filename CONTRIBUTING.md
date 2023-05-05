@@ -25,7 +25,7 @@ There are two ways of running the `goat` locally:
 
     ```bash
     docker build .
-    docker run -e RUN_LOCAL=true -it -v $PWD:/goat/ --rm <first several character of the hash output from the build step>
+    docker run -e RUN_LOCAL=true -v $PWD:/goat/ --rm <first several character of the hash output from the build step>
     ```
 
 ### Note
