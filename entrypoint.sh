@@ -228,7 +228,7 @@ if [ "${linter_failed:-true}" == "true" ]; then
   done
   feedback ERROR "Linting failed"
   exit 1
-else
+fi
   feedback INFO "Linters found no errors."
   exit 0
 fi
