@@ -5,7 +5,7 @@ version: "3"
 
 includes:
   base:
-    taskfile: ../Taskfile.yaml
+    taskfile: ../Taskfile.yml
     internal: true
 
 vars:
