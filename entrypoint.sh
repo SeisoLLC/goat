@@ -229,7 +229,5 @@ if [ "${linter_failed:-true}" == "true" ]; then
   feedback ERROR "Linting failed"
   exit 1
 fi
-  feedback INFO "Linters found no errors."
-  exit 0
-fi
-  
+
+feedback INFO "Linters found no errors."
