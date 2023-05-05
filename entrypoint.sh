@@ -35,9 +35,6 @@ function setup_environment() {
   # Set the default branch
   export DEFAULT_BRANCH="main"
 
-  # Turn off the possum
-  export SUPPRESS_POSSUM="true"
-
   # Set workspace to /goat/ for local runs
   export DEFAULT_WORKSPACE="/goat"
 
@@ -65,15 +62,9 @@ function setup_environment() {
     echo "The provided LOG_LEVEL of ${INPUT_LOG_LEVEL:-null or unset} is not valid"
   fi
 
-  if [[ -n ${GITHUB_WORKSPACE:-} ]]; then
-    echo "Setting ${GITHUB_WORKSPACE} as safe directory"
-    git config --global --add safe.directory "${GITHUB_WORKSPACE}"
-
-  fi
-
-  # When run in a pipeline, move per-repo configurations into the right location at runtime so super-linter finds them, overwriting the defaults.
-  # This will handle hidden and non-hidden files, as well as sym links
-  cp -p "${GITHUB_WORKSPACE:-.}/.github/linters/"* "${GITHUB_WORKSPACE:-.}/.github/linters/".* /etc/opt/goat/ || true
+  linter_failed="false"
+  declare -a linter_failures
+  declare -a linter_successes
 }
 
 function check_environment() {
@@ -96,7 +87,38 @@ ${overlap}"
 }
 
 function super_lint() {
-  /action/lib/linter.sh
+  superlinter_logfile="/opt/goat/log/super-linter.log"
+
+  echo -e "\nRunning Super-Linter\n--------------------------\n"
+  echo "===============================" >> "$superlinter_logfile"
+  echo "SUPER-LINTER" >> "$superlinter_logfile"
+
+  # Turn off the possum
+  export SUPPRESS_POSSUM="true"
+
+  if [[ -n ${GITHUB_WORKSPACE:-} ]]; then
+    echo "Setting ${GITHUB_WORKSPACE} as safe directory"
+    git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+
+  fi
+
+  # When run in a pipeline, move per-repo configurations into the right location at runtime so super-linter finds them, overwriting the defaults.
+  # This will handle hidden and non-hidden files, as well as sym links
+  cp -p "${GITHUB_WORKSPACE:-.}/.github/linters/"* "${GITHUB_WORKSPACE:-.}/.github/linters/".* /etc/opt/goat/ || true
+  
+  set +e
+  superlinter_result=$(/action/lib/linter.sh >> "$superlinter_logfile" 2>&1; echo $?)
+  set -e
+
+  echo "-------------------------------" >> "$superlinter_logfile"
+
+  if [ "$superlinter_result" -gt 0 ]; then
+    cat "$superlinter_logfile"
+    linter_failed="true"
+    linter_failures+=("super-linter")
+  else
+    linter_successes+=("super-linter")
+  fi
 }
 
 function get_files_matching_filetype() {
@@ -132,10 +154,6 @@ function lint_files() {
   done
 }
 
-linter_failed="false"
-linter_failures=()
-linter_successes=()
-
 function seiso_lint() {
   echo -e "\nRunning Seiso Linter\n--------------------------\n"
 
@@ -163,7 +181,7 @@ function seiso_lint() {
       linter["$key"]=$value
     done < <(echo "$line" | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]')
         
-    linter+=([logfile]="/opt/goat/log/${linter[name]}.log")
+    linter[logfile]="/opt/goat/log/${linter[name]}.log"
 
     echo "===============================" >> "${linter[logfile]}"
     echo "Running linter: ${linter[name]}"
@@ -197,27 +215,7 @@ function seiso_lint() {
 
 setup_environment
 check_environment
-
-superlinter_logfile="/opt/goat/log/super-linter.log"
-
-echo -e "\nRunning Super-Linter\n--------------------------\n"
-echo "===============================" >> "$superlinter_logfile"
-echo "SUPER-LINTER" >> "$superlinter_logfile"
-
-set +e
-superlinter_result=$(super_lint >> "$superlinter_logfile" 2>&1; echo $?)
-set -e
-
-echo "-------------------------------" >> "$superlinter_logfile"
-
-if [ "$superlinter_result" -gt 0 ]; then
-  cat "$superlinter_logfile"
-  linter_failed="true"
-  linter_failures+=("super-linter")
-else
-  feedback INFO "Super-linter completed successfully"
-fi
-
+super_lint
 seiso_lint
 
 for success in "${linter_successes[@]}"; do

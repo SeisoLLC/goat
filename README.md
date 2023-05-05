@@ -103,18 +103,9 @@ with:
 
 ## Releases
 
-The `goat` project does not do releases, as it is intended as a minimum expectation that evolves over time. Please refer to `main` or, in limited
+The `goat` project does not do releases, as it is intended as a minimum expectation that evolves over time. Please refer to `main` or, in limited  
 situations, pin to the commit hash tag that is published with each commit.
 
 ## GOAT Development
 
-### Prerequisites
-
-`pipenv` and `docker`.
-
-### Running the goat against the goat project locally
-
-```bash
-pipenv install --deploy --ignore-pipfile --dev
-pipenv run invoke goat
-```
+See [CONTRIBUTING.md](./CONTRIBUTING.md)
