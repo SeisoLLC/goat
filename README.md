@@ -108,15 +108,4 @@ situations, pin to the commit hash tag that is published with each commit.
 
 ## GOAT Development
 
-### Prerequisites
-
-```bash
-pipenv
-```
-
-### Running the goat locally
-
-```bash
-pipenv install --dev
-pipenv run invoke goat
-```
+See [CONTRIBUTING.md](./CONTRIBUTING.md)

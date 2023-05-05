@@ -18,7 +18,6 @@ function feedback() {
   case "${1}" in
     ERROR)
       >&2 echo -e "${!color}${1}:  ${2}${DEFAULT}"
-      exit 1
       ;;
     WARNING)
       >&2 echo -e "${!color}${1}:  ${2}${DEFAULT}"
@@ -35,9 +34,6 @@ function setup_environment() {
 
   # Set the default branch
   export DEFAULT_BRANCH="main"
-
-  # Turn off the possum
-  export SUPPRESS_POSSUM="true"
 
   # Set workspace to /goat/ for local runs
   export DEFAULT_WORKSPACE="/goat"
@@ -66,15 +62,9 @@ function setup_environment() {
     echo "The provided LOG_LEVEL of ${INPUT_LOG_LEVEL:-null or unset} is not valid"
   fi
 
-  if [[ -n ${GITHUB_WORKSPACE:-} ]]; then
-    echo "Setting ${GITHUB_WORKSPACE} as safe directory"
-    git config --global --add safe.directory "${GITHUB_WORKSPACE}"
-
-  fi
-
-  # When run in a pipeline, move per-repo configurations into the right location at runtime so super-linter finds them, overwriting the defaults.
-  # This will handle hidden and non-hidden files, as well as sym links
-  cp -p "${GITHUB_WORKSPACE:-.}/.github/linters/"* "${GITHUB_WORKSPACE:-.}/.github/linters/".* /etc/opt/goat/ || true
+  linter_failed="false"
+  declare -a linter_failures
+  declare -a linter_successes
 }
 
 function check_environment() {
@@ -97,40 +87,147 @@ ${overlap}"
 }
 
 function super_lint() {
-  /action/lib/linter.sh
+  superlinter_logfile="/opt/goat/log/super-linter.log"
+
+  echo -e "\nRunning Super-Linter\n--------------------------\n"
+  echo "===============================" >> "$superlinter_logfile"
+  echo "SUPER-LINTER" >> "$superlinter_logfile"
+
+  # Turn off the possum
+  export SUPPRESS_POSSUM="true"
+
+  if [[ -n ${GITHUB_WORKSPACE:-} ]]; then
+    echo "Setting ${GITHUB_WORKSPACE} as safe directory"
+    git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+
+  fi
+
+  # When run in a pipeline, move per-repo configurations into the right location at runtime so super-linter finds them, overwriting the defaults.
+  # This will handle hidden and non-hidden files, as well as sym links
+  cp -p "${GITHUB_WORKSPACE:-.}/.github/linters/"* "${GITHUB_WORKSPACE:-.}/.github/linters/".* /etc/opt/goat/ || true
+  
+  set +e
+  superlinter_result=$(/action/lib/linter.sh >> "$superlinter_logfile" 2>&1; echo $?)
+  set -e
+
+  echo "-------------------------------" >> "$superlinter_logfile"
+
+  if [ "$superlinter_result" -gt 0 ]; then
+    cat "$superlinter_logfile"
+    linter_failed="true"
+    linter_failures+=("super-linter")
+  else
+    linter_successes+=("super-linter")
+  fi
+}
+
+function get_files_matching_filetype() {
+  local filetype="$1"
+  shift
+  local filenames=("$@")
+  matching_files=()
+
+  for file in "${filenames[@]}"; do
+    filename=$(basename "$file")
+    
+    if [[ "$filename" == *"$filetype" ]]; then
+      matching_files+=("$file")
+    fi
+  done
+  echo "${matching_files[@]}"
+}
+
+function lint_files() {
+  if [[ "${linter[filetype]}" = "all" ]]; then
+    cmd="${linter[name]} ${linter[args]}"
+    eval "$cmd" >> "${linter[logfile]}" 2>&1
+    return
+  fi
+  
+  for file in $(get_files_matching_filetype "${linter[filetype]}" "${included[@]}"); do 
+    if [[ "${linter[executor]+x}" ]]; then
+      cmd="${linter[executor]} ${linter[name]} ${linter[args]} ${file}"
+    else
+      cmd="${linter[name]} ${linter[args]} ${file}"
+    fi
+    eval "$cmd" >> "${linter[logfile]}" 2>&1
+  done
 }
 
 function seiso_lint() {
+  echo -e "\nRunning Seiso Linter\n--------------------------\n"
+
   excluded=()
   included=()
 
   while read -r file; do
-    # Apply filter with =~ to ensure it is aligned with github/super-linter
     if [[ -n ${INPUT_EXCLUDE:+x} && "${file}" =~ ${INPUT_EXCLUDE} ]]; then
       excluded+=("${file}")
       continue
     fi
-
     included+=("${file}")
+  done < <(find . -path "./.git" -prune -o -type f)
+  
+  declare -gA pids
 
-    # Check Dockerfiles
-    if [[ "${file}" = *Dockerfile ]]; then
-      dockerfile_lint -f "${file}" -r /etc/opt/goat/oci.yml
+  input="/etc/opt/goat/linters.json"
+
+  while read -r line; do  
+    unset linter
+    declare -gA linter
+ 
+    while IFS='=' read -r key value; do
+      value=$(echo "$value" | tr -d "'")
+      linter["$key"]=$value
+    done < <(echo "$line" | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]')
+        
+    linter[logfile]="/opt/goat/log/${linter[name]}.log"
+
+    echo "===============================" >> "${linter[logfile]}"
+    echo "Running linter: ${linter[name]}"
+    echo "${linter[name]^^}" >>"${linter[logfile]}"
+
+    lint_files & 
+    pid=$!
+    pids["$pid"]="${linter[name]}"
+
+    echo "-------------------------------" >> "${linter[logfile]}"
+  done < <(jq -c '.[]' $input)
+
+  for p in "${!pids[@]}"; do
+    set +e
+    wait "$p"
+    exit_code=$?
+    set -e
+
+    if [ "$exit_code" -gt 0 ]; then
+      cat "/opt/goat/log/${pids[$p]}.log"
+      linter_failures+=("${pids[$p]}")
+      linter_failed="true"
+    else
+      linter_successes+=("${pids[$p]}")
     fi
-
-    # Check .md file spelling and links
-    if [[ "${file}" = *.md ]]; then
-      npx cspell -c /etc/opt/goat/cspell.config.js -- "${file}"
-      npx markdown-link-check --config /etc/opt/goat/links.json --verbose "${file}"
-    fi
-  done < <(find . -path "./.git" -prune -or -type f)
-
-  echo "Scanned ${#included[@]} files"
-  echo "Excluded ${#excluded[@]} files"
+  done
+  
+  echo -e "\nScanned ${#included[@]} files"
+  echo -e "Excluded ${#excluded[@]} files\n"
 }
-
 
 setup_environment
 check_environment
 super_lint
 seiso_lint
+
+for success in "${linter_successes[@]}"; do
+  feedback INFO "$success completed successfully"
+done
+
+if [ "${linter_failed:-true}" == "true" ]; then
+  for failure in "${linter_failures[@]}"; do
+    feedback ERROR "$failure found errors"
+  done
+  feedback ERROR "Linting failed"
+  exit 1
+fi
+
+feedback INFO "Linters found no errors."

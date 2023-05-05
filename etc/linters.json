@@ -1,0 +1,28 @@
+[
+    {
+        "name": "ruff",
+        "args": "check --fix -v",
+        "filetype": ".py",
+        "installer": "pip"
+    },
+    {
+        "name": "dockerfile_lint",
+        "args": "-r /etc/opt/goat/oci.yml -f",
+        "filetype": "Dockerfile",
+        "installer": "npm"
+    },
+    {
+        "name": "markdown-link-check",
+        "args": "--config /etc/opt/goat/links.json --verbose",
+        "filetype": ".md",
+        "installer": "npm",
+        "executor": "npx"
+    },
+    {
+        "name": "cspell",
+        "args": "-c /etc/opt/goat/cspell.config.js -v --no-must-find-files --",
+        "filetype": ".md",
+        "installer": "npm",
+        "executor": "npx"
+    }
+]

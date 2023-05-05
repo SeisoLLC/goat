@@ -23,19 +23,21 @@ ENV PIP_NO_CACHE_DIR=1
 COPY Pipfile Pipfile.lock ./
 # hadolint ignore=DL3016,DL3018,DL3013
 RUN pip install pipenv \
- && pipenv install --deploy --ignore-pipfile \
- && apk upgrade \
- && apk --no-cache add go \
-                       jq \
-                       npm \
-                       tini \
-                       ruby \
- && gem install \
-                       rubocop \
-                       rubocop-github \
- && npm install --no-cache -g dockerfile_lint \
-                       cspell \
-                       markdown-link-check
+    && pipenv install --deploy --ignore-pipfile \
+    && pip install shed ruff \
+    && apk upgrade \
+    && apk --no-cache add go \
+    jq \
+    npm \
+    tini \
+    ruby \
+    && gem install \
+    rubocop \
+    rubocop-github \
+    && npm install --no-cache -g dockerfile_lint \
+    cspell \
+    markdown-link-check \
+    && mkdir -p /opt/goat/log
 
 WORKDIR /goat/
 
