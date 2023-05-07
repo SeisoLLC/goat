@@ -1,7 +1,7 @@
 [
     {
         "name": "ruff",
-        "args": "check --fix -v",
+        "args": "check --fix --config /etc/opt/goat/pyproject.toml -v",
         "filetype": ".py",
         "installer": "pip"
     },
