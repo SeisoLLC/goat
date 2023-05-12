@@ -1,5 +1,5 @@
 FROM ghcr.io/yannh/kubeconform:v0.6.1 as kubeconfrm
-FROM hadolint/hadolint:latest-alpine as hadolint
+FROM hadolint/hadolint:v2.12.1-beta-alpine as hadolint
 FROM koalaman/shellcheck:v0.9.0 as shellcheck
 FROM mvdan/shfmt:v3.6.0 as shfmt
 FROM rhysd/actionlint:1.6.24 as actionlint
@@ -32,8 +32,6 @@ COPY --from=actionlint /usr/local/bin/actionlint /usr/bin/
 # hadolint ignore=DL3016,DL3018,DL3013
 RUN apk upgrade \
     && apk --no-cache add go \
-    docker \
-    openrc \
     jq \
     npm \
     tini \
