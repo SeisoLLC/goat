@@ -27,7 +27,7 @@ def opinionated_docker_run(
     auto_remove: bool = False,
     detach: bool = True,
     environment: dict = {},
-    entrypoint: str = "",
+    entrypoint: str = str(),
     expected_exit: int = 0,
 ):
     """Perform an opinionated docker run"""

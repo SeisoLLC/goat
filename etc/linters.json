@@ -2,27 +2,136 @@
     {
         "name": "ruff",
         "args": "check --config /etc/opt/goat/pyproject.toml -v",
-        "filetype": ".py",
+        "filetype": [
+            ".py"
+        ],
         "installer": "pip"
+    },
+    {
+        "name": "hadolint",
+        "args": "-V -c /etc/opt/goat/.hadolint.yml",
+        "filetype": [
+            "Dockerfile"
+        ],
+        "installer": "docker"
+    },
+    {
+        "name": "kubeconform",
+        "args": "-verbose -strict",
+        "filetype": [
+            ".yml",
+            ".yaml"
+        ],
+        "installer": "docker"
     },
     {
         "name": "dockerfile_lint",
         "args": "-r /etc/opt/goat/oci.yml -f",
-        "filetype": "Dockerfile",
+        "filetype": [
+            "Dockerfile"
+        ],
         "installer": "npm"
     },
     {
         "name": "markdown-link-check",
         "args": "--config /etc/opt/goat/links.json --verbose",
-        "filetype": ".md",
+        "filetype": [
+            ".md"
+        ],
         "installer": "npm",
         "executor": "npx"
     },
     {
         "name": "cspell",
         "args": "-c /etc/opt/goat/cspell.config.js -v --no-must-find-files --",
-        "filetype": ".md",
+        "filetype": [
+            ".md"
+        ],
         "installer": "npm",
         "executor": "npx"
+    },
+    {
+        "name": "cfn-lint",
+        "args": "-D --config-file /etc/opt/goat/.cfnlintrc.yml",
+        "filetype": [
+            ".yml",
+            ".yaml"
+        ],
+        "installer": "pip"
+    },
+    {
+        "name": "jscpd",
+        "args": "--config /etc/opt/goat/.jscpd.json *",
+        "filetype": [
+            "all"
+        ],
+        "installer": "npm",
+        "executor": "npx"
+    },
+    {
+        "name": "actionlint",
+        "args": "-config-file /etc/opt/goat/actionlint.yml",
+        "filetype": [
+            "all"
+        ],
+        "installer": "docker"
+    },
+    {
+        "name": "markdownlint",
+        "args": "-c /etc/opt/goat/.markdown-lint.yml",
+        "filetype": [
+            ".md"
+        ],
+        "installer": "npm"
+    },
+    {
+        "name": "textlint",
+        "args": "-c /etc/opt/goat/.textlintrc \"/goat/**\"",
+        "filetype": [
+            "all"
+        ],
+        "installer": "npm",
+        "executor": "npx"
+    },
+    {
+        "name": "black",
+        "args": "--config /etc/opt/goat/.python-black --diff --check",
+        "filetype": [
+            ".py"
+        ],
+        "installer": "pip"
+    },
+    {
+        "name": "mypy",
+        "args": "--config-file /etc/opt/goat/.mypy.ini --install-types --non-interactive",
+        "filetype": [
+            ".py"
+        ],
+        "installer": "pip"
+    },
+    {
+        "name": "shfmt",
+        "args": "-d",
+        "filetype": [
+            ".sh"
+        ],
+        "installer": "docker"
+    },
+    {
+        "name": "shellcheck",
+        "args": "-C -x",
+        "filetype": [
+            ".sh"
+        ],
+        "installer": "docker"
+    },
+    {
+        "name": "yamllint",
+        "args": "-c /etc/opt/goat/.yamllint.yml",
+        "filetype": [
+            ".yaml",
+            ".yml"
+        ],
+        "installer": "pip"
     }
 ]
