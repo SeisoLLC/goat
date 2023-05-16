@@ -25,9 +25,6 @@ tasks:
       - docker run --rm -v "${PWD}:/goat" -e RUN_LOCAL=true seiso/goat:latest
 
   test:
-    preconditions:
-      - sh: test `git symbolic-ref -q HEAD`
-        msg: "In detached HEAD state."
     cmds:
       - pipenv run pytest --cov={{.PROJECT_SLUG}} tests
 
