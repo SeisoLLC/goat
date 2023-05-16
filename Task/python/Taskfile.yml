@@ -68,7 +68,7 @@ tasks:
 
   update:
     cmds:
-      - git submodule update --init --recursive
+      - git submodule update --remote
       - >
         docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}} /bin/bash
         -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
