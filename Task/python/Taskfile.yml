@@ -118,3 +118,4 @@ tasks:
       - find {{.ROOT_DIR}} -type f -name '*.pyc' -delete
       - find {{.ROOT_DIR}} -type d -name 'coverage-reports' -exec rm -rf {} +
       - find {{.ROOT_DIR}} -type f -name '.coverage' -delete
+      - find {{.ROOT_DIR}} -type d -name '.ruff_cache' -exec rm -r "{}" \;
