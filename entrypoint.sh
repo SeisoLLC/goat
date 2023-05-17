@@ -140,9 +140,15 @@ function get_files_matching_filetype() {
 }
 
 function lint_files() {
+	local linter_args="${linter[args]}"
+
+	if [[ -v "${linter[env]}" && -n "${!linter[env]}" ]]; then
+		linter_args="${!linter[env]}"
+	fi
+
 	for type in "${linter_filetypes[@]}"; do
 		if [[ $type == "all" ]]; then
-			cmd="${linter[name]} ${linter[args]}"
+			cmd="${linter[name]} $linter_args"
 			eval "$cmd" >>"${linter[logfile]}" 2>&1
 			return
 		fi
@@ -150,9 +156,9 @@ function lint_files() {
 
 	for file in $(get_files_matching_filetype "${included[@]}"); do
 		if [[ "${linter[executor]+x}" ]]; then
-			cmd="${linter[executor]} ${linter[name]} ${linter[args]} ${file}"
+			cmd="${linter[executor]} ${linter[name]} $linter_args ${file}"
 		else
-			cmd="${linter[name]} ${linter[args]} ${file}"
+			cmd="${linter[name]} $linter_args ${file}"
 		fi
 
 		eval "$cmd" >>"${linter[logfile]}" 2>&1
@@ -166,8 +172,8 @@ function seiso_lint() {
 	included=()
 
 	while read -r file; do
-		if [[ -n ${INPUT_EXCLUDE:+x} && ${file} =~ ${INPUT_EXCLUDE} ]]; then
-			excluded+=("$file")
+		if [[ -n ${INPUT_EXCLUDE:+x} && "${file}" =~ ${INPUT_EXCLUDE} ]]; then
+			excluded+=("${file}")
 			continue
 		fi
 		included+=("$file")

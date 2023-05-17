@@ -5,7 +5,8 @@
         "filetype": [
             ".py"
         ],
-        "installer": "pip"
+        "installer": "pip",
+        "env": "RUFF_CONFIG"
     },
     {
         "name": "hadolint",
@@ -13,7 +14,8 @@
         "filetype": [
             "Dockerfile"
         ],
-        "installer": "docker"
+        "installer": "docker",
+        "env": "HADOLINT_CONFIG"
     },
     {
         "name": "kubeconform",
@@ -22,7 +24,8 @@
             ".yml",
             ".yaml"
         ],
-        "installer": "docker"
+        "installer": "docker",
+        "env": "KUBECONFORM_CONFIG"
     },
     {
         "name": "dockerfile_lint",
@@ -30,7 +33,8 @@
         "filetype": [
             "Dockerfile"
         ],
-        "installer": "npm"
+        "installer": "npm",
+        "env": "DOCKERFILE_LINT_CONFIG"
     },
     {
         "name": "markdown-link-check",
@@ -39,7 +43,8 @@
             ".md"
         ],
         "installer": "npm",
-        "executor": "npx"
+        "executor": "npx",
+        "env": "MARKDOWN_LINK_CHECK_CONFIG"
     },
     {
         "name": "cspell",
@@ -48,7 +53,8 @@
             ".md"
         ],
         "installer": "npm",
-        "executor": "npx"
+        "executor": "npx",
+        "env": "CSPELL_CONFIG"
     },
     {
         "name": "cfn-lint",
@@ -57,7 +63,8 @@
             ".yml",
             ".yaml"
         ],
-        "installer": "pip"
+        "installer": "pip",
+        "env": "CFN_LINT_CONFIG"
     },
     {
         "name": "jscpd",
@@ -66,7 +73,8 @@
             "all"
         ],
         "installer": "npm",
-        "executor": "npx"
+        "executor": "npx",
+        "env": "JSCPD_CONFIG"
     },
     {
         "name": "actionlint",
@@ -74,7 +82,8 @@
         "filetype": [
             "all"
         ],
-        "installer": "docker"
+        "installer": "docker",
+        "env": "ACTIONLINT_CONFIG"
     },
     {
         "name": "markdownlint",
@@ -82,7 +91,8 @@
         "filetype": [
             ".md"
         ],
-        "installer": "npm"
+        "installer": "npm",
+        "env": "MARKDOWNLINT_CONFIG"
     },
     {
         "name": "textlint",
@@ -91,7 +101,8 @@
             "all"
         ],
         "installer": "npm",
-        "executor": "npx"
+        "executor": "npx",
+        "env": "TEXTLINT_CONFIG"
     },
     {
         "name": "black",
@@ -99,7 +110,8 @@
         "filetype": [
             ".py"
         ],
-        "installer": "pip"
+        "installer": "pip",
+        "env": "BLACK_CONFIG"
     },
     {
         "name": "mypy",
@@ -107,7 +119,8 @@
         "filetype": [
             ".py"
         ],
-        "installer": "pip"
+        "installer": "pip",
+        "env": "MYPY_CONFIG"
     },
     {
         "name": "shfmt",
@@ -115,7 +128,8 @@
         "filetype": [
             ".sh"
         ],
-        "installer": "docker"
+        "installer": "docker",
+        "env": "SHFMT_CONFIG"
     },
     {
         "name": "shellcheck",
@@ -123,7 +137,8 @@
         "filetype": [
             ".sh"
         ],
-        "installer": "docker"
+        "installer": "docker",
+        "env": "SHELLCHECK_CONFIG"
     },
     {
         "name": "yamllint",
@@ -132,6 +147,7 @@
             ".yaml",
             ".yml"
         ],
-        "installer": "pip"
+        "installer": "pip",
+        "env": "YAMLLINT_CONFIG"
     }
 ]
