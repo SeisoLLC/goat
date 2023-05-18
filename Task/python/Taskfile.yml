@@ -25,9 +25,6 @@ tasks:
       - docker run --rm -v "${PWD}:/goat" -e RUN_LOCAL=true seiso/goat:latest
 
   test:
-    preconditions:
-      - sh: test `git symbolic-ref -q HEAD`
-        msg: "In detached HEAD state."
     cmds:
       - pipenv run pytest --cov={{.PROJECT_SLUG}} tests
 
@@ -55,8 +52,7 @@ tasks:
               build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
           print(build_version)'
     cmds:
-      - docker buildx build --build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" --tag \
-        {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} .
+      - docker buildx build --build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" --tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} .
 
   reformat:
     preconditions:
