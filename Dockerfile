@@ -1,4 +1,4 @@
-FROM ghcr.io/yannh/kubeconform:v0.6.1 as kubeconfrm
+FROM ghcr.io/yannh/kubeconform:v0.6.1 as kubeconform
 FROM hadolint/hadolint:v2.12.1-beta-alpine as hadolint
 FROM koalaman/shellcheck:v0.9.0 as shellcheck
 FROM mvdan/shfmt:v3.6.0 as shfmt
