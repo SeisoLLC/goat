@@ -84,7 +84,10 @@ function detect_kubernetes_file() {
 	# and 1 indicates a failure to find the string
 	local file="$1"
 
-	if grep -q -v 'kustomize.config.k8s.io' "${file}" && grep -q -v "tekton" "${file}" && grep -q -E '(apiVersion):' "${file}" && grep -q -E '(kind):' "${file}"; then
+	if grep -q -v 'kustomize.config.k8s.io' "${file}" &&
+		grep -q -v "tekton" "${file}" &&
+		grep -q -E '(apiVersion):' "${file}" &&
+		grep -q -E '(kind):' "${file}"; then
 		return 0
 	fi
 
@@ -112,7 +115,7 @@ function detect_cloudformation_file() {
 
 function get_files_matching_filetype() {
 	local filenames=("$@")
-	matching_files=()
+	local matching_files=()
 
 	for filetype in "${linter_filetypes[@]}"; do
 		for file in "${filenames[@]}"; do
@@ -159,10 +162,6 @@ function lint_files() {
 	done
 
 	files_to_lint="$(get_files_matching_filetype "${included[@]}")"
-	
-	if [ -n "${files_to_lint[*]}" ]; then
-		return
-	fi
 
 	for file in "${files_to_lint[@]}"; do
 		if [[ "${linter[executor]+x}" ]]; then
