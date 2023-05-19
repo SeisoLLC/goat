@@ -80,35 +80,33 @@ ${overlap}"
 
 function detect_kubernetes_file() {
 	# Seach for k8s-specific strings in files to determine which files to pass to kubeconform for linting
-	# Return values are used as bools: 1 = true, strings were found; 2 = false, strings were not found
 	local file="$1"
 
 	if grep -q -v 'kustomize.config.k8s.io' "${file}" &&
 		grep -q -v "tekton" "${file}" &&
 		grep -q -E '(apiVersion):' "${file}" &&
 		grep -q -E '(kind):' "${file}"; then
-		return 1
+		echo "true"
 	fi
 
-	return 0
+	echo "false"
 }
 
 function detect_cloudformation_file() {
 	# Search for AWS Cloud Formation-related strings in files to determine which files to pass to cfn-lint
-	# Return values are used as bools: 1 = true, strings were found; 2 = false, strings were not found
 	local file="$1"
 
 	# Searches for a string specific to AWS CF templates
 	if grep -q 'AWSTemplateFormatVersion' "${file}" >/dev/null; then
-		return 1
+		echo "true"
 	fi
 
 	# Search for AWS, Alexa Skills Kit, or Custom Cloud Formation syntax within the file
 	if grep -q -E '(AWS|Alexa|Custom)::' "${file}" >/dev/null; then
-		return 1
+		echo "true"
 	fi
 
-	return 0
+	echo "false"
 }
 
 function get_files_matching_filetype() {
@@ -121,12 +119,12 @@ function get_files_matching_filetype() {
 		for filetype in "${linter_filetypes[@]}"; do
 			if [[ $filename == *"$filetype" ]]; then
 				if [ "${linter[name]}" == "cfn-lint" ]; then
-					if detect_cloudformation_file "${file}"; then
+					if [ "$(detect_cloudformation_file "${file}")" == "false" ]; then
 						continue
 					fi
 				fi
 				if [ "${linter[name]}" == "kubeconform" ]; then
-					if detect_kubernetes_file "${file}"; then
+					if [ "$(detect_kubernetes_file "${file}")" ]; then
 						continue
 					fi
 				fi
