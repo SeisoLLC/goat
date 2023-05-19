@@ -80,51 +80,54 @@ ${overlap}"
 
 function detect_kubernetes_file() {
 	# Seach for k8s-specific strings in files to determine which files to pass to kubeconform for linting
+	# Here a return of 0 indicates the function found a string match and exits with a success code,
+	# and 0 indicates a failure to find the string
 	local file="$1"
 
 	if grep -q -v 'kustomize.config.k8s.io' "${file}" &&
 		grep -q -v "tekton" "${file}" &&
 		grep -q -E '(apiVersion):' "${file}" &&
 		grep -q -E '(kind):' "${file}"; then
-		echo "true"
+		return 0
 	fi
 
-	echo "false"
+	return 1
 }
 
 function detect_cloudformation_file() {
 	# Search for AWS Cloud Formation-related strings in files to determine which files to pass to cfn-lint
+	# Here a return of 0 indicates the function found a string match and exits with a success code,
+	# and 0 indicates a failure to find the string
 	local file="$1"
 
 	# Searches for a string specific to AWS CF templates
 	if grep -q 'AWSTemplateFormatVersion' "${file}" >/dev/null; then
-		echo "true"
+		return 0
 	fi
 
 	# Search for AWS, Alexa Skills Kit, or Custom Cloud Formation syntax within the file
 	if grep -q -E '(AWS|Alexa|Custom)::' "${file}" >/dev/null; then
-		echo "true"
+		return 0
 	fi
 
-	echo "false"
+	return 1
 }
 
 function get_files_matching_filetype() {
 	local filenames=("$@")
 	matching_files=()
 
-	for file in "${filenames[@]}"; do
-		filename=$(basename "$file")
-
-		for filetype in "${linter_filetypes[@]}"; do
+	for filetype in "${linter_filetypes[@]}"; do
+		for file in "${filenames[@]}"; do
+			filename=$(basename "$file")
 			if [[ $filename == *"$filetype" ]]; then
 				if [ "${linter[name]}" == "cfn-lint" ]; then
-					if [ "$(detect_cloudformation_file "${file}")" == "false" ]; then
+					if ! detect_cloudformation_file "$file"; then
 						continue
 					fi
 				fi
 				if [ "${linter[name]}" == "kubeconform" ]; then
-					if [ "$(detect_kubernetes_file "${file}")" ]; then
+					if ! detect_kubernetes_file "$file"; then
 						continue
 					fi
 				fi
@@ -135,7 +138,6 @@ function get_files_matching_filetype() {
 					fi
 				fi
 				matching_files+=("$file")
-				break
 			fi
 		done
 	done
@@ -249,6 +251,7 @@ function seiso_lint() {
 			cat "/opt/goat/log/${pids[$p]}.log"
 			linter_failures+=("${pids[$p]}")
 		else
+			cat "/opt/goat/log/${pids[$p]}.log"
 			linter_successes+=("${pids[$p]}")
 		fi
 	done
