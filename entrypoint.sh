@@ -115,7 +115,7 @@ function detect_cloudformation_file() {
 
 function get_files_matching_filetype() {
 	local filenames=("$@")
-	local matching_files=()
+	declare -a matching_files=()
 
 	for filetype in "${linter_filetypes[@]}"; do
 		for file in "${filenames[@]}"; do
