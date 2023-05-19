@@ -158,19 +158,16 @@ function lint_files() {
 		fi
 	done
 
-	files_to_lint=$(get_files_matching_filetype "${included[@]}")
+	files_to_lint="$(get_files_matching_filetype "${included[@]}")"
 
 	for file in "${files_to_lint[@]}"; do
-		if [ -n "${file}" ]; then
-			continue
-		fi
-
 		if [[ "${linter[executor]+x}" ]]; then
 			cmd="${linter[executor]} ${linter[name]} $linter_args ${file}"
 		else
 			cmd="${linter[name]} $linter_args ${file}"
 		fi
 
+		echo "$cmd" >>"${linter[logfile]}"
 		eval "$cmd" >>"${linter[logfile]}" 2>&1
 		return
 	done
