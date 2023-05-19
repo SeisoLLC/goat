@@ -39,6 +39,7 @@ RUN pip install pipenv \
     tini \
     ruby \
     bash \
+    git \
     && npm install --save-dev --no-cache -g dockerfile_lint \
     markdownlint-cli \
     textlint \
