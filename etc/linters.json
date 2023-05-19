@@ -6,6 +6,7 @@
             ".py"
         ],
         "installer": "pip",
+        "executor": "pipenv run",
         "env": "RUFF_CONFIG"
     },
     {
@@ -64,6 +65,7 @@
             ".yaml"
         ],
         "installer": "pip",
+        "executor": "pipenv run",
         "env": "CFN_LINT_CONFIG"
     },
     {
@@ -78,9 +80,10 @@
     },
     {
         "name": "actionlint",
-        "args": "-config-file /etc/opt/goat/actionlint.yml",
+        "args": "",
         "filetype": [
-            "all"
+            ".yml",
+            ".yaml"
         ],
         "installer": "docker",
         "env": "ACTIONLINT_CONFIG"
@@ -111,6 +114,7 @@
             ".py"
         ],
         "installer": "pip",
+        "executor": "pipenv run",
         "env": "BLACK_CONFIG"
     },
     {
@@ -120,6 +124,7 @@
             ".py"
         ],
         "installer": "pip",
+        "executor": "pipenv run",
         "env": "MYPY_CONFIG"
     },
     {
@@ -148,6 +153,7 @@
             ".yml"
         ],
         "installer": "pip",
+        "executor": "pipenv run",
         "env": "YAMLLINT_CONFIG"
     }
 ]

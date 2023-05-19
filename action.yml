@@ -2,20 +2,16 @@
 name: Seiso Grand Opinionated AutoTester (GOAT)
 description: Apply Seiso's standard testing
 inputs:
-  disable_terrascan:
-    description: 'Disable terrascan'
-    required: false
-    default: 'false'
   disable_mypy:
-    description: 'Disable mypy'
+    description: "Disable mypy"
     required: false
-    default: 'false'
+    default: "false"
   exclude:
-    description: 'Exclude anything that matches the regular expression'
+    description: "Exclude anything that matches the regular expression"
     required: false
   log_level:
-    description: 'Set the logging verbosity'
+    description: "Set the logging verbosity"
     required: false
 runs:
-  using: 'docker'
-  image: 'docker://docker.io/seiso/goat:latest'
+  using: "docker"
+  image: "docker://docker.io/seiso/goat:latest"

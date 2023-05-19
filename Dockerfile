@@ -1,5 +1,5 @@
 FROM ghcr.io/yannh/kubeconform:v0.6.1 as kubeconform
-FROM hadolint/hadolint:v2.12.1-beta-alpine as hadolint
+FROM hadolint/hadolint:v2.12.0-alpine as hadolint
 FROM koalaman/shellcheck:v0.9.0 as shellcheck
 FROM mvdan/shfmt:v3.6.0 as shfmt
 FROM rhysd/actionlint:1.6.24 as actionlint
@@ -30,16 +30,15 @@ COPY --from=shfmt /bin/shfmt /usr/bin/
 COPY --from=actionlint /usr/local/bin/actionlint /usr/bin/
 
 # hadolint ignore=DL3016,DL3018,DL3013
-RUN apk upgrade \
+RUN pip install pipenv \
+    && pipenv install --system --deploy --ignore-pipfile \
+    && apk upgrade \
     && apk --no-cache add go \
     jq \
     npm \
     tini \
     ruby \
     bash \
-    && gem install \
-    rubocop \
-    rubocop-github \
     && npm install --save-dev --no-cache -g dockerfile_lint \
     markdownlint-cli \
     textlint \
@@ -50,14 +49,7 @@ RUN apk upgrade \
     cspell \
     jscpd \
     markdown-link-check \
-    && mkdir -p /opt/goat/log \
-    && pip install pipenv \
-    ruff \
-    mypy \
-    cfn-lint \
-    black \
-    yamllint \
-    && pipenv install --deploy --ignore-pipfile
+    && mkdir -p /opt/goat/log
 
 WORKDIR /goat/
 

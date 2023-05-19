@@ -42,11 +42,6 @@ function setup_environment() {
 	export GLOBAL_DICTIONARY="/etc/opt/goat/seiso_global_dictionary.txt"
 	export REPO_DICTIONARY="${GITHUB_WORKSPACE:-/goat}/.github/etc/dictionary.txt"
 
-	# Map certain environment variables
-	if [[ ${INPUT_DISABLE_TERRASCAN-} == "true" ]]; then
-		export VALIDATE_TERRAFORM_TERRASCAN="false"
-	fi
-
 	if [[ ${INPUT_DISABLE_MYPY-} == "true" ]]; then
 		export VALIDATE_PYTHON_MYPY="false"
 	fi
@@ -60,7 +55,6 @@ function setup_environment() {
 		export ACTIONS_RUNNER_DEBUG="true"
 	fi
 
-	linter_failed="false"
 	declare -a linter_failures
 	declare -a linter_successes
 }
@@ -85,30 +79,36 @@ ${overlap}"
 }
 
 function detect_kubernetes_file() {
+	# Seach for k8s-specific strings in files to determine which files to pass to kubeconform for linting
+	# Return values are used as bools: 1 = true, strings were found; 2 = false, strings were not found
 	local file="$1"
 
 	if grep -q -v 'kustomize.config.k8s.io' "${file}" &&
 		grep -q -v "tekton" "${file}" &&
 		grep -q -E '(apiVersion):' "${file}" &&
 		grep -q -E '(kind):' "${file}"; then
-		return 0
+		return 1
 	fi
 
-	return 1
+	return 0
 }
 
 function detect_cloudformation_file() {
+	# Search for AWS Cloud Formation-related strings in files to determine which files to pass to cfn-lint
+	# Return values are used as bools: 1 = true, strings were found; 2 = false, strings were not found
 	local file="$1"
 
+	# Searches for a string specific to AWS CF templates
 	if grep -q 'AWSTemplateFormatVersion' "${file}" >/dev/null; then
-		return 0
+		return 1
 	fi
 
+	# Search for AWS, Alexa Skills Kit, or Custom Cloud Formation syntax within the file
 	if grep -q -E '(AWS|Alexa|Custom)::' "${file}" >/dev/null; then
-		return 0
+		return 1
 	fi
 
-	return 1
+	return 0
 }
 
 function get_files_matching_filetype() {
@@ -121,13 +121,19 @@ function get_files_matching_filetype() {
 		for filetype in "${linter_filetypes[@]}"; do
 			if [[ $filename == *"$filetype" ]]; then
 				if [ "${linter[name]}" == "cfn-lint" ]; then
-					if ! detect_cloudformation_file "${file}"; then
-						break
+					if detect_cloudformation_file "${file}"; then
+						continue
 					fi
 				fi
 				if [ "${linter[name]}" == "kubeconform" ]; then
-					if ! detect_kubernetes_file "${file}"; then
-						break
+					if detect_kubernetes_file "${file}"; then
+						continue
+					fi
+				fi
+				if [ "${linter[name]}" == "actionlint" ]; then
+					local action_path="./.github/workflows/"
+					if [[ "$file" != "${action_path}"* ]]; then
+						continue
 					fi
 				fi
 				matching_files+=("$file")
@@ -141,6 +147,7 @@ function get_files_matching_filetype() {
 
 function lint_files() {
 	local linter_args="${linter[args]}"
+	local files_to_lint=""
 
 	if [[ -v "${linter[env]}" && -n "${!linter[env]}" ]]; then
 		linter_args="${!linter[env]}"
@@ -154,7 +161,9 @@ function lint_files() {
 		fi
 	done
 
-	for file in $(get_files_matching_filetype "${included[@]}"); do
+	files_to_lint=$(get_files_matching_filetype "${included[@]}")
+
+	for file in "${files_to_lint[@]}"; do
 		if [[ "${linter[executor]+x}" ]]; then
 			cmd="${linter[executor]} ${linter[name]} $linter_args ${file}"
 		else
@@ -162,11 +171,23 @@ function lint_files() {
 		fi
 
 		eval "$cmd" >>"${linter[logfile]}" 2>&1
+		return
 	done
 }
 
 function seiso_lint() {
 	echo -e "\nRunning Seiso Linter\n--------------------------\n"
+
+	if [[ -n ${GITHUB_WORKSPACE:-} ]]; then
+		echo "Setting ${GITHUB_WORKSPACE} as safe directory"
+		git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+	fi
+
+	# When run in a pipeline, move per-repo configurations into the right location at runtime so super-linter finds them, overwriting the defaults.
+	# This will handle hidden and non-hidden files, as well as sym links
+	if [[ -d "${GITHUB_WORKSPACE:-.}/.github/linters" ]]; then
+		cp -p "${GITHUB_WORKSPACE:-.}/.github/linters/"* "${GITHUB_WORKSPACE:-.}/.github/linters/".* /etc/opt/goat/ || true
+	fi
 
 	excluded=()
 	included=()
@@ -203,6 +224,11 @@ function seiso_lint() {
 
 		linter[logfile]="/opt/goat/log/${linter[name]}.log"
 
+		if [[ -v VALIDATE_PYTHON_MYPY && "${VALIDATE_PYTHON_MYPY,,}" == "false" ]] && [[ "${linter[name]}" == "mypy" ]]; then
+			echo "mypy linter has been disabled"
+			continue
+		fi
+
 		echo "===============================" >>"${linter[logfile]}"
 		echo "Running linter: ${linter[name]}"
 		echo "${linter[name]^^}" >>"${linter[logfile]}"
@@ -224,7 +250,6 @@ function seiso_lint() {
 		if [ "$exit_code" -gt 0 ]; then
 			cat "/opt/goat/log/${pids[$p]}.log"
 			linter_failures+=("${pids[$p]}")
-			linter_failed="true"
 		else
 			linter_successes+=("${pids[$p]}")
 		fi
@@ -242,7 +267,7 @@ for success in "${linter_successes[@]}"; do
 	feedback INFO "$success completed successfully"
 done
 
-if [ "${linter_failed:-true}" == "true" ]; then
+if [ -n "${linter_failures[*]}" ]; then
 	for failure in "${linter_failures[@]}"; do
 		feedback ERROR "$failure found errors"
 	done

@@ -25,13 +25,13 @@ There are two ways of running the `goat` locally:
 
     ```bash
     docker build .
-    docker run -e RUN_LOCAL=true -v $PWD:/goat/ --rm <first several character of the hash output from the build step>
+    docker run -v $PWD:/goat/ --rm <first several character of the hash output from the build step>
     ```
 
-3. To pass in custom configs for individual linters or to exclude files with regex, set environment variables:
+3. To pass in custom configs for individual linters or to exclude files with regular expressions, set environment variables:
 
     ```bash
-    docker run -e RUN_LOCAL=true -e INPUT_EXCLUDE='.*\.json$' -e BLACK_CONFIG='--required-version 21.9b0' -v $PWD:/goat/ --rm <hash>
+    docker run -e INPUT_EXCLUDE='.*\.json$' -e BLACK_CONFIG='--required-version 21.9b0' -v $PWD:/goat/ --rm <hash>
 
     Running Seiso Linter
     --------------------------
@@ -79,7 +79,8 @@ There are two ways of running the `goat` locally:
     ERROR:  Linting failed
     ```
 
-    Note: Linter env variables must be formatted as <LINTER_CONFIG>, i.e. RUFF_CONFIG, CFN_LINT_CONFIG, etc.
+    Note: Linter env variables must be formatted as <LINTER_CONFIG>, i.e. RUFF_CONFIG, CFN_LINT_CONFIG,  
+    etc., and the values supplied will overwrite the default arguments supplied in the goat.
 
 ### Note
 
