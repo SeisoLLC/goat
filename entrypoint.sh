@@ -84,10 +84,7 @@ function detect_kubernetes_file() {
 	# and 1 indicates a failure to find the string
 	local file="$1"
 
-	if grep -q -v 'kustomize.config.k8s.io' "${file}" &&
-		grep -q -v "tekton" "${file}" &&
-		grep -q -E '(apiVersion):' "${file}" &&
-		grep -q -E '(kind):' "${file}"; then
+	if grep -q -v 'kustomize.config.k8s.io' "${file}" && grep -q -v "tekton" "${file}" && grep -q -E '(apiVersion):' "${file}" && grep -q -E '(kind):' "${file}"; then
 		return 0
 	fi
 
