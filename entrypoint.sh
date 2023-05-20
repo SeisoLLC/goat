@@ -80,37 +80,37 @@ ${overlap}"
 
 function detect_kubernetes_file() {
 	# Seach for k8s-specific strings in files to determine which files to pass to kubeconform for linting
-	# Here a return of 0 indicates the function found a string match and exits with a success code,
-	# and 1 indicates a failure to find the string
+	# Here a return of 0 indicates the function did not find a string match and exits with a success code,
+	# and 1 indicates the strings were found. This more aligns with a boolean-like response.
 	local file="$1"
 
 	if grep -q -v 'kustomize.config.k8s.io' "${file}" &&
 		grep -q -v "tekton" "${file}" &&
 		grep -q -E '(apiVersion):' "${file}" &&
 		grep -q -E '(kind):' "${file}"; then
-		return 0
+		return 1
 	fi
 
-	return 1
+	return 0
 }
 
 function detect_cloudformation_file() {
 	# Search for AWS Cloud Formation-related strings in files to determine which files to pass to cfn-lint
-	# Here a return of 0 indicates the function found a string match and exits with a success code,
-	# and 1 indicates a failure to find the string
+	# Here a return of 0 indicates the function did not find a string match and exits with a success code,
+	# and 1 indicates the string was found. This more aligns with a boolean-like response.
 	local file="$1"
 
 	# Searches for a string specific to AWS CF templates
 	if grep -q 'AWSTemplateFormatVersion' "${file}" >/dev/null; then
-		return 0
+		return 1
 	fi
 
 	# Search for AWS, Alexa Skills Kit, or Custom Cloud Formation syntax within the file
 	if grep -q -E '(AWS|Alexa|Custom)::' "${file}" >/dev/null; then
-		return 0
+		return 1
 	fi
 
-	return 1
+	return 0
 }
 
 function get_files_matching_filetype() {
@@ -122,12 +122,12 @@ function get_files_matching_filetype() {
 			filename=$(basename "${file}")
 			if [[ $filename == *"$filetype" ]]; then
 				if [ "${linter[name]}" == "cfn-lint" ]; then
-					if ! detect_cloudformation_file "${file}"; then
+					if detect_cloudformation_file "${file}"; then
 						continue
 					fi
 				fi
 				if [ "${linter[name]}" == "kubeconform" ]; then
-					if ! detect_kubernetes_file "${file}"; then
+					if detect_kubernetes_file "${file}"; then
 						continue
 					fi
 				fi
