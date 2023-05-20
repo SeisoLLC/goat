@@ -1,6 +1,7 @@
 # Grand Opinionated AutoTester (GOAT)
 
 The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard testing.
+This project has been designed to be easier to understand and more opinionated than other open source projects.
 
 ## Getting Started
 
