@@ -163,6 +163,10 @@ function lint_files() {
 
 	files_to_lint="$(get_files_matching_filetype "${included[@]}")"
 
+	if [ "${#files_to_lint}" -eq 0 ]; then
+		return
+	fi
+
 	for file in "${files_to_lint[@]}"; do
 		if [[ "${linter[executor]+x}" ]]; then
 			cmd="${linter[executor]} ${linter[name]} $linter_args ${file}"
@@ -201,7 +205,7 @@ function seiso_lint() {
 		included+=("$file")
 	done < <(find . \( -path "./.git" -prune \) -o \( -type f -print \))
 
-	declare -gA pids
+	declare -A pids
 
 	input="/etc/opt/goat/linters.json"
 
