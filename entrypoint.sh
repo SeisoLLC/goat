@@ -163,7 +163,7 @@ function lint_files() {
 
 	files_to_lint="$(get_files_matching_filetype "${included[@]}")"
 
-	if [ "${#files_to_lint[@]}" -eq 0 ]; then
+	if [ "${#files_to_lint}" -eq 0 ]; then
 		return
 	fi
 
