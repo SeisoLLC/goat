@@ -132,7 +132,7 @@ function get_files_matching_filetype() {
 					fi
 				fi
 				if [ "${linter[name]}" == "actionlint" ]; then
-					local action_path="./.github/workflows/"
+					local action_path="${GITHUB_WORKSPACE:-.}/.github/workflows/"
 					if [[ "${file}" != "${action_path}"* ]]; then
 						continue
 					fi

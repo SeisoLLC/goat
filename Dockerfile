@@ -37,7 +37,6 @@ RUN pip install pipenv \
     jq \
     npm \
     tini \
-    ruby \
     bash \
     git \
     && npm install --save-dev --no-cache -g dockerfile_lint \

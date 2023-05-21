@@ -5,7 +5,6 @@
         "filetype": [
             ".py"
         ],
-        "installer": "pip",
         "executor": "pipenv run",
         "env": "RUFF_CONFIG"
     },
@@ -15,7 +14,6 @@
         "filetype": [
             "Dockerfile"
         ],
-        "installer": "docker",
         "env": "HADOLINT_CONFIG"
     },
     {
@@ -25,7 +23,6 @@
             ".yml",
             ".yaml"
         ],
-        "installer": "docker",
         "env": "KUBECONFORM_CONFIG"
     },
     {
@@ -34,7 +31,6 @@
         "filetype": [
             "Dockerfile"
         ],
-        "installer": "npm",
         "env": "DOCKERFILE_LINT_CONFIG"
     },
     {
@@ -43,7 +39,6 @@
         "filetype": [
             ".md"
         ],
-        "installer": "npm",
         "executor": "npx",
         "env": "MARKDOWN_LINK_CHECK_CONFIG"
     },
@@ -53,7 +48,6 @@
         "filetype": [
             ".md"
         ],
-        "installer": "npm",
         "executor": "npx",
         "env": "CSPELL_CONFIG"
     },
@@ -64,7 +58,6 @@
             ".yml",
             ".yaml"
         ],
-        "installer": "pip",
         "executor": "pipenv run",
         "env": "CFN_LINT_CONFIG"
     },
@@ -74,7 +67,6 @@
         "filetype": [
             "all"
         ],
-        "installer": "npm",
         "executor": "npx",
         "env": "JSCPD_CONFIG"
     },
@@ -85,7 +77,6 @@
             ".yml",
             ".yaml"
         ],
-        "installer": "docker",
         "env": "ACTIONLINT_CONFIG"
     },
     {
@@ -94,7 +85,6 @@
         "filetype": [
             ".md"
         ],
-        "installer": "npm",
         "env": "MARKDOWNLINT_CONFIG"
     },
     {
@@ -103,7 +93,6 @@
         "filetype": [
             "all"
         ],
-        "installer": "npm",
         "executor": "npx",
         "env": "TEXTLINT_CONFIG"
     },
@@ -113,7 +102,6 @@
         "filetype": [
             ".py"
         ],
-        "installer": "pip",
         "executor": "pipenv run",
         "env": "BLACK_CONFIG"
     },
@@ -123,7 +111,6 @@
         "filetype": [
             ".py"
         ],
-        "installer": "pip",
         "executor": "pipenv run",
         "env": "MYPY_CONFIG"
     },
@@ -133,7 +120,6 @@
         "filetype": [
             ".sh"
         ],
-        "installer": "docker",
         "env": "SHFMT_CONFIG"
     },
     {
@@ -142,7 +128,6 @@
         "filetype": [
             ".sh"
         ],
-        "installer": "docker",
         "env": "SHELLCHECK_CONFIG"
     },
     {
@@ -152,7 +137,6 @@
             ".yaml",
             ".yml"
         ],
-        "installer": "pip",
         "executor": "pipenv run",
         "env": "YAMLLINT_CONFIG"
     }
