@@ -259,14 +259,17 @@ function seiso_lint() {
 			linter_successes+=("${pids[$p]}")
 		fi
 	done
-
-	echo -e "\nScanned ${#included[@]} files"
-	echo -e "Excluded ${#excluded[@]} files\n"
 }
 
+start=$(date +%s)
 setup_environment
 check_environment
 seiso_lint
+end=$(date +%s)
+runtime=$((end - start))
+
+echo -e "\nScanned ${#included[@]} files in ${runtime} seconds"
+echo -e "Excluded ${#excluded[@]} files\n"
 
 for success in "${linter_successes[@]}"; do
 	feedback INFO "$success completed successfully"
