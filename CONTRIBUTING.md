@@ -2,11 +2,11 @@
 
 ## Environment Setup
 
-Ensure you have `docker` and `pipenv` installed locally, and the `docker` daemon is running.  
-Then run the following command to install the dependencies onto your local system:  
+Ensure you have `docker` and `pipenv` installed locally, and the `docker` daemon is running.
+Then run the following command to install the dependencies onto your local system:
 
 ```bash
-pipenv install --deploy --ignore-pipfile --dev 
+pipenv install --deploy --ignore-pipfile --dev
 ```
 
 ## Running the goat against the goat project locally
@@ -57,7 +57,7 @@ There are two ways of running the `goat` locally:
     -------------------------------
     Oh no! 💥 💔 💥 The required version `21.9b0` does not match the running version `23.3.0`!
 
-    Scanned 45 files
+    Scanned 45 files in 6 seconds
     Excluded 575 files
 
     INFO:  hadolint completed successfully
@@ -79,7 +79,7 @@ There are two ways of running the `goat` locally:
     ERROR:  Linting failed
     ```
 
-    Note: Linter env variables must be formatted as <LINTER_CONFIG>, i.e. RUFF_CONFIG, CFN_LINT_CONFIG,  
+    Note: Linter env variables must be formatted as <LINTER_CONFIG>, i.e. RUFF_CONFIG, CFN_LINT_CONFIG,
     etc., and the values supplied will overwrite the default arguments supplied in the goat.
 
 ### Note
