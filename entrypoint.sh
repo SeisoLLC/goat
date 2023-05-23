@@ -188,7 +188,7 @@ function seiso_lint() {
 		git config --global --add safe.directory "${GITHUB_WORKSPACE}"
 	fi
 
-	# When run in a pipeline, move per-repo configurations into the right location at runtime so super-linter finds them, overwriting the defaults.
+	# When run in a pipeline, move per-repo configurations into the right location at runtime so the goat finds them, overwriting the defaults.
 	# This will handle hidden and non-hidden files, as well as sym links
 	if [[ -d "${GITHUB_WORKSPACE:-.}/.github/linters" ]]; then
 		cp -p "${GITHUB_WORKSPACE:-.}/.github/linters/"* "${GITHUB_WORKSPACE:-.}/.github/linters/".* /etc/opt/goat/ || true
@@ -229,7 +229,7 @@ function seiso_lint() {
 
 		linter[logfile]="/opt/goat/log/${linter[name]}.log"
 
-		if [[ -v VALIDATE_PYTHON_MYPY && "${VALIDATE_PYTHON_MYPY,,}" == "false" ]] && [[ "${linter[name]}" == "mypy" ]]; then
+		if [[ -v VALIDATE_PYTHON_MYPY && "${VALIDATE_PYTHON_MYPY,,}" == "false" && "${linter[name]}" == "mypy" ]]; then
 			echo "mypy linter has been disabled"
 			continue
 		fi
