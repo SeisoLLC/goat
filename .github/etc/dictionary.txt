@@ -2,5 +2,4 @@ capricornis
 crispus
 hadolint
 kubeconform
-Pipfiles
 textlint

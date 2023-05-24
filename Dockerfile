@@ -21,6 +21,7 @@ LABEL org.opencontainers.image.licenses="MIT"
 
 WORKDIR /etc/opt/goat/
 ENV PIP_NO_CACHE_DIR=1
+ENV PIPENV_PIPFILE="/etc/opt/goat/Pipfile"
 COPY Pipfile Pipfile.lock ./
 COPY --from=kubeconform /kubeconform /usr/bin/
 COPY --from=hadolint /bin/hadolint /usr/bin/
