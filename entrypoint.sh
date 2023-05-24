@@ -191,7 +191,7 @@ function seiso_lint() {
 	# When run in a pipeline, move per-repo configurations into the right location at runtime so the goat finds them, overwriting the defaults.
 	# This will handle hidden and non-hidden files, as well as sym links
 	if [[ -d "${GITHUB_WORKSPACE:-.}/.github/linters" ]]; then
-		cp -p "${GITHUB_WORKSPACE:-.}/.github/linters/"* "${GITHUB_WORKSPACE:-.}/.github/linters/".* /etc/opt/goat/ || true
+		cp -p "${GITHUB_WORKSPACE:-.}/.github/linters/"* "${GITHUB_WORKSPACE:-.}/.github/linters/".* /etc/opt/goat/ 2>/dev/null || true
 	fi
 
 	excluded=()
