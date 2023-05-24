@@ -25,7 +25,7 @@ There are two ways of running the `goat` locally:
 
     ```bash
     docker build .
-    docker run -v $PWD:/goat/ --rm <first several character of the hash output from the build step>
+    docker run -v $PWD:/goat/ -e PIPENV_PIPFILE="/etc/opt/goat/Pipfile" --rm <first several character of the hash output from the build step>
     ```
 
 3. To pass in custom configs for individual linters or to exclude files with regular expressions, set environment variables:
@@ -79,6 +79,12 @@ There are two ways of running the `goat` locally:
 
     Note: Linter env variables must be formatted as <LINTER_CONFIG>, i.e. RUFF_CONFIG, CFN_LINT_CONFIG,
     etc., and the values supplied will overwrite the default arguments supplied in the goat.
+
+4. Environment variables
+   1. `-e PIPENV_PIPFILE="/etc/opt/goat/Pipfile"` is necessary when running the goat against repositories with their own  
+   Pipfiles to ensure the goat's internal pipenv loads with the correct packages.
+   2. `-e VALIDATE_PYTHON_MYPY="false"` disables the mypy linter. When this ENV is set, the goat will display output noting  
+   mypy was skipped.
 
 ### Note
 
