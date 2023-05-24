@@ -57,6 +57,7 @@ function setup_environment() {
 
 	declare -a linter_failures
 	declare -a linter_successes
+	declare -a linter_skipped
 }
 
 function check_environment() {
@@ -231,6 +232,7 @@ function seiso_lint() {
 
 		if [[ -v VALIDATE_PYTHON_MYPY && "${VALIDATE_PYTHON_MYPY,,}" == "false" && "${linter[name]}" == "mypy" ]]; then
 			echo "mypy linter has been disabled"
+			linter_skipped+=("${linter[name]}")
 			continue
 		fi
 
@@ -273,6 +275,10 @@ echo -e "Excluded ${#excluded[@]} files\n"
 
 for success in "${linter_successes[@]}"; do
 	feedback INFO "$success completed successfully"
+done
+
+for skip in "${linter_skipped[@]}"; do
+	feedback WARNING "$skip was skipped"
 done
 
 if [ -n "${linter_failures[*]}" ]; then
