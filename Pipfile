@@ -4,6 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+ruff = "*"
+mypy = "*"
+cfn-lint = "*"
+black = "*"
+yamllint = "*" 
 
 [dev-packages]
 docker = "*"

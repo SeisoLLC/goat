@@ -2,27 +2,134 @@
     {
         "name": "ruff",
         "args": "check --config /etc/opt/goat/pyproject.toml -v",
-        "filetype": ".py",
-        "installer": "pip"
+        "filetype": [
+            ".py"
+        ],
+        "executor": "pipenv run",
+        "env": "RUFF_CONFIG"
+    },
+    {
+        "name": "hadolint",
+        "args": "-V -c /etc/opt/goat/.hadolint.yml",
+        "filetype": [
+            "Dockerfile"
+        ],
+        "env": "HADOLINT_CONFIG"
+    },
+    {
+        "name": "kubeconform",
+        "args": "-verbose -strict",
+        "filetype": [
+            ".yml",
+            ".yaml"
+        ],
+        "env": "KUBECONFORM_CONFIG"
     },
     {
         "name": "dockerfile_lint",
         "args": "-r /etc/opt/goat/oci.yml -f",
-        "filetype": "Dockerfile",
-        "installer": "npm"
+        "filetype": [
+            "Dockerfile"
+        ],
+        "env": "DOCKERFILE_LINT_CONFIG"
     },
     {
         "name": "markdown-link-check",
         "args": "--config /etc/opt/goat/links.json --verbose",
-        "filetype": ".md",
-        "installer": "npm",
-        "executor": "npx"
+        "filetype": [
+            ".md"
+        ],
+        "executor": "npx",
+        "env": "MARKDOWN_LINK_CHECK_CONFIG"
     },
     {
         "name": "cspell",
         "args": "-c /etc/opt/goat/cspell.config.js -v --no-must-find-files --",
-        "filetype": ".md",
-        "installer": "npm",
-        "executor": "npx"
+        "filetype": [
+            ".md"
+        ],
+        "executor": "npx",
+        "env": "CSPELL_CONFIG"
+    },
+    {
+        "name": "cfn-lint",
+        "args": "--config-file /etc/opt/goat/.cfnlintrc.yml",
+        "filetype": [
+            ".yml",
+            ".yaml"
+        ],
+        "executor": "pipenv run",
+        "env": "CFN_LINT_CONFIG"
+    },
+    {
+        "name": "jscpd",
+        "args": "--config /etc/opt/goat/.jscpd.json *",
+        "filetype": [
+            "all"
+        ],
+        "executor": "npx",
+        "env": "JSCPD_CONFIG"
+    },
+    {
+        "name": "actionlint",
+        "args": "",
+        "filetype": [
+            ".yml",
+            ".yaml"
+        ],
+        "env": "ACTIONLINT_CONFIG"
+    },
+    {
+        "name": "markdownlint",
+        "args": "-c /etc/opt/goat/.markdown-lint.yml",
+        "filetype": [
+            ".md"
+        ],
+        "env": "MARKDOWNLINT_CONFIG"
+    },
+    {
+        "name": "textlint",
+        "args": "-c /etc/opt/goat/.textlintrc \"/goat/**\"",
+        "filetype": [
+            "all"
+        ],
+        "executor": "npx",
+        "env": "TEXTLINT_CONFIG"
+    },
+    {
+        "name": "black",
+        "args": "--config /etc/opt/goat/.python-black --diff --check",
+        "filetype": [
+            ".py"
+        ],
+        "executor": "pipenv run",
+        "env": "BLACK_CONFIG"
+    },
+    {
+        "name": "mypy",
+        "args": "--config-file /etc/opt/goat/.mypy.ini --install-types --non-interactive",
+        "filetype": [
+            ".py"
+        ],
+        "executor": "pipenv run",
+        "env": "MYPY_CONFIG"
+    },
+    {
+        "name": "shellcheck",
+        "args": "-C -x",
+        "filetype": [
+            ".sh"
+        ],
+        "env": "SHELLCHECK_CONFIG"
+    },
+    {
+        "name": "yamllint",
+        "args": "-c /etc/opt/goat/.yamllint.yml",
+        "filetype": [
+            ".yaml",
+            ".yml"
+        ],
+        "executor": "pipenv run",
+        "env": "YAMLLINT_CONFIG"
     }
 ]

@@ -1,8 +1,9 @@
-# Based on python:alpine as of February 2021
-FROM github/super-linter:slim-v5.0.0
+FROM ghcr.io/yannh/kubeconform:v0.6.1 as kubeconform
+FROM hadolint/hadolint:v2.12.0-alpine as hadolint
+FROM koalaman/shellcheck:v0.9.0 as shellcheck
+FROM rhysd/actionlint:1.6.24 as actionlint
 
-# Required for the github/super-linter log (cannot be disabled)
-RUN mkdir -p /tmp/lint/
+FROM python:3.10-alpine3.17 as base_image
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -20,22 +21,32 @@ LABEL org.opencontainers.image.licenses="MIT"
 
 WORKDIR /etc/opt/goat/
 ENV PIP_NO_CACHE_DIR=1
+ENV PIPENV_PIPFILE="/etc/opt/goat/Pipfile"
 COPY Pipfile Pipfile.lock ./
+COPY --from=kubeconform /kubeconform /usr/bin/
+COPY --from=hadolint /bin/hadolint /usr/bin/
+COPY --from=shellcheck /bin/shellcheck /usr/bin/
+COPY --from=actionlint /usr/local/bin/actionlint /usr/bin/
+
 # hadolint ignore=DL3016,DL3018,DL3013
 RUN pip install pipenv \
-    && pipenv install --deploy --ignore-pipfile \
-    && pip install shed ruff \
+    && pipenv install --system --deploy --ignore-pipfile \
     && apk upgrade \
     && apk --no-cache add go \
     jq \
     npm \
     tini \
-    ruby \
-    && gem install \
-    rubocop \
-    rubocop-github \
-    && npm install --no-cache -g dockerfile_lint \
+    bash \
+    git \
+    && npm install --save-dev --no-cache -g dockerfile_lint \
+    markdownlint-cli \
+    textlint \
+    textlint-filter-rule-allowlist \
+    textlint-filter-rule-comments \
+    textlint-rule-terminology \
+    textlint-plugin-rst \
     cspell \
+    jscpd \
     markdown-link-check \
     && mkdir -p /opt/goat/log
 

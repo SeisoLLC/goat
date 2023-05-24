@@ -1,6 +1,7 @@
 # Grand Opinionated AutoTester (GOAT)
 
 The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard testing.
+This project has been designed to be easier to understand and more opinionated than other open source multi-linter projects.
 
 ## Getting Started
 
@@ -55,13 +56,12 @@ jobs:
     EOF
     ```
 
-1. Configure the goat to skip terrascan and/or mypy scanning.
+1. Configure the goat to skip mypy scanning.
 
     ```bash
     uses: seisollc/goat@main
     with:
       disable_mypy: true
-      disable_terrascan: true
     ```
 
 1. Exclude a file extension.
@@ -80,7 +80,7 @@ jobs:
       exclude: ^.*/(Dockerfile|Dockerfile\.dev)$
     ```
 
-1. Provide a linting configuration for any of the linters supported by `super-linter` in the `.github/linters/` directory of your repository.
+1. Provide a linting configuration for any of the supported linters in the `.github/linters/` directory of your repository.
 
     ```bash
     $ mkdir -p .github/linters/
@@ -90,6 +90,24 @@ jobs:
       line_length: 120
     EOF
     ```
+
+#### Supported Linters
+
+- actionlint
+- black
+- cfn-lint
+- cspell
+- dockerfile_lint
+- hadolint
+- jscpd
+- kubeconform
+- markdown-link-check
+- markdownlint
+- mypy
+- ruff
+- shellcheck
+- textlint
+- yamllint
 
 #### Debugging
 

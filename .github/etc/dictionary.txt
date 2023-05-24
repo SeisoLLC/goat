@@ -1,2 +1,5 @@
 capricornis
 crispus
+hadolint
+kubeconform
+textlint
