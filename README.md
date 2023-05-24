@@ -106,7 +106,6 @@ jobs:
 - mypy
 - ruff
 - shellcheck
-- shfmt
 - textlint
 - yamllint
 

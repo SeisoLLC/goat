@@ -115,14 +115,6 @@
         "env": "MYPY_CONFIG"
     },
     {
-        "name": "shfmt",
-        "args": "-d",
-        "filetype": [
-            ".sh"
-        ],
-        "env": "SHFMT_CONFIG"
-    },
-    {
         "name": "shellcheck",
         "args": "-C -x",
         "filetype": [
