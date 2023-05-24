@@ -49,7 +49,6 @@ There are two ways of running the `goat` locally:
     Running linter: textlint
     Running linter: black
     Running linter: mypy
-    Running linter: shfmt
     Running linter: shellcheck
     Running linter: yamllint
     ===============================
@@ -69,7 +68,6 @@ There are two ways of running the `goat` locally:
     INFO:  jscpd completed successfully
     INFO:  kubeconform completed successfully
     INFO:  shellcheck completed successfully
-    INFO:  shfmt completed successfully
     INFO:  ruff completed successfully
     INFO:  cspell completed successfully
     INFO:  actionlint completed successfully
