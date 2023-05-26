@@ -1,3 +1,4 @@
+autofix
 capricornis
 crispus
 hadolint

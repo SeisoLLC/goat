@@ -228,6 +228,16 @@ function seiso_lint() {
 			linter["$key"]=$value
 		done < <(echo "$line" | jq -r 'to_entries|map("\(.key)=\(.value|tojson)")|.[]')
 
+		if [[ ${AUTO_FIX-} == "true" ]]; then
+			if [[ -v linter[autofix] && -n "${linter[autofix]}" ]]; then
+				linter[args]="${linter[autofix]}"
+			else
+				echo "${linter[name]} has no autofix option and has been skipped"
+				linter_skipped+=("${linter[name]}")
+				continue
+			fi
+		fi
+
 		linter[logfile]="/opt/goat/log/${linter[name]}.log"
 
 		if [[ -v VALIDATE_PYTHON_MYPY && "${VALIDATE_PYTHON_MYPY,,}" == "false" && "${linter[name]}" == "mypy" ]]; then
@@ -258,6 +268,9 @@ function seiso_lint() {
 			cat "/opt/goat/log/${pids[$p]}.log"
 			linter_failures+=("${pids[$p]}")
 		else
+			if [[ ${AUTO_FIX-} == "true" ]]; then
+				cat "/opt/goat/log/${pids[$p]}.log"
+			fi
 			linter_successes+=("${pids[$p]}")
 		fi
 	done

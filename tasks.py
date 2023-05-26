@@ -258,26 +258,25 @@ def reformat(_c, debug=False):
     if debug:
         getLogger().setLevel("DEBUG")
 
-    entrypoint_and_command = [
-        ("isort", ". --settings-file /action/lib/.automation/.isort.cfg"),
-        ("black", "."),
-    ]
     image = "seiso/goat:latest"
+    environment = {}
+    environment["AUTO_FIX"] = "true"
     working_dir = "/goat/"
     volumes = {CWD: {"bind": working_dir, "mode": "rw"}}
 
     LOG.info("Pulling %s...", image)
     CLIENT.images.pull(image)
     LOG.info("Reformatting the project...")
-    for entrypoint, command in entrypoint_and_command:
-        opinionated_docker_run(
-            image=image,
-            command=command,
-            volumes=volumes,
-            working_dir=working_dir,
-            entrypoint=entrypoint,
-            auto_remove=True,
-        )
+
+    opinionated_docker_run(
+        image=image,
+        volumes=volumes,
+        working_dir=working_dir,
+        auto_remove=True,
+        environment=environment,
+    )
+
+    LOG.info("Reformatting has completed")
 
 
 @task
