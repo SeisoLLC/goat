@@ -92,12 +92,11 @@
         "name": "textlint",
         "args": "-c /etc/opt/goat/.textlintrc --dry-run",
         "filetype": [
-            ".md",
-            ".rst"
+            ".md"
         ],
         "executor": "npx",
         "env": "TEXTLINT_CONFIG",
-        "autofix": "-c /etc/opt/goat/.textlintrc --fix \"/goat/**\""
+        "autofix": "-c /etc/opt/goat/.textlintrc --fix"
     },
     {
         "name": "black",

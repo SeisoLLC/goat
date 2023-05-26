@@ -44,7 +44,6 @@ RUN pip install pipenv \
     textlint-filter-rule-allowlist \
     textlint-filter-rule-comments \
     textlint-rule-terminology \
-    textlint-plugin-rst \
     cspell \
     jscpd \
     markdown-link-check \
