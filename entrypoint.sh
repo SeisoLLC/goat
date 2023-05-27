@@ -42,8 +42,12 @@ function setup_environment() {
 	export GLOBAL_DICTIONARY="/etc/opt/goat/seiso_global_dictionary.txt"
 	export REPO_DICTIONARY="${GITHUB_WORKSPACE:-/goat}/.github/etc/dictionary.txt"
 
-	if [[ ${INPUT_DISABLE_MYPY-} == "true" ]]; then
+	if [[ ${INPUT_DISABLE_MYPY:-} == "true" ]]; then
 		export VALIDATE_PYTHON_MYPY="false"
+	fi
+
+	if [[ ${INPUT_AUTO_FIX:-} == "true" ]]; then
+		export AUTO_FIX="true"
 	fi
 
 	if [[ -n ${INPUT_EXCLUDE:+x} ]]; then
@@ -228,7 +232,7 @@ function seiso_lint() {
 			linter["$key"]=$value
 		done < <(echo "$line" | jq -r 'to_entries|map("\(.key)=\(.value|tojson)")|.[]')
 
-		if [[ ${AUTO_FIX-} == "true" ]]; then
+		if [[ ${AUTO_FIX:-} == "true" ]]; then
 			if [[ -v linter[autofix] && -n "${linter[autofix]}" ]]; then
 				linter[args]="${linter[autofix]}"
 			else
@@ -268,7 +272,7 @@ function seiso_lint() {
 			cat "/opt/goat/log/${pids[$p]}.log"
 			linter_failures+=("${pids[$p]}")
 		else
-			if [[ ${AUTO_FIX-} == "true" ]]; then
+			if [[ ${AUTO_FIX:-} == "true" ]]; then
 				cat "/opt/goat/log/${pids[$p]}.log"
 			fi
 			linter_successes+=("${pids[$p]}")

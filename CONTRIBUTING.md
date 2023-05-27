@@ -81,10 +81,10 @@ There are two ways of running the `goat` locally:
     etc., and the values supplied will overwrite the default arguments supplied in the goat.
 
 4. Autofix is available for certain linters and can be invoked in two ways:
-   1. `docker run -e AUTO_FIX="true" -v $PWD:/goat/ -rm <hash>`
+   1. `docker run -e INPUT_AUTO_FIX="true" -v $PWD:/goat/ -rm <hash>`
    2. `pipenv run invoke reformat`
 
-### Note
+### Linter Update Considerations
 
 1. If adding linters to `linters.json`, the `executor` is an optional member of the linter object.  
 2. The `autofix` member is also optional. If a linter has an autofix command-line option, this field holds those arguments.

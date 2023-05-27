@@ -260,7 +260,7 @@ def reformat(_c, debug=False):
 
     image = "seiso/goat:latest"
     environment = {}
-    environment["AUTO_FIX"] = "true"
+    environment["INPUT_AUTO_FIX"] = "true"
     working_dir = "/goat/"
     volumes = {CWD: {"bind": working_dir, "mode": "rw"}}
 

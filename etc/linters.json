@@ -90,7 +90,7 @@
     },
     {
         "name": "textlint",
-        "args": "-c /etc/opt/goat/.textlintrc --dry-run",
+        "args": "-c /etc/opt/goat/.textlintrc",
         "filetype": [
             ".md"
         ],
