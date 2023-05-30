@@ -91,7 +91,7 @@ jobs:
     EOF
     ```
   
-1. Auto-fix code formatting errors using those linters with a built-in `fix` option.
+1. Autofix code formatting errors using those linters with a built-in `fix` option.
 
     ```bash
     uses: seisollc/goat@main
