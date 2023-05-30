@@ -90,6 +90,14 @@ jobs:
       line_length: 120
     EOF
     ```
+  
+1. Auto-fix code formatting errors using those linters with a built-in `fix` option.
+
+    ```bash
+    uses: seisollc/goat@main
+    with:
+      auto_fix: true
+    ```
 
 #### Supported Linters
 

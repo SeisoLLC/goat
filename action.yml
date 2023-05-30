@@ -12,6 +12,9 @@ inputs:
   log_level:
     description: "Set the logging verbosity"
     required: false
+  auto_fix:
+    description: "Auto-fix code formatting errors"
+    required: false
 runs:
   using: "docker"
   image: "docker://docker.io/seiso/goat:latest"
