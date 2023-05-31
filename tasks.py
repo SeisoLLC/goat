@@ -297,7 +297,7 @@ def update(_c, debug=False):
     if debug:
         getLogger().setLevel("DEBUG")
 
-    repo = "" # TODO Repurpose update to manage new dependencies
+    repo = ""  # TODO Repurpose update to manage new dependencies
     version = get_latest_release_from_github(repo=repo)
     update_dockerfile_from(image=repo, tag=version)
 
