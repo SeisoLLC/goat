@@ -209,7 +209,6 @@ def goat(_c, debug=False):
 
     LOG.info("Baaaaaaaaaaah! (Running the goat)")
     environment = {}
-    environment["RUN_LOCAL"] = "true"
     environment["DEFAULT_WORKSPACE"] = "/goat"
     environment["INPUT_DISABLE_MYPY"] = "true"
     working_dir = "/goat/"
@@ -298,7 +297,7 @@ def update(_c, debug=False):
     if debug:
         getLogger().setLevel("DEBUG")
 
-    repo = "github/super-linter"
+    repo = "" # TODO Repurpose update to manage new dependencies
     version = get_latest_release_from_github(repo=repo)
     update_dockerfile_from(image=repo, tag=version)
 
