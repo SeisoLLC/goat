@@ -234,6 +234,7 @@ function seiso_lint() {
 
 		if [[ ${AUTO_FIX:-} == "true" ]]; then
 			if [[ -v linter[autofix] && -n "${linter[autofix]}" ]]; then
+				# Replacing the linter's args with the autofix args for that linter
 				linter[args]="${linter[autofix]}"
 			else
 				echo "${linter[name]} has no autofix option and has been skipped"
