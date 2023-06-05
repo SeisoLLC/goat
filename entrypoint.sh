@@ -119,69 +119,72 @@ function detect_cloudformation_file() {
 }
 
 function get_files_matching_filetype() {
-	local filenames=("$@")
+	local filenames=("${@:3}")
+	local linter_name="$2"
+	local f_type="$1"
+
 	declare -a matching_files=()
 
-	for filetype in "${linter_filetypes[@]}"; do
-		for file in "${filenames[@]}"; do
-			filename=$(basename "${file}")
-			if [[ $filename == *"$filetype" ]]; then
-				if [ "${linter[name]}" == "cfn-lint" ]; then
-					if detect_cloudformation_file "${file}"; then
-						continue
-					fi
+	for file in "${filenames[@]}"; do
+		filename=$(basename "${file}")
+		if [[ $filename == *"$f_type" ]]; then
+			if [ "$linter_name" == "cfn-lint" ]; then
+				if detect_cloudformation_file "${file}"; then
+					continue
 				fi
-				if [ "${linter[name]}" == "kubeconform" ]; then
-					if detect_kubernetes_file "${file}"; then
-						continue
-					fi
-				fi
-				if [ "${linter[name]}" == "actionlint" ]; then
-					local action_path="${GITHUB_WORKSPACE:-.}/.github/workflows/"
-					if [[ "${file}" != "${action_path}"* ]]; then
-						continue
-					fi
-				fi
-				matching_files+=("${file}")
 			fi
-		done
+			if [ "$linter_name" == "kubeconform" ]; then
+				if detect_kubernetes_file "${file}"; then
+					continue
+				fi
+			fi
+			if [ "$linter_name" == "actionlint" ]; then
+				local action_path="${GITHUB_WORKSPACE:-.}/.github/workflows/"
+				if [[ "${file}" != "${action_path}"* ]]; then
+					continue
+				fi
+			fi
+			matching_files+=("${file}")
+		fi
 	done
 
 	echo "${matching_files[@]}"
 }
 
 function lint_files() {
-	local linter_args="${linter[args]}"
+	local -n linter_array="$1"
+	local filetypes_to_lint=("${@:2}")
+	local linter_args="${linter_array[args]}"
 	local files_to_lint=""
+	local env_var_name="${linter_array[env]}"
 
-	if [[ -v "${linter[env]}" && -n "${!linter[env]}" ]]; then
-		linter_args="${!linter[env]}"
+	if [[ -v "${env_var_name}" ]]; then
+		linter_args="${!env_var_name}"
 	fi
 
-	for type in "${linter_filetypes[@]}"; do
+	for type in "${filetypes_to_lint[@]}"; do
 		if [[ $type == "all" ]]; then
-			cmd="${linter[name]} $linter_args"
-			eval "$cmd" >>"${linter[logfile]}" 2>&1
+			cmd="${linter_array[name]} $linter_args"
+			eval "$cmd" >>"${linter_array[logfile]}" 2>&1
 			return
 		fi
-	done
 
-	files_to_lint="$(get_files_matching_filetype "${included[@]}")"
-
-	if [ "${#files_to_lint}" -eq 0 ]; then
-		return
-	fi
-
-	for file in "${files_to_lint[@]}"; do
-		if [[ "${linter[executor]+x}" ]]; then
-			cmd="${linter[executor]} ${linter[name]} $linter_args ${file}"
-		else
-			cmd="${linter[name]} $linter_args ${file}"
+		files_to_lint="$(get_files_matching_filetype "$type" "${linter_array[name]}" "${included[@]}")"
+		
+		if [ "${#files_to_lint}" -eq 0 ]; then
+			return
 		fi
 
-		echo "$cmd" >>"${linter[logfile]}"
-		eval "$cmd" >>"${linter[logfile]}" 2>&1
-		return
+		for file in "${files_to_lint[@]}"; do
+			if [[ "${linter_array[executor]+x}" ]]; then
+				cmd="${linter_array[executor]} ${linter_array[name]} $linter_args ${file}"
+			else
+				cmd="${linter_array[name]} $linter_args ${file}"
+			fi
+
+			echo "$cmd" >>"${linter_array[logfile]}"
+			eval "$cmd" >>"${linter_array[logfile]}" 2>&1
+		done
 	done
 }
 
@@ -216,9 +219,9 @@ function seiso_lint() {
 
 	while read -r line; do
 		unset linter
-		declare -gA linter
+		declare -A linter
 		unset linter_filetypes
-		declare -ag linter_filetypes
+		declare -a linter_filetypes
 
 		while IFS='=' read -r key value; do
 			if [[ $key == "filetype" ]]; then
@@ -255,7 +258,7 @@ function seiso_lint() {
 		echo "Running linter: ${linter[name]}"
 		echo "${linter[name]^^}" >>"${linter[logfile]}"
 
-		lint_files &
+		lint_files linter "${linter_filetypes[@]}" &
 
 		pid=$!
 		pids["$pid"]="${linter[name]}"
