@@ -6,7 +6,8 @@
             ".py"
         ],
         "executor": "pipenv run",
-        "env": "RUFF_CONFIG"
+        "env": "RUFF_CONFIG",
+        "autofix": "check --config /etc/opt/goat/pyproject.toml -v --fix"
     },
     {
         "name": "hadolint",
@@ -89,12 +90,13 @@
     },
     {
         "name": "textlint",
-        "args": "-c /etc/opt/goat/.textlintrc \"/goat/**\"",
+        "args": "-c /etc/opt/goat/.textlintrc",
         "filetype": [
-            "all"
+            ".md"
         ],
         "executor": "npx",
-        "env": "TEXTLINT_CONFIG"
+        "env": "TEXTLINT_CONFIG",
+        "autofix": "-c /etc/opt/goat/.textlintrc --fix"
     },
     {
         "name": "black",
@@ -103,7 +105,8 @@
             ".py"
         ],
         "executor": "pipenv run",
-        "env": "BLACK_CONFIG"
+        "env": "BLACK_CONFIG",
+        "autofix": "--config /etc/opt/goat/.python-black"
     },
     {
         "name": "mypy",

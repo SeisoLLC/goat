@@ -8,4 +8,3 @@ tasks:
     cmds:
       - find {{.ROOT_DIR}} -type f -name '.DS_Store' -delete
       - find {{.ROOT_DIR}} -type f -name '.Thumbs.db' -delete
-      - find {{.ROOT_DIR}} -type f -name 'super-linter.log' -delete

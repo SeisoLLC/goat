@@ -3,7 +3,7 @@ FROM hadolint/hadolint:v2.12.0-alpine as hadolint
 FROM koalaman/shellcheck:v0.9.0 as shellcheck
 FROM rhysd/actionlint:1.6.24 as actionlint
 
-FROM python:3.10-alpine3.17 as base_image
+FROM python:3.10-alpine3.18 as base_image
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -44,7 +44,6 @@ RUN pip install pipenv \
     textlint-filter-rule-allowlist \
     textlint-filter-rule-comments \
     textlint-rule-terminology \
-    textlint-plugin-rst \
     cspell \
     jscpd \
     markdown-link-check \
