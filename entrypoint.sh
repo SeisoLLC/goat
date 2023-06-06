@@ -152,6 +152,7 @@ function get_files_matching_filetype() {
 }
 
 function lint_files() {
+	# Turn the received string back into an object
 	local -n linter_array="$1"
 	local filetypes_to_lint=("${@:2}")
 	local linter_args="${linter_array[args]}"
@@ -258,6 +259,7 @@ function seiso_lint() {
 		echo "Running linter: ${linter[name]}"
 		echo "${linter[name]^^}" >>"${linter[logfile]}"
 
+		# The string "linter" gets dereferenced back into a variable on the receiving end
 		lint_files linter "${linter_filetypes[@]}" &
 
 		pid=$!
