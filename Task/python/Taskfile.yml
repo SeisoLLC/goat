@@ -59,12 +59,7 @@ tasks:
       - sh: docker pull seiso/goat:latest || echo "Failed to pull the latest goat, continuing anyway..."
     cmds:
       - >
-        docker run --rm -v "${PWD}:/goat"
-        --entrypoint isort seiso/goat:latest .
-        --settings-file /action/lib/.automation/.isort.cfg
-      - >
-        docker run --rm -v "${PWD}:/goat"
-        --entrypoint black seiso/goat:latest .
+        docker run --rm -v "${PWD}:/goat" -e INPUT_AUTO_FIX=true seiso/goat:latest
 
   update:
     cmds:
