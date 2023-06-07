@@ -64,7 +64,7 @@
     },
     {
         "name": "jscpd",
-        "args": "--config /etc/opt/goat/.jscpd.json *",
+        "args": "--config /etc/opt/goat/.jscpd.json",
         "filetype": [
             "all"
         ],

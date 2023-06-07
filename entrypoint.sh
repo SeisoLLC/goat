@@ -165,7 +165,7 @@ function lint_files() {
 
 	for type in "${filetypes_to_lint[@]}"; do
 		if [[ $type == "all" ]]; then
-			cmd="${linter_array[name]} $linter_args"
+			cmd="${linter_array[name]} $linter_args ${included[@]}"
 			eval "$cmd" >>"${linter_array[logfile]}" 2>&1
 			return
 		fi
@@ -207,11 +207,11 @@ function seiso_lint() {
 	included=()
 
 	while read -r file; do
-		if [[ -n ${INPUT_EXCLUDE:+x} && "${file}" =~ ${INPUT_EXCLUDE} ]]; then
+		if [[ -n ${FILTER_REGEX_EXCLUDE:+x} && "${file}" =~ ${FILTER_REGEX_EXCLUDE} ]]; then
 			excluded+=("${file}")
 			continue
 		fi
-		included+=("$file")
+		included+=("${file}")
 	done < <(find . \( -path "./.git" -prune \) -o \( -type f -print \))
 
 	declare -A pids
