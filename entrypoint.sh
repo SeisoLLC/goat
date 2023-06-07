@@ -173,7 +173,7 @@ function lint_files() {
 
 	for type in "${filetypes_to_lint[@]}"; do
 		if [[ $type == "all" ]]; then
-			cmd="${linter_array[name]} $linter_args ${included[@]}"
+			cmd="${linter_array[name]} $linter_args $(printf '%q ' "${included[@]}")"
 			eval "$cmd" >>"${linter_array[logfile]}" 2>&1
 			return
 		fi
