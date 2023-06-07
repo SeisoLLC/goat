@@ -70,6 +70,7 @@ function check_environment() {
 		mainline="${GITHUB_BASE_REF##*/}"
 		if [[ ${mainline} != "main" ]]; then
 			feedback ERROR "Base branch name is not main"
+			exit 1
 		fi
 	fi
 
@@ -80,6 +81,13 @@ function check_environment() {
 		feedback WARNING "The following words are already in the global dictionary:
 ${overlap}"
 		feedback ERROR "Overlap was detected in the per-repo and global dictionaries"
+		exit 1
+	fi
+
+	# Ensure dictionaries are sorted
+	if ! sort -c "${REPO_DICTIONARY}" 2>/dev/null; then
+		feedback ERROR "The repo dictionary must be sorted"
+		exit 1
 	fi
 }
 
@@ -171,7 +179,7 @@ function lint_files() {
 		fi
 
 		files_to_lint="$(get_files_matching_filetype "$type" "${linter_array[name]}" "${included[@]}")"
-		
+
 		if [ "${#files_to_lint}" -eq 0 ]; then
 			return
 		fi
