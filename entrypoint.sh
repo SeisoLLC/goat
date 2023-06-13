@@ -38,6 +38,9 @@ function setup_environment() {
 	# Set workspace to /goat/ for local runs
 	export DEFAULT_WORKSPACE="/goat"
 
+	# Set default value for auto fix
+	export AUTO_FIX="true"
+
 	# Create variables for the various dictionary file paths
 	export GLOBAL_DICTIONARY="/etc/opt/goat/seiso_global_dictionary.txt"
 	export REPO_DICTIONARY="${GITHUB_WORKSPACE:-/goat}/.github/etc/dictionary.txt"
@@ -46,12 +49,12 @@ function setup_environment() {
 		export VALIDATE_PYTHON_MYPY="false"
 	fi
 
-	if [[ ${INPUT_AUTO_FIX:-} == "true" ]]; then
-		export AUTO_FIX="true"
-	fi
-
 	if [[ -n ${INPUT_EXCLUDE:+x} ]]; then
 		export FILTER_REGEX_EXCLUDE="${INPUT_EXCLUDE}"
+	fi
+	
+	if [[ ${INPUT_AUTO_FIX:-true} == "false" ]]; then
+		AUTO_FIX="false"
 	fi
 
 	if [[ ${INPUT_LOG_LEVEL:='VERBOSE'} =~ ^(ERROR|WARN|NOTICE|VERBOSE|DEBUG|TRACE)$ ]]; then
@@ -61,7 +64,7 @@ function setup_environment() {
 
 	declare -a linter_failures
 	declare -a linter_successes
-	declare -a linter_skipped
+	declare -a linter_autofix
 }
 
 function check_environment() {
@@ -88,6 +91,10 @@ ${overlap}"
 	if ! sort -c "${REPO_DICTIONARY}" 2>/dev/null; then
 		feedback ERROR "The repo dictionary must be sorted"
 		exit 1
+	fi
+
+	if [[ ${CI:-false} == "true" || ${CONTINUOUS_INTEGRATION:-false} == "true" || ${GITHUB_ACTIONS:-false} == "true" ]]; then
+		AUTO_FIX="false"
 	fi
 }
 
@@ -244,15 +251,13 @@ function seiso_lint() {
 			linter["$key"]=$value
 		done < <(echo "$line" | jq -r 'to_entries|map("\(.key)=\(.value|tojson)")|.[]')
 
-		if [[ ${AUTO_FIX:-} == "true" ]]; then
-			if [[ -v linter[autofix] && -n "${linter[autofix]}" ]]; then
+		if [[ -v linter[autofix] && -n "${linter[autofix]}" ]]; then
+			if [[ ${AUTO_FIX:-} == "true" ]]; then
 				# Replacing the linter's args with the autofix args for that linter
 				linter[args]="${linter[autofix]}"
-			else
-				echo "${linter[name]} has no autofix option and has been skipped"
-				linter_skipped+=("${linter[name]}")
-				continue
 			fi
+
+			linter_autofix+=("${linter[name]}")
 		fi
 
 		linter[logfile]="/opt/goat/log/${linter[name]}.log"
@@ -286,9 +291,6 @@ function seiso_lint() {
 			cat "/opt/goat/log/${pids[$p]}.log"
 			linter_failures+=("${pids[$p]}")
 		else
-			if [[ ${AUTO_FIX:-} == "true" ]]; then
-				cat "/opt/goat/log/${pids[$p]}.log"
-			fi
 			linter_successes+=("${pids[$p]}")
 		fi
 	done
@@ -304,18 +306,36 @@ runtime=$((end - start))
 echo -e "\nScanned ${#included[@]} files in ${runtime} seconds"
 echo -e "Excluded ${#excluded[@]} files\n"
 
-for success in "${linter_successes[@]}"; do
-	feedback INFO "$success completed successfully"
-done
+if [ -n "${linter_successes[*]}" ]; then
+	if [[ -n "${linter_autofix[*]}" && -n $(git status -s) && ${AUTO_FIX:-} == "true" ]]; then
+		for fix in "${linter_autofix[@]}"; do
+			cat "/opt/goat/log/$fix.log"
+		done
 
-for skip in "${linter_skipped[@]}"; do
-	feedback WARNING "$skip was skipped"
-done
+		feedback INFO "Some errors were autofixed"
+	fi
 
-if [ -n "${linter_failures[*]}" ]; then
-	for failure in "${linter_failures[@]}"; do
-		feedback ERROR "$failure found errors"
+	for success in "${linter_successes[@]}"; do
+		feedback INFO "$success completed successfully"
 	done
+fi
+
+if [ -n "${linter_failures[*]}" ]; then	
+	for failure in "${linter_failures[@]}"; do
+		cannot_autofix="false"
+
+		for element in "${linter_autofix[@]}"; do
+			if [ "$element" == "$failure" ]; then
+				feedback ERROR "$element can perform autofix on some errors when run locally"
+				cannot_autofix="true"
+			fi
+		done
+		
+		if [ "$cannot_autofix" == "false" ]; then
+			feedback ERROR "$failure found errors"
+		fi
+	done
+
 	feedback ERROR "Linting failed"
 	exit 1
 fi

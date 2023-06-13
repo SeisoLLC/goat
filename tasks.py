@@ -251,21 +251,21 @@ def goat(_c, debug=False):
     LOG.info("All goat tests completed successfully!")
 
 
-@task
-def reformat(_c, debug=False):
-    """Reformat the goat"""
+@task(pre=[build])
+def disable_reformat(_c, debug=False):
+    """Run the goat without reformatting"""
     if debug:
         getLogger().setLevel("DEBUG")
 
     image = "seiso/goat:latest"
     environment = {}
-    environment["INPUT_AUTO_FIX"] = "true"
+    environment["INPUT_AUTO_FIX"] = "false"
     working_dir = "/goat/"
     volumes = {CWD: {"bind": working_dir, "mode": "rw"}}
 
     LOG.info("Pulling %s...", image)
     CLIENT.images.pull(image)
-    LOG.info("Reformatting the project...")
+    LOG.info("Linting the project...")
 
     opinionated_docker_run(
         image=image,
@@ -275,7 +275,7 @@ def reformat(_c, debug=False):
         environment=environment,
     )
 
-    LOG.info("Reformatting has completed")
+    LOG.info("Linting has completed")
 
 
 @task
