@@ -252,7 +252,7 @@ def goat(_c, debug=False):
 
 
 @task(pre=[build])
-def disable_reformat(_c, debug=False):
+def noreformat(_c, debug=False):
     """Run the goat without reformatting"""
     if debug:
         getLogger().setLevel("DEBUG")
@@ -295,7 +295,7 @@ def disable_reformat(_c, debug=False):
         environment=environment,
     )
     LOG.info("Linting tests passed")
-    
+
 
 @task
 def publish(_c, debug=False):
