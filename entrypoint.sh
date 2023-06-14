@@ -38,7 +38,7 @@ function setup_environment() {
 	# Set workspace to /goat/ for local runs
 	export DEFAULT_WORKSPACE="/goat"
 
-	# Set default value for auto fix
+	# Set default value for autofix
 	export AUTO_FIX="true"
 
 	# Create variables for the various dictionary file paths
@@ -54,6 +54,7 @@ function setup_environment() {
 	fi
 	
 	if [[ ${INPUT_AUTO_FIX:-true} == "false" ]]; then
+		# Let INPUT_AUTO_FIX override the autofix value. This allows for disabling autofix locally.
 		AUTO_FIX="false"
 	fi
 
@@ -94,7 +95,12 @@ ${overlap}"
 	fi
 
 	if [[ ${CI:-false} == "true" || ${CONTINUOUS_INTEGRATION:-false} == "true" || ${GITHUB_ACTIONS:-false} == "true" ]]; then
-		AUTO_FIX="false"
+		export IS_PIPELINE="true"
+		# If this is run in a pipeline and INPUT_AUTO_FIX does not equal true, disable autofix. INPUT_AUTO_FIX="true" would force autofix
+		# in the pipeline and result in dirty git directory if anything was fixed.
+		if [[ ${INPUT_AUTO_FIX:-true} != "true" ]]; then
+			AUTO_FIX="false"
+		fi
 	fi
 }
 
@@ -252,7 +258,7 @@ function seiso_lint() {
 		done < <(echo "$line" | jq -r 'to_entries|map("\(.key)=\(.value|tojson)")|.[]')
 
 		if [[ -v linter[autofix] && -n "${linter[autofix]}" ]]; then
-			if [[ ${AUTO_FIX:-} == "true" ]]; then
+			if [[ ${AUTO_FIX:-true} == "true" ]]; then
 				# Replacing the linter's args with the autofix args for that linter
 				linter[args]="${linter[autofix]}"
 			fi
@@ -306,13 +312,19 @@ runtime=$((end - start))
 echo -e "\nScanned ${#included[@]} files in ${runtime} seconds"
 echo -e "Excluded ${#excluded[@]} files\n"
 
+linting_failed="false"
+
 if [ -n "${linter_successes[*]}" ]; then
-	if [[ -n "${linter_autofix[*]}" && -n $(git status -s) && ${AUTO_FIX:-} == "true" ]]; then
+	if [[ -n "${linter_autofix[*]}" && -n $(git status -s) && ${AUTO_FIX:-true} == "true" ]]; then
 		for fix in "${linter_autofix[@]}"; do
 			cat "/opt/goat/log/$fix.log"
 		done
-
-		feedback INFO "Some errors were autofixed"
+		if [[ ${IS_PIPELINE:-false} == "true" ]]; then
+			feedback ERROR "Linting found errors that can be fixed automatically when run locally"
+			linting_failed="true"
+		else
+			feedback INFO "Some errors were autofixed"
+		fi
 	fi
 
 	for success in "${linter_successes[@]}"; do
@@ -337,6 +349,10 @@ if [ -n "${linter_failures[*]}" ]; then
 	done
 
 	feedback ERROR "Linting failed"
+	linting_failed="true"
+fi
+
+if [[ $linting_failed == "true" ]]; then
 	exit 1
 fi
 

@@ -257,44 +257,25 @@ def noreformat(_c, debug=False):
     if debug:
         getLogger().setLevel("DEBUG")
 
-    LOG.info("Baaaaaaaaaaah! (Running the goat)")
+    image = "seiso/goat:latest"
     environment = {}
-    environment["DEFAULT_WORKSPACE"] = "/goat"
-    environment["INPUT_DISABLE_MYPY"] = "true"
     environment["INPUT_AUTO_FIX"] = "false"
     working_dir = "/goat/"
+    volumes = {CWD: {"bind": working_dir, "mode": "rw"}}
 
-    if REPO.is_dirty(untracked_files=True):
-        LOG.error("Linting requires a clean git directory to function properly")
-        sys.exit(1)
-
-    # Pass in all of the host environment variables starting with GITHUB_ or INPUT_
-    for element in dict(os.environ):
-        if element.startswith("GITHUB_"):
-            environment[element] = os.environ.get(element)
-        if element.startswith("INPUT_"):
-            environment[element] = os.environ.get(element)
-
-    if os.environ.get("GITHUB_ACTIONS") == "true":
-        host_dir = os.environ.get("GITHUB_WORKSPACE")
-        homedir = os.environ.get("HOME")
-        volumes = {
-            host_dir: {"bind": working_dir, "mode": "rw"},
-            homedir: {"bind": homedir, "mode": "ro"},
-        }
-    else:
-        volumes = {
-            CWD: {"bind": working_dir, "mode": "rw"},
-        }
+    LOG.info("Pulling %s...", image)
+    CLIENT.images.pull(image)
+    LOG.info("Linting the project...")
 
     opinionated_docker_run(
-        image=IMAGE,
+        image=image,
         volumes=volumes,
         working_dir=working_dir,
         auto_remove=True,
         environment=environment,
     )
-    LOG.info("Linting tests passed")
+
+    LOG.info("Linting has completed")
 
 
 @task
