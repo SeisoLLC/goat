@@ -251,7 +251,7 @@ def goat(_c, debug=False):
     LOG.info("All goat tests completed successfully!")
 
 
-@task(pre=[build])
+@task
 def noreformat(_c, debug=False):
     """Run the goat without reformatting"""
     if debug:
