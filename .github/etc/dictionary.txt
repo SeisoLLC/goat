@@ -3,4 +3,5 @@ capricornis
 crispus
 hadolint
 kubeconform
+noreformat
 textlint
