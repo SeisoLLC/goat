@@ -54,12 +54,6 @@ tasks:
     cmds:
       - docker buildx build --build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" --tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} .
 
-  noreformat:
-    preconditions:
-      - sh: docker pull seiso/goat:latest || echo "Failed to pull the latest goat, continuing anyway..."
-    cmds:
-      - docker run --rm -v "${PWD}:/goat" -e INPUT_AUTO_FIX="false" seiso/goat:latest
-
   update:
     cmds:
       - git submodule update --remote
