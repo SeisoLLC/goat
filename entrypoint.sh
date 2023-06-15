@@ -70,6 +70,7 @@ function setup_environment() {
 
 	declare -a linter_failures
 	declare -a linter_successes
+	declare -a linter_skipped
 	input="/etc/opt/goat/linters.json"
 }
 
