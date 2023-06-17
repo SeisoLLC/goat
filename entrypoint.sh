@@ -318,7 +318,7 @@ function seiso_lint() {
 }
 
 function rerun_lint() {
-	local failed_linter=$1
+	local failed_linter="$1"
 	unset rerun_linter
 	declare -A rerun_linter
 	unset rerun_filetypes
