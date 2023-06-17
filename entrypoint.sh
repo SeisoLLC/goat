@@ -194,7 +194,7 @@ function has_autofix() {
 				return 1
 			fi
 		fi
-	done < <(jq -c '.[]' $input)
+	done < <(jq -c '.[]' "${input}")
 }
 
 function lint_files() {
