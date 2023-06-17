@@ -40,11 +40,12 @@ function setup_environment() {
 
 	# Set default values for autofix
 	export AUTO_FIX="true"
-	export RE_RUN="false"
+	export LINT_ROUND=1
 
 	# Create variables for the various dictionary file paths
 	export GLOBAL_DICTIONARY="/etc/opt/goat/seiso_global_dictionary.txt"
 	export REPO_DICTIONARY="${GITHUB_WORKSPACE:-/goat}/.github/etc/dictionary.txt"
+	export LINTER_CONFIG="/etc/opt/goat/linters.json"
 
 	if [[ ${INPUT_DISABLE_MYPY:-} == "true" ]]; then
 		export VALIDATE_PYTHON_MYPY="false"
@@ -57,10 +58,8 @@ function setup_environment() {
 	if [[ ${INPUT_AUTO_FIX:-} == "false" ]]; then
 		# Let INPUT_AUTO_FIX override the autofix value. This allows for disabling autofix locally.
 		AUTO_FIX="false"
-	fi
-
-	if [[ ${INPUT_AUTO_FIX:-} == "true" ]]; then
-		RE_RUN="true"
+	else
+		LINT_ROUND=2
 	fi
 
 	if [[ ${INPUT_LOG_LEVEL:='VERBOSE'} =~ ^(ERROR|WARN|NOTICE|VERBOSE|DEBUG|TRACE)$ ]]; then
@@ -71,7 +70,6 @@ function setup_environment() {
 	declare -a linter_failures
 	declare -a linter_successes
 	declare -a linter_skipped
-	input="/etc/opt/goat/linters.json"
 }
 
 function check_environment() {
@@ -188,13 +186,13 @@ function has_autofix() {
 		name=$(echo "$line" | jq -r ".name")
 		if [[ "$name" == "$lint_name" ]]; then
 			if echo "$line" | jq -e '.autofix' > /dev/null; then
-				# If linter has an autofix exit successfully
-				return 0
-			else
+				# If linter has an autofix exit true bit
 				return 1
+			else
+				return 0
 			fi
 		fi
-	done < <(jq -c '.[]' "${input}")
+	done < <(jq -c '.[]' "${LINTER_CONFIG}")
 }
 
 function lint_files() {
@@ -205,7 +203,7 @@ function lint_files() {
 	local files_to_lint=""
 	local env_var_name="${linter_array[env]}"
 
-	if [ ${RE_RUN:-false} == "true" ] && has_autofix "${linter_array[name]}"; then
+	if [ ${LINT_ROUND} == 2 ] && !has_autofix "${linter_array[name]}"; then
 		linter_args="${linter_array[autofix]}"
 	fi
 
@@ -300,7 +298,7 @@ function seiso_lint() {
 		pids["$pid"]="${linter[name]}"
 
 		echo "-------------------------------" >>"${linter[logfile]}"
-	done < <(jq -c '.[]' $input)
+	done < <(jq -c '.[]' "${LINTER_CONFIG}")
 
 	for p in "${!pids[@]}"; do
 		set +e
@@ -340,7 +338,7 @@ function rerun_lint() {
 
 			rerun_linter[logfile]="/opt/goat/log/rerun_${rerun_linter[name]}.log"
 		fi
-	done < <(jq -c '.[]' "${input}")
+	done < <(jq -c '.[]' "${LINTER_CONFIG}")
 
 	echo "===============================" >>"${rerun_linter[logfile]}"
 	echo "Re-running linter: ${rerun_linter[name]}"
@@ -374,11 +372,11 @@ failed_lint="false"
 
 if [ -n "${linter_failures[*]}" ]; then
 	if [[ ${AUTO_FIX:-true} == "true" ]]; then
-		RE_RUN="true"
+		LINT_ROUND=2
 		declare -A rerun_pids
 
 		for failure in "${linter_failures[@]}"; do
-			if has_autofix "$failure"; then
+			if !has_autofix "$failure"; then
 				rerun_lint "$failure" &
 				rerun_pid=$!
 				rerun_pids["$rerun_pid"]="$failure"

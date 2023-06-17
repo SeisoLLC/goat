@@ -94,7 +94,6 @@ jobs:
 1. Autofix code formatting errors using those linters with a built-in `fix` option. Note, this is enabled by default  
    when running locally and can create a `dirty` git directory. You will need to manage committing and pushing any  
    changes.
-   `true` will force autofix to run in a pipeline.
 
     ```bash
     uses: seisollc/goat@main
