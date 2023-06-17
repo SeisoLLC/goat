@@ -340,7 +340,7 @@ function rerun_lint() {
 
 			rerun_linter[logfile]="/opt/goat/log/rerun_${rerun_linter[name]}.log"
 		fi
-	done < <(jq -c '.[]' $input)
+	done < <(jq -c '.[]' "${input}")
 
 	echo "===============================" >>"${rerun_linter[logfile]}"
 	echo "Re-running linter: ${rerun_linter[name]}"
