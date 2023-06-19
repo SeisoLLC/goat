@@ -58,7 +58,7 @@ function setup_environment() {
 	if [[ ${INPUT_AUTO_FIX:-} == "false" ]]; then
 		# Let INPUT_AUTO_FIX override the autofix value. This allows for disabling autofix locally.
 		AUTO_FIX="false"
-	else
+	elif [[ ${INPUT_AUTO_FIX:-} == "true" ]]; then
 		LINT_ROUND=2
 	fi
 
@@ -203,7 +203,7 @@ function lint_files() {
 	local files_to_lint=""
 	local env_var_name="${linter_array[env]}"
 
-	if [ ${LINT_ROUND} == 2 ] && !has_autofix "${linter_array[name]}"; then
+	if [ ${LINT_ROUND} == 2 ] && ! has_autofix "${linter_array[name]}"; then
 		linter_args="${linter_array[autofix]}"
 	fi
 
@@ -376,7 +376,7 @@ if [ -n "${linter_failures[*]}" ]; then
 		declare -A rerun_pids
 
 		for failure in "${linter_failures[@]}"; do
-			if !has_autofix "$failure"; then
+			if ! has_autofix "$failure"; then
 				rerun_lint "$failure" &
 				rerun_pid=$!
 				rerun_pids["$rerun_pid"]="$failure"
