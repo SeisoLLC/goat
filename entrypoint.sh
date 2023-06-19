@@ -203,7 +203,7 @@ function lint_files() {
 	local files_to_lint=""
 	local env_var_name="${linter_array[env]}"
 
-	if [ ${LINT_ROUND} == 2 ] && ! has_autofix "${linter_array[name]}"; then
+	if [ "${LINT_ROUND}" -eq 2 ] && ! has_autofix "${linter_array[name]}"; then
 		linter_args="${linter_array[autofix]}"
 	fi
 
