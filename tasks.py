@@ -213,7 +213,7 @@ def goat(_c, disable_autofix=False, debug=False):
     environment["INPUT_DISABLE_MYPY"] = "true"
     working_dir = "/goat/"
 
-    if not disable_autofix:
+    if disable_autofix:
         environment["INPUT_AUTO_FIX"] = "false"
 
     if REPO.is_dirty(untracked_files=True):
@@ -252,33 +252,6 @@ def goat(_c, disable_autofix=False, debug=False):
     LOG.info("Security tests passed")
 
     LOG.info("All goat tests completed successfully!")
-
-
-@task
-def reformat(_c, debug=False):
-    """Reformat the goat"""
-    if debug:
-        getLogger().setLevel("DEBUG")
-
-    image = "seiso/goat:latest"
-    environment = {}
-    environment["INPUT_AUTO_FIX"] = "true"
-    working_dir = "/goat/"
-    volumes = {CWD: {"bind": working_dir, "mode": "rw"}}
-
-    LOG.info("Pulling %s...", image)
-    CLIENT.images.pull(image)
-    LOG.info("Reformatting the project...")
-
-    opinionated_docker_run(
-        image=image,
-        volumes=volumes,
-        working_dir=working_dir,
-        auto_remove=True,
-        environment=environment,
-    )
-
-    LOG.info("Reformatting has completed")
 
 
 @task
