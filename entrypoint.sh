@@ -55,11 +55,9 @@ function setup_environment() {
 		export FILTER_REGEX_EXCLUDE="${INPUT_EXCLUDE}"
 	fi
 	
-	if [[ ${INPUT_AUTO_FIX:-} == "false" ]]; then
+	if [[ ${INPUT_AUTO_FIX:-true} == "false" ]]; then
 		# Let INPUT_AUTO_FIX override the autofix value. This allows for disabling autofix locally.
 		AUTO_FIX="false"
-	elif [[ ${INPUT_AUTO_FIX:-} == "true" ]]; then
-		LINT_ROUND=2
 	fi
 
 	if [[ ${INPUT_LOG_LEVEL:='VERBOSE'} =~ ^(ERROR|WARN|NOTICE|VERBOSE|DEBUG|TRACE)$ ]]; then
@@ -413,7 +411,7 @@ fi
 if [[ -n "${rerun_linter_successes[*]}" && -n $(git status -s) ]]; then
 	for success in "${rerun_linter_successes[@]}"; do
 		if [[ ${CI:-false} == "true" ]]; then
-			feedback ERROR "Autofix of $success errors completed successfully, but action is needed. Run 'pipenv run invoke reformat' to fix errors."
+			feedback ERROR "Autofix of $success errors completed successfully, but action is needed. Run 'pipenv run invoke lint' to fix errors."
 			continue
 		fi
 

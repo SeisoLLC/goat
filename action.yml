@@ -15,6 +15,7 @@ inputs:
   auto_fix:
     description: "Auto-fix code formatting errors"
     required: false
+    default: "true"
 runs:
   using: "docker"
   image: "docker://docker.io/seiso/goat:latest"
