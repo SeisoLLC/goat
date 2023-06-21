@@ -82,7 +82,7 @@ There are two ways of running the `goat` locally:
 
 4. Autofix is available for certain linters and is enabled by default. To disable autofix, use:  
    `docker run -e INPUT_AUTO_FIX="false" -v "$PWD:/goat/" --rm <hash>` or  
-   `pipenv run invoke goat --disable-reformat`
+   `pipenv run invoke goat --disable-autofix`
 
 ### Linter Update Considerations
 
