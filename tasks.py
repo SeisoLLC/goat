@@ -215,6 +215,7 @@ def goat(_c, disable_autofix=False, debug=False):
 
     if disable_autofix:
         environment["INPUT_AUTO_FIX"] = "false"
+        LOG.info("Autofix has been disabled")
 
     if REPO.is_dirty(untracked_files=True):
         LOG.error("Linting requires a clean git directory to function properly")
