@@ -18,6 +18,12 @@ vars:
     sh: grep versioning setup.cfg | cut -d '"' -f 2
 
 tasks:
+  init:
+    cmds:
+      - git submodule init
+      - pipenv install --deploy --ignore-pipfile --dev
+      - pre-commit autoupdate --freeze --jobs 4
+
   lint:
     preconditions:
       - sh: docker pull seiso/goat:latest || echo "Failed to pull the latest goat, continuing anyway..."
