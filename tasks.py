@@ -202,7 +202,7 @@ def build(_c, debug=False):
 
 
 @task(pre=[build])
-def goat(_c, debug=False):
+def goat(_c, disable_autofix=False, debug=False):
     """Run the goat"""
     if debug:
         getLogger().setLevel("DEBUG")
@@ -212,6 +212,10 @@ def goat(_c, debug=False):
     environment["DEFAULT_WORKSPACE"] = "/goat"
     environment["INPUT_DISABLE_MYPY"] = "true"
     working_dir = "/goat/"
+
+    if disable_autofix:
+        environment["INPUT_AUTO_FIX"] = "false"
+        LOG.info("Autofix has been disabled")
 
     if REPO.is_dirty(untracked_files=True):
         LOG.error("Linting requires a clean git directory to function properly")
@@ -249,33 +253,6 @@ def goat(_c, debug=False):
     LOG.info("Security tests passed")
 
     LOG.info("All goat tests completed successfully!")
-
-
-@task
-def reformat(_c, debug=False):
-    """Reformat the goat"""
-    if debug:
-        getLogger().setLevel("DEBUG")
-
-    image = "seiso/goat:latest"
-    environment = {}
-    environment["INPUT_AUTO_FIX"] = "true"
-    working_dir = "/goat/"
-    volumes = {CWD: {"bind": working_dir, "mode": "rw"}}
-
-    LOG.info("Pulling %s...", image)
-    CLIENT.images.pull(image)
-    LOG.info("Reformatting the project...")
-
-    opinionated_docker_run(
-        image=image,
-        volumes=volumes,
-        working_dir=working_dir,
-        auto_remove=True,
-        environment=environment,
-    )
-
-    LOG.info("Reformatting has completed")
 
 
 @task

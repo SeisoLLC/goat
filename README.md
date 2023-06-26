@@ -91,13 +91,14 @@ jobs:
     EOF
     ```
   
-1. Autofix code formatting errors using those linters with a built-in `fix` option. Note, this will create a `dirty` git directory,  
-   and you will need to manage committing and pushing any changes; consider setting `INPUT_AUTO_FIX=true` locally instead.
+1. Autofix code formatting errors using those linters with a built-in `fix` option. Note, this is enabled by default  
+   when running locally and can create a `dirty` git directory. You will need to manage committing and pushing any  
+   changes.
 
     ```bash
     uses: seisollc/goat@main
     with:
-      auto_fix: true
+      auto_fix: false
     ```
 
 #### Supported Linters

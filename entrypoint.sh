@@ -38,20 +38,26 @@ function setup_environment() {
 	# Set workspace to /goat/ for local runs
 	export DEFAULT_WORKSPACE="/goat"
 
+	# Set default values for autofix
+	export AUTO_FIX="true"
+	export CURRENT_LINT_ROUND=1
+
 	# Create variables for the various dictionary file paths
 	export GLOBAL_DICTIONARY="/etc/opt/goat/seiso_global_dictionary.txt"
 	export REPO_DICTIONARY="${GITHUB_WORKSPACE:-/goat}/.github/etc/dictionary.txt"
+	export LINTER_CONFIG="/etc/opt/goat/linters.json"
 
 	if [[ ${INPUT_DISABLE_MYPY:-} == "true" ]]; then
 		export VALIDATE_PYTHON_MYPY="false"
 	fi
 
-	if [[ ${INPUT_AUTO_FIX:-} == "true" ]]; then
-		export AUTO_FIX="true"
-	fi
-
 	if [[ -n ${INPUT_EXCLUDE:+x} ]]; then
 		export FILTER_REGEX_EXCLUDE="${INPUT_EXCLUDE}"
+	fi
+
+	if [[ ${INPUT_AUTO_FIX:-true} == "false" ]]; then
+		# Let INPUT_AUTO_FIX override the autofix value. This allows for disabling autofix locally.
+		AUTO_FIX="false"
 	fi
 
 	if [[ ${INPUT_LOG_LEVEL:='VERBOSE'} =~ ^(ERROR|WARN|NOTICE|VERBOSE|DEBUG|TRACE)$ ]]; then
@@ -159,6 +165,34 @@ function get_files_matching_filetype() {
 	echo "${matching_files[@]}"
 }
 
+function load_filetype_array() {
+	local val=$1
+	declare -a types
+
+	val=$(echo "$val" | jq -r '.[]')
+	while IFS= read -r filetype; do
+		types+=("$filetype")
+	done <<<"$val"
+
+	echo "${types[@]}"
+}
+
+function has_autofix() {
+	local lint_name=$1
+
+	while IFS= read -r line; do
+		name=$(echo "$line" | jq -r ".name")
+		if [[ "$name" == "$lint_name" ]]; then
+			if echo "$line" | jq -e '.autofix' > /dev/null; then
+				# If linter has an autofix exit true bit
+				return 1
+			else
+				return 0
+			fi
+		fi
+	done < <(jq -c '.[]' "${LINTER_CONFIG}")
+}
+
 function lint_files() {
 	# Turn the received string back into an object
 	local -n linter_array="$1"
@@ -166,6 +200,10 @@ function lint_files() {
 	local linter_args="${linter_array[args]}"
 	local files_to_lint=""
 	local env_var_name="${linter_array[env]}"
+
+	if [ "${CURRENT_LINT_ROUND}" -eq 2 ] && ! has_autofix "${linter_array[name]}"; then
+		linter_args="${linter_array[autofix]}"
+	fi
 
 	if [[ -v "${env_var_name}" ]]; then
 		linter_args="${!env_var_name}"
@@ -224,8 +262,6 @@ function seiso_lint() {
 
 	declare -A pids
 
-	input="/etc/opt/goat/linters.json"
-
 	while read -r line; do
 		unset linter
 		declare -A linter
@@ -234,26 +270,12 @@ function seiso_lint() {
 
 		while IFS='=' read -r key value; do
 			if [[ $key == "filetype" ]]; then
-				value=$(echo "$value" | jq -r '.[]')
-				while IFS= read -r filetype; do
-					linter_filetypes+=("$filetype")
-				done <<<"$value"
+				linter_filetypes=("$(load_filetype_array "$value")")
 				continue
 			fi
 			value=$(echo "$value" | tr -d "'" | tr -d '"')
 			linter["$key"]=$value
 		done < <(echo "$line" | jq -r 'to_entries|map("\(.key)=\(.value|tojson)")|.[]')
-
-		if [[ ${AUTO_FIX:-} == "true" ]]; then
-			if [[ -v linter[autofix] && -n "${linter[autofix]}" ]]; then
-				# Replacing the linter's args with the autofix args for that linter
-				linter[args]="${linter[autofix]}"
-			else
-				echo "${linter[name]} has no autofix option and has been skipped"
-				linter_skipped+=("${linter[name]}")
-				continue
-			fi
-		fi
 
 		linter[logfile]="/opt/goat/log/${linter[name]}.log"
 
@@ -274,7 +296,7 @@ function seiso_lint() {
 		pids["$pid"]="${linter[name]}"
 
 		echo "-------------------------------" >>"${linter[logfile]}"
-	done < <(jq -c '.[]' $input)
+	done < <(jq -c '.[]' "${LINTER_CONFIG}")
 
 	for p in "${!pids[@]}"; do
 		set +e
@@ -286,12 +308,44 @@ function seiso_lint() {
 			cat "/opt/goat/log/${pids[$p]}.log"
 			linter_failures+=("${pids[$p]}")
 		else
-			if [[ ${AUTO_FIX:-} == "true" ]]; then
-				cat "/opt/goat/log/${pids[$p]}.log"
-			fi
 			linter_successes+=("${pids[$p]}")
 		fi
 	done
+}
+
+function rerun_lint() {
+	local failed_linter="$1"
+	unset rerun_linter
+	declare -A rerun_linter
+	unset rerun_filetypes
+	declare -a rerun_filetypes
+
+	while IFS= read -r line; do
+		name=$(echo "$line" | jq -r ".name")
+		if [[ "$name" == "$failed_linter" ]]; then
+			feedback INFO "Linter $failed_linter found errors and has a fix option. Attempting fix."
+
+			while IFS='=' read -r key value; do
+				if [[ $key == "filetype" ]]; then
+					rerun_filetypes=("$(load_filetype_array "$value")")
+					continue
+				fi
+				value=$(echo "$value" | tr -d "'" | tr -d '"')
+				rerun_linter["$key"]=$value
+			done < <(echo "$line" | jq -r 'to_entries|map("\(.key)=\(.value|tojson)")|.[]')
+
+			rerun_linter[logfile]="/opt/goat/log/rerun_${rerun_linter[name]}.log"
+		fi
+	done < <(jq -c '.[]' "${LINTER_CONFIG}")
+
+	echo "===============================" >>"${rerun_linter[logfile]}"
+	echo "Re-running linter: ${rerun_linter[name]}"
+	echo "${rerun_linter[name]^^}" >>"${rerun_linter[logfile]}"
+
+	# The string "rerun_linter" gets dereferenced back into a variable on the receiving end
+	lint_files rerun_linter "${rerun_filetypes[@]}"
+
+	echo "-------------------------------" >>"${rerun_linter[logfile]}"
 }
 
 start=$(date +%s)
@@ -304,19 +358,83 @@ runtime=$((end - start))
 echo -e "\nScanned ${#included[@]} files in ${runtime} seconds"
 echo -e "Excluded ${#excluded[@]} files\n"
 
-for success in "${linter_successes[@]}"; do
-	feedback INFO "$success completed successfully"
-done
+if [ -n "${linter_successes[*]}" ]; then
+	for success in "${linter_successes[@]}"; do
+		feedback INFO "$success completed successfully"
+	done
+fi
 
-for skip in "${linter_skipped[@]}"; do
-	feedback WARNING "$skip was skipped"
-done
+declare -a rerun_linter_failures
+declare -a rerun_linter_successes
+failed_lint="false"
 
 if [ -n "${linter_failures[*]}" ]; then
-	for failure in "${linter_failures[@]}"; do
-		feedback ERROR "$failure found errors"
+	if [[ ${AUTO_FIX:-true} == "true" ]]; then
+		CURRENT_LINT_ROUND=2
+		declare -A rerun_pids
+
+		for failure in "${linter_failures[@]}"; do
+			if ! has_autofix "$failure"; then
+				rerun_lint "$failure" &
+				rerun_pid=$!
+				rerun_pids["$rerun_pid"]="$failure"
+				continue
+			fi
+
+			feedback ERROR "$failure found errors"
+			failed_lint="true"
+		done
+
+		for p in "${!rerun_pids[@]}"; do
+			set +e
+			wait "$p"
+			exit_code=$?
+			set -e
+
+			if [ "$exit_code" -gt 0 ]; then
+				rerun_linter_failures+=("${rerun_pids[$p]}")
+			else
+				rerun_linter_successes+=("${rerun_pids[$p]}")
+			fi
+
+			cat "/opt/goat/log/rerun_${rerun_pids[$p]}.log"
+		done
+	else
+		for failure in "${linter_failures[@]}"; do
+			feedback ERROR "$failure found errors"
+		done
+
+		failed_lint="true"
+	fi
+fi
+
+if [[ -n "${rerun_linter_successes[*]}" && -n $(git status -s) ]]; then
+	for success in "${rerun_linter_successes[@]}"; do
+		if [[ ${CI:-false} == "true" ]]; then
+			feedback ERROR "$success detected issues but they can be **automatically fixed**; run 'pipenv run invoke lint' locally, commit, and push."
+			continue
+		fi
+
+		feedback ERROR "Autofix of $success errors completed successfully. Check it out and commit the changes."
 	done
-	feedback ERROR "Linting failed"
+	failed_lint="true"
+fi
+
+if [[ -n "${rerun_linter_failures[*]}" ]]; then
+	for failure in "${rerun_linter_failures[@]}"; do
+		if [[ ${CI:-false} == "true" ]]; then
+			feedback ERROR "Attempts to autofix $failure errors were unsuccessful. Please correct manually."
+			continue
+		fi
+
+		feedback ERROR "Attempts to autofix $failure errors were unsuccessful. Your local directory might be dirty with partial fixes."
+	done
+
+	failed_lint="true"
+fi
+
+if [[ "$failed_lint" == "true" ]]; then
+	feedback ERROR "Linters found errors"
 	exit 1
 fi
 

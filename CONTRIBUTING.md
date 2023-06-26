@@ -80,9 +80,9 @@ There are two ways of running the `goat` locally:
     Note: Linter env variables must be formatted as <LINTER_CONFIG>, i.e. RUFF_CONFIG, CFN_LINT_CONFIG,
     etc., and the values supplied will overwrite the default arguments supplied in the goat.
 
-4. Autofix is available for certain linters and can be invoked in two ways:
-   1. `docker run -e INPUT_AUTO_FIX="true" -v $PWD:/goat/ -rm <hash>`
-   2. `pipenv run invoke reformat`
+4. Autofix is available for certain linters and is enabled by default. To disable autofix, use:  
+   `docker run -e INPUT_AUTO_FIX="false" -v "$PWD:/goat/" --rm <hash>` or  
+   `pipenv run invoke goat --disable-autofix`
 
 ### Linter Update Considerations
 

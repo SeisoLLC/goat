@@ -54,12 +54,6 @@ tasks:
     cmds:
       - docker buildx build --build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" --tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} .
 
-  reformat:
-    preconditions:
-      - sh: docker pull seiso/goat:latest || echo "Failed to pull the latest goat, continuing anyway..."
-    cmds:
-      - docker run --rm -v "${PWD}:/goat" -e INPUT_AUTO_FIX=true seiso/goat:latest
-
   update:
     cmds:
       - git submodule update --remote
@@ -112,4 +106,4 @@ tasks:
       - find {{.ROOT_DIR}} -type f -name '*.pyc' -delete
       - find {{.ROOT_DIR}} -type d -name 'coverage-reports' -exec rm -rf {} +
       - find {{.ROOT_DIR}} -type f -name '.coverage' -delete
-      - find {{.ROOT_DIR}} -type d -name '.ruff_cache' -exec rm -r "{}" \;
+      - find {{.ROOT_DIR}} -type d -name '.ruff_cache' -exec rm -rf {} +
