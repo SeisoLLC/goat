@@ -1,0 +1,6 @@
+---
+repos:
+  - repo: https://github.com/seisollc/goat
+    rev: d5bbefb
+    hooks:
+      - id: seiso-goat

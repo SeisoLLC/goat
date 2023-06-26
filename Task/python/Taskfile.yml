@@ -18,6 +18,12 @@ vars:
     sh: grep versioning setup.cfg | cut -d '"' -f 2
 
 tasks:
+  init:
+    cmds:
+      - git submodule init
+      - pipenv install --deploy --ignore-pipfile --dev
+      - pre-commit install
+
   lint:
     preconditions:
       - sh: docker pull seiso/goat:latest || echo "Failed to pull the latest goat, continuing anyway..."
@@ -57,6 +63,7 @@ tasks:
   update:
     cmds:
       - git submodule update --remote
+      - pre-commit autoupdate --freeze --jobs 4
       - >
         docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}} /bin/bash
         -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
