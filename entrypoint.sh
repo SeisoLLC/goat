@@ -40,7 +40,7 @@ function setup_environment() {
 
 	# Set default values for autofix
 	export AUTO_FIX="true"
-	export LINT_ROUND=1
+	export CURRENT_LINT_ROUND=1
 
 	# Create variables for the various dictionary file paths
 	export GLOBAL_DICTIONARY="/etc/opt/goat/seiso_global_dictionary.txt"
@@ -54,7 +54,7 @@ function setup_environment() {
 	if [[ -n ${INPUT_EXCLUDE:+x} ]]; then
 		export FILTER_REGEX_EXCLUDE="${INPUT_EXCLUDE}"
 	fi
-	
+
 	if [[ ${INPUT_AUTO_FIX:-true} == "false" ]]; then
 		# Let INPUT_AUTO_FIX override the autofix value. This allows for disabling autofix locally.
 		AUTO_FIX="false"
@@ -201,7 +201,7 @@ function lint_files() {
 	local files_to_lint=""
 	local env_var_name="${linter_array[env]}"
 
-	if [ "${LINT_ROUND}" -eq 2 ] && ! has_autofix "${linter_array[name]}"; then
+	if [ "${CURRENT_LINT_ROUND}" -eq 2 ] && ! has_autofix "${linter_array[name]}"; then
 		linter_args="${linter_array[autofix]}"
 	fi
 
@@ -324,7 +324,7 @@ function rerun_lint() {
 		name=$(echo "$line" | jq -r ".name")
 		if [[ "$name" == "$failed_linter" ]]; then
 			feedback INFO "Linter $failed_linter found errors and has a fix option. Attempting fix."
-		
+
 			while IFS='=' read -r key value; do
 				if [[ $key == "filetype" ]]; then
 					rerun_filetypes=("$(load_filetype_array "$value")")
@@ -343,7 +343,7 @@ function rerun_lint() {
 	echo "${rerun_linter[name]^^}" >>"${rerun_linter[logfile]}"
 
 	# The string "rerun_linter" gets dereferenced back into a variable on the receiving end
-	lint_files rerun_linter "${rerun_filetypes[@]}" 
+	lint_files rerun_linter "${rerun_filetypes[@]}"
 
 	echo "-------------------------------" >>"${rerun_linter[logfile]}"
 }
@@ -370,7 +370,7 @@ failed_lint="false"
 
 if [ -n "${linter_failures[*]}" ]; then
 	if [[ ${AUTO_FIX:-true} == "true" ]]; then
-		LINT_ROUND=2
+		CURRENT_LINT_ROUND=2
 		declare -A rerun_pids
 
 		for failure in "${linter_failures[@]}"; do
@@ -380,7 +380,7 @@ if [ -n "${linter_failures[*]}" ]; then
 				rerun_pids["$rerun_pid"]="$failure"
 				continue
 			fi
-			
+
 			feedback ERROR "$failure found errors"
 			failed_lint="true"
 		done
@@ -396,7 +396,7 @@ if [ -n "${linter_failures[*]}" ]; then
 			else
 				rerun_linter_successes+=("${rerun_pids[$p]}")
 			fi
-			
+
 			cat "/opt/goat/log/rerun_${rerun_pids[$p]}.log"
 		done
 	else
@@ -411,7 +411,7 @@ fi
 if [[ -n "${rerun_linter_successes[*]}" && -n $(git status -s) ]]; then
 	for success in "${rerun_linter_successes[@]}"; do
 		if [[ ${CI:-false} == "true" ]]; then
-			feedback ERROR "Autofix of $success errors completed successfully, but action is needed. Run 'pipenv run invoke lint' to fix errors."
+			feedback ERROR "$success detected issues but they can be **automatically fixed**; run 'pipenv run invoke lint' locally, commit, and push."
 			continue
 		fi
 
