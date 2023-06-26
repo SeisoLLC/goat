@@ -5,7 +5,7 @@
         "filetype": [
             ".py"
         ],
-        "executor": "pipenv run --clear",
+        "executor": "pipenv run",
         "env": "RUFF_CONFIG",
         "autofix": "check --config /etc/opt/goat/pyproject.toml -v --fix"
     },
@@ -59,7 +59,7 @@
             ".yml",
             ".yaml"
         ],
-        "executor": "pipenv run --clear",
+        "executor": "pipenv run",
         "env": "CFN_LINT_CONFIG"
     },
     {
@@ -104,7 +104,7 @@
         "filetype": [
             ".py"
         ],
-        "executor": "pipenv run --clear",
+        "executor": "pipenv run",
         "env": "BLACK_CONFIG",
         "autofix": "--config /etc/opt/goat/.python-black"
     },
@@ -114,7 +114,7 @@
         "filetype": [
             ".py"
         ],
-        "executor": "pipenv run --clear",
+        "executor": "pipenv run",
         "env": "MYPY_CONFIG"
     },
     {
@@ -132,7 +132,7 @@
             ".yaml",
             ".yml"
         ],
-        "executor": "pipenv run --clear",
+        "executor": "pipenv run",
         "env": "YAMLLINT_CONFIG"
     }
 ]
