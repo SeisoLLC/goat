@@ -35,7 +35,7 @@ function setup_environment() {
 	# Set the default branch
 	export DEFAULT_BRANCH="main"
 
-	# Set workspace to /goat/ for local runs
+	# Set workspace to /goat for local runs
 	export DEFAULT_WORKSPACE="/goat"
 
 	# Set default values for autofix
@@ -44,8 +44,24 @@ function setup_environment() {
 
 	# Create variables for the various dictionary file paths
 	export GLOBAL_DICTIONARY="/etc/opt/goat/seiso_global_dictionary.txt"
-	export REPO_DICTIONARY="${GITHUB_WORKSPACE:-/goat}/.github/etc/dictionary.txt"
 	export LINTER_CONFIG="/etc/opt/goat/linters.json"
+
+	# Identify the correct relative path to use
+	if [[ -d "${DEFAULT_WORKSPACE}/.git" ]]; then
+		# Local / default use
+		RELATIVE_PATH="${DEFAULT_WORKSPACE}"
+	elif [[ -n "${GITHUB_WORKSPACE:+x}" ]]; then
+		# GitHub Actions
+		RELATIVE_PATH="${DEFAULT_WORKSPACE}"
+	elif [[ -d "/src/.git" ]]; then
+		# Pre-commit
+		RELATIVE_PATH="${DEFAULT_WORKSPACE}"
+	else
+		feedback ERROR "Unable to identify the right relative path to find the repo dictionary"
+		exit 1
+	fi
+
+	export REPO_DICTIONARY="${RELATIVE_PATH}/.github/etc/dictionary.txt"
 
 	if [[ ${INPUT_DISABLE_MYPY:-} == "true" ]]; then
 		export VALIDATE_PYTHON_MYPY="false"
@@ -78,6 +94,12 @@ function check_environment() {
 			feedback ERROR "Base branch name is not main"
 			exit 1
 		fi
+	fi
+
+	# Ensure there is a repo dictionary
+	if [[ ! -r "${REPO_DICTIONARY}" ]]; then
+		feedback ERROR "Unable to read a repo dictionary at ${REPO_DICTIONARY}; does it exist?"
+		exit 1
 	fi
 
 	# Ensure dictionaries don't have overlap
