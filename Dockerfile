@@ -48,8 +48,10 @@ RUN pip install pipenv \
     jscpd \
     markdown-link-check \
     && mkdir -p /opt/goat/log \
-    # Necessary because pre-commit adds -u os.uid():os.gid() to the docker run
-    && chmod o+w /opt/goat/log
+    # The following commands are necessary because pre-commit adds -u os.uid():os.gid() to the docker run
+    && chmod o+w /opt/goat/log \
+    && mkdir -p /.local \
+    && chmod o+w /.local
 
 WORKDIR /goat/
 
