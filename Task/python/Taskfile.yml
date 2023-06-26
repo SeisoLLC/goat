@@ -22,7 +22,7 @@ tasks:
     cmds:
       - git submodule init
       - pipenv install --deploy --ignore-pipfile --dev
-      - pre-commit autoupdate --freeze --jobs 4
+      - pre-commit install
 
   lint:
     preconditions:
@@ -63,7 +63,7 @@ tasks:
   update:
     cmds:
       - git submodule update --remote
-      - pre-commit autoupdate
+      - pre-commit autoupdate --freeze --jobs 4
       - >
         docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}} /bin/bash
         -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
