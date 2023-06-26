@@ -52,10 +52,10 @@ function setup_environment() {
 		RELATIVE_PATH="${DEFAULT_WORKSPACE}"
 	elif [[ -n "${GITHUB_WORKSPACE:+x}" ]]; then
 		# GitHub Actions
-		RELATIVE_PATH="${DEFAULT_WORKSPACE}"
+		RELATIVE_PATH="${GITHUB_WORKSPACE}"
 	elif [[ -d "/src/.git" ]]; then
 		# Pre-commit
-		RELATIVE_PATH="${DEFAULT_WORKSPACE}"
+		RELATIVE_PATH="/src"
 	else
 		feedback ERROR "Unable to identify the right relative path to find the repo dictionary"
 		exit 1
