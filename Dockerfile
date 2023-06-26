@@ -21,7 +21,7 @@ LABEL org.opencontainers.image.licenses="MIT"
 
 WORKDIR /etc/opt/goat/
 ENV PIP_NO_CACHE_DIR=1
-ENV PIPENV_PIPFILE="/etc/opt/goat/Pipfile"
+ENV PIPENV_VENV_IN_PROJECT=1
 COPY Pipfile Pipfile.lock ./
 COPY --from=kubeconform /kubeconform /usr/bin/
 COPY --from=hadolint /bin/hadolint /usr/bin/
@@ -53,8 +53,6 @@ RUN pip install pipenv \
 
 WORKDIR /goat/
 
-# LINTER_RULES_PATH is a path relative to GITHUB_WORKSPACE
-ENV LINTER_RULES_PATH=../../../../../etc/opt/goat
 COPY etc/ /etc/opt/goat/
 COPY entrypoint.sh /opt/goat/bin/entrypoint.sh
 
