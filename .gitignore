@@ -1,6 +1,5 @@
 *.tar
 .ruff_cache
-.local/
 
 # Created by https://www.toptal.com/developers/gitignore/api/vim,emacs,vs,python,node,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=vim,emacs,vs,python,node,macos
