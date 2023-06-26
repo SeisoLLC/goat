@@ -411,7 +411,7 @@ fi
 if [[ -n "${rerun_linter_successes[*]}" && -n $(git status -s) ]]; then
 	for success in "${rerun_linter_successes[@]}"; do
 		if [[ ${CI:-false} == "true" ]]; then
-			feedback ERROR "Autofix of $success errors completed successfully, but action is needed. Run 'pipenv run invoke goat' to fix errors."
+			feedback ERROR "Autofix of $success errors completed successfully, but action is needed. Run 'pipenv run invoke lint' to fix errors."
 			continue
 		fi
 
