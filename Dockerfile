@@ -21,7 +21,6 @@ LABEL org.opencontainers.image.licenses="MIT"
 
 WORKDIR /etc/opt/goat/
 ENV PIP_NO_CACHE_DIR=1
-ENV PIPENV_VENV_IN_PROJECT=1
 ENV WORKON_HOME=/tmp
 COPY Pipfile Pipfile.lock ./
 COPY --from=kubeconform /kubeconform /usr/bin/
