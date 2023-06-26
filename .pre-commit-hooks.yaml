@@ -1,0 +1,5 @@
+---
+- id: seiso-goat
+  name: Seiso GOAT
+  language: docker_image
+  entry: docker.io/seiso/goat:latest
