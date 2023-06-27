@@ -28,10 +28,10 @@ There are two ways of running the `goat` locally:
     docker run -v $PWD:/goat/ --rm <first several character of the hash output from the build step>
     ```
 
-3. It is possible to pass custom arguments or config file paths to the linters in the goat using environment variables.  
+3. It is possible to pass custom arguments or config file paths to the linters in the goat using environment variables (detailed in `linters.json`).  
    Examples:
 
-   `docker run -e RUFF_CONFIG='check --config <path to new config> -v'`
+   `docker run -e RUFF_CONFIG='check --config <path to new config> -v' --rm <hash>`
 
     ```bash
     docker run -e INPUT_EXCLUDE='.*\.json$' -e BLACK_CONFIG='--required-version 21.9b0' -v $PWD:/goat/ --rm <hash>
