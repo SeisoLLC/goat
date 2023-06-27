@@ -84,7 +84,7 @@ There are two ways of running the `goat` locally:
     and the values supplied will take precedence over the default autofix or standard arguments supplied in the goat.  
     Any desired autofix arguments must be explicitly supplied as part of the new env variable value.
 
-4. Autofix is available for certain linters and is enabled by default> To disable autofix, use:
+4. Autofix is available for certain linters and is enabled by default. To disable autofix, use:
    1. `docker run -e INPUT_AUTO_FIX="false" -v "$PWD:/goat/" --rm <hash>` or
    2. `pipenv run invoke goat --disable-autofix`
 
