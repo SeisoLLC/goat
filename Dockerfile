@@ -21,7 +21,7 @@ LABEL org.opencontainers.image.licenses="MIT"
 
 WORKDIR /etc/opt/goat/
 ENV PIP_NO_CACHE_DIR=1
-ENV PIPENV_PIPFILE="/etc/opt/goat/Pipfile"
+ENV WORKON_HOME=/tmp
 COPY Pipfile Pipfile.lock ./
 COPY --from=kubeconform /kubeconform /usr/bin/
 COPY --from=hadolint /bin/hadolint /usr/bin/
@@ -47,12 +47,14 @@ RUN pip install pipenv \
     cspell \
     jscpd \
     markdown-link-check \
-    && mkdir -p /opt/goat/log
+    && mkdir -p /opt/goat/log \
+    # The following commands are necessary because pre-commit adds -u os.uid():os.gid() to the docker run
+    && chmod o+w /opt/goat/log \
+    && mkdir -p /.local \
+    && chmod o+w /.local
 
 WORKDIR /goat/
 
-# LINTER_RULES_PATH is a path relative to GITHUB_WORKSPACE
-ENV LINTER_RULES_PATH=../../../../../etc/opt/goat
 COPY etc/ /etc/opt/goat/
 COPY entrypoint.sh /opt/goat/bin/entrypoint.sh
 
