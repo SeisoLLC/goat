@@ -28,7 +28,10 @@ There are two ways of running the `goat` locally:
     docker run -v $PWD:/goat/ --rm <first several character of the hash output from the build step>
     ```
 
-3. To pass in custom configs for individual linters or to exclude files with regular expressions, set environment variables:
+3. It is possible to pass custom arguments or config file paths to the linters in the goat using environment variables.  
+   Examples:
+
+   `docker run -e RUFF_CONFIG='check --config <path to new config> -v'`
 
     ```bash
     docker run -e INPUT_EXCLUDE='.*\.json$' -e BLACK_CONFIG='--required-version 21.9b0' -v $PWD:/goat/ --rm <hash>
@@ -77,12 +80,13 @@ There are two ways of running the `goat` locally:
     ERROR:  Linting failed
     ```
 
-    Note: Linter env variables must be formatted as <LINTER_CONFIG>, i.e. RUFF_CONFIG, CFN_LINT_CONFIG,
-    etc., and the values supplied will overwrite the default arguments supplied in the goat.
+    Note: Linter env variables must be formatted as <LINTER_CONFIG>, i.e. RUFF_CONFIG, CFN_LINT_CONFIG, etc.,  
+    and the values supplied will take precedence over the default autofix or standard arguments supplied in the goat.  
+    Any desired autofix arguments must be explicitly supplied as part of the new env variable value.
 
-4. Autofix is available for certain linters and is enabled by default. To disable autofix, use:  
-   `docker run -e INPUT_AUTO_FIX="false" -v "$PWD:/goat/" --rm <hash>` or  
-   `pipenv run invoke goat --disable-autofix`
+4. Autofix is available for certain linters and can be invoked in two ways:
+   1. `docker run -e INPUT_AUTO_FIX="true" -v $PWD:/goat/ -rm <hash>`
+   2. `pipenv run invoke reformat`
 
 ### Linter Update Considerations
 
