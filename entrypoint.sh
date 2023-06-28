@@ -225,6 +225,7 @@ function lint_files() {
 
 	if [ "${CURRENT_LINT_ROUND}" -eq 2 ] && ! has_autofix "${linter_array[name]}"; then
 		linter_args="${linter_array[autofix]}"
+		feedback WARNING "The linter runtime for ${linter_array[name]} has been customized, which might have unwanted side effects. Use with caution."
 	fi
 
 	if [[ -v "${env_var_name}" ]]; then
