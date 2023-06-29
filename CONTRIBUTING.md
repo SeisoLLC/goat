@@ -2,12 +2,14 @@
 
 ## Environment Setup
 
-Ensure you have `docker` and `pipenv` installed locally, and the `docker` daemon is running.
-Then run the following command to install the dependencies onto your local system:
+Ensure you have `docker` and `pipenv` installed locally, and the `docker` daemon is running. Then run the following command to install the dependencies onto
+your local system:
 
 ```bash
 pipenv install --deploy --ignore-pipfile --dev
 ```
+
+We are also in the process of migrating from `Invoke` to `Taskfile`; if you want to use the `task` commands, you must install `Taskfile`
 
 ## Running the goat against the goat project locally
 
@@ -28,7 +30,7 @@ There are two ways of running the `goat` locally:
     docker run -v $PWD:/goat/ --rm <first several character of the hash output from the build step>
     ```
 
-3. It is possible to pass custom arguments or config file paths to the linters in the goat using environment variables (detailed in `linters.json`).  
+3. It is possible to pass custom arguments or config file paths to the linters in the goat using environment variables (detailed in `linters.json`).
    Examples:
 
    `docker run -e RUFF_CONFIG='check --config <path to new config> -v' --rm <hash>`
@@ -80,8 +82,8 @@ There are two ways of running the `goat` locally:
     ERROR:  Linting failed
     ```
 
-    Note: Linter env variables must be formatted as <LINTER_CONFIG>, i.e. RUFF_CONFIG, CFN_LINT_CONFIG, etc.,  
-    and the values supplied will take precedence over the default autofix or standard arguments supplied in the goat.  
+    Note: Linter env variables must be formatted as <LINTER_CONFIG>, i.e. RUFF_CONFIG, CFN_LINT_CONFIG, etc.,
+    and the values supplied will take precedence over the default autofix or standard arguments supplied in the goat.
     Any desired autofix arguments must be explicitly supplied as part of the new env variable value.
 
 4. Autofix is available for certain linters and is enabled by default. To disable autofix, use:
@@ -90,5 +92,5 @@ There are two ways of running the `goat` locally:
 
 ### Linter Update Considerations
 
-1. If adding linters to `linters.json`, the `executor` is an optional member of the linter object.  
+1. If adding linters to `linters.json`, the `executor` is an optional member of the linter object.
 2. The `autofix` member is also optional. If a linter has an autofix command-line option, this field holds those arguments.
