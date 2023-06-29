@@ -9,7 +9,7 @@ tasks:
     env:
       ACTION: "{{.CLI_ARGS}}"
     cmds:
-      - pre-commit autoupdate --freeze --jobs 4
+      - pipenv run pre-commit autoupdate --freeze --jobs 4
       - |
         if [[ "${ACTION}" == "commit" ]]; then
           git add -A
