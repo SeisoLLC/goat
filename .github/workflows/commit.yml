@@ -68,7 +68,6 @@ jobs:
     permissions:
       contents: write
     steps:
-      # This should check out the reference or SHA of the event that caused this to be triggered, not the new commit from the prior job
       - name: Checkout the repository
         uses: actions/checkout@v3
       - uses: actions/setup-python@v4
