@@ -15,7 +15,7 @@ env:
 jobs:
   test:
     name: Test
-    runs-on: Ubuntu-20.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
@@ -40,7 +40,7 @@ jobs:
   bump-pre-commit:
     name: Bump pre-commit
     needs: [test]
-    if: "${{ github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'Bump pre-commit revision')}}"
+    if: "${{ github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'Bump pre-commit revision') }}"
     permissions:
       contents: write
     runs-on: ubuntu-20.04
@@ -63,7 +63,7 @@ jobs:
   distribute:
     name: Distribute
     if: ${{ github.event_name == 'push' }}
-    runs-on: Ubuntu-20.04
+    runs-on: ubuntu-20.04
     needs: [test, bump-pre-commit]
     permissions:
       contents: write
