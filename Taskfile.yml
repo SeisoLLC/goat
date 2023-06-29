@@ -1,0 +1,20 @@
+# https://taskfile.dev
+
+version: '3'
+
+silent: true
+
+tasks:
+  pre-commit-update:
+    env:
+      ACTION: "{{.CLI_ARGS}}"
+    cmds:
+      - pre-commit autoupdate --freeze --jobs 4
+      - |
+        if [[ "${ACTION}" == "commit" ]]; then
+          git add -A
+          git commit -m "Bump pre-commit revision"
+        elif [[ "${ACTION:=empty}" != "empty" ]]; then
+          echo "Unsupported action of ${ACTION} provided"
+          exit 230
+        fi

@@ -15,7 +15,7 @@ env:
 jobs:
   test:
     name: Test
-    runs-on: Ubuntu-20.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
@@ -37,14 +37,38 @@ jobs:
         run: pipenv run invoke build
       - name: Goat the goat
         run: pipenv run invoke goat --debug
+  bump-pre-commit:
+    name: Bump pre-commit
+    needs: [test]
+    if: "${{ github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'Bump pre-commit revision') }}"
+    permissions:
+      contents: write
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          fetch-depth: 0
+      - name: Install Task
+        uses: arduino/setup-task@v1
+      - name: Bump the pre-commit revision
+        run: |
+          git config --global user.name 'Seiso Automation'
+          git config --global user.email 'automation@seisollc.com'
+          # Non-string variables are pending https://github.com/go-task/task/issues/140
+          task pre-commit-update -- commit
+          BRANCH="$(git branch --show-current)"
+          git push --atomic origin "${BRANCH}"
   distribute:
     name: Distribute
     if: ${{ github.event_name == 'push' }}
-    runs-on: Ubuntu-20.04
-    needs: test
+    runs-on: ubuntu-20.04
+    needs: [test, bump-pre-commit]
     permissions:
       contents: write
     steps:
+      # This should check out the reference or SHA of the event that caused this to be triggered, not the new commit from the prior job
       - name: Checkout the repository
         uses: actions/checkout@v3
       - uses: actions/setup-python@v4
