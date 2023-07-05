@@ -57,7 +57,7 @@ RUN pip install pipenv \
     && echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile \
     && echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile \
     && echo 'eval "$(pyenv init -)"' >> ~/.profile \
-    && find $PYENV_ROOT -type -d -name ".git" -exec rm -rf {} +
+    && find $PYENV_ROOT -type d -name ".git" -exec rm -rf {} +
 
 WORKDIR /goat/
 
