@@ -50,7 +50,9 @@ RUN pip install pipenv \
     jscpd \
     markdown-link-check \
     && git clone https://github.com/pyenv/pyenv.git --depth=1 "${PYENV_ROOT}" \
-    && eval "$(pyenv init -)" \
+    && echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile \
+    && echo 'eval "$(pyenv init -)"' >> ~/.profile \
+    # This will cleanup the pyenv .git folder as well as any plugin .git folders
     && find "${PYENV_ROOT}" -type d -name ".git" -exec rm -rf {} + \
     && mkdir -p /opt/goat/log \
     #####################################################################################################
