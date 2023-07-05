@@ -51,8 +51,8 @@ RUN pip install pipenv \
     markdown-link-check \
     && git clone https://github.com/pyenv/pyenv.git --depth=1 ~/.pyenv \
     && find "${PYENV_ROOT}" -type d -name ".git" -exec rm -rf {} + \
+    && eval "$(pyenv init -)" \
     && mkdir -p /opt/goat/log \
-    && echo 'eval "$(pyenv init -)"' >> ~/.profile \
     #####################################################################################################
     # The following commands are necessary because pre-commit adds -u os.uid():os.gid() to the docker run
     && chmod o+w /opt/goat/log \
@@ -64,6 +64,5 @@ WORKDIR /goat/
 
 COPY etc/ /etc/opt/goat/
 COPY entrypoint.sh /opt/goat/bin/entrypoint.sh
-COPY 10pyenv.sh /etc/profile.d/10pyenv.sh
 
 ENTRYPOINT ["tini", "-g", "--", "/opt/goat/bin/entrypoint.sh"]
