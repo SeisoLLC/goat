@@ -50,8 +50,8 @@ RUN pip install pipenv \
     jscpd \
     markdown-link-check \
     && git clone https://github.com/pyenv/pyenv.git --depth=1 "${PYENV_ROOT}" \
-    && find "${PYENV_ROOT}" -type d -name ".git" -exec rm -rf {} + \
     && eval "$(pyenv init -)" \
+    && find "${PYENV_ROOT}" -type d -name ".git" -exec rm -rf {} + \
     && mkdir -p /opt/goat/log \
     #####################################################################################################
     # The following commands are necessary because pre-commit adds -u os.uid():os.gid() to the docker run
