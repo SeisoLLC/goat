@@ -22,6 +22,8 @@ LABEL org.opencontainers.image.licenses="MIT"
 WORKDIR /etc/opt/goat/
 ENV PIP_NO_CACHE_DIR=1
 ENV WORKON_HOME=/tmp
+ENV PYENV_ROOT="/root/.pyenv"
+ENV PATH="$PYENV_ROOT/bin:$PATH"
 COPY Pipfile Pipfile.lock ./
 COPY --from=kubeconform /kubeconform /usr/bin/
 COPY --from=hadolint /bin/hadolint /usr/bin/
@@ -47,16 +49,18 @@ RUN pip install pipenv \
     cspell \
     jscpd \
     markdown-link-check \
+    && git clone https://github.com/pyenv/pyenv.git --depth=1 "${PYENV_ROOT}" \
+    && echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile \
+    && echo 'eval "$(pyenv init -)"' >> ~/.profile \
+    # This will cleanup the pyenv .git folder as well as any plugin .git folders
+    && find "${PYENV_ROOT}" -type d -name ".git" -exec rm -rf {} + \
     && mkdir -p /opt/goat/log \
+    #####################################################################################################
     # The following commands are necessary because pre-commit adds -u os.uid():os.gid() to the docker run
     && chmod o+w /opt/goat/log \
     && mkdir -p /.local \
-    && chmod o+w /.local \
-    && git clone https://github.com/pyenv/pyenv.git --depth=1 ~/.pyenv \
-    && echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile \
-    && echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile \
-    && echo 'eval "$(pyenv init -)"' >> ~/.profile \
-    && find $PYENV_ROOT -type d -name ".git" -exec rm -rf {} +
+    && chmod o+w /.local
+    #####################################################################################################
 
 WORKDIR /goat/
 

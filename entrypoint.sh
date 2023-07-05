@@ -81,6 +81,10 @@ function setup_environment() {
 		export ACTIONS_RUNNER_DEBUG="true"
 	fi
 
+	# Sets up pyenv so that any linters ran via pipenv run can have an arbitrary python version
+	# More details in https://github.com/pyenv/pyenv/tree/7b713a88c40f39139e1df4ed0ceb764f73767dac#advanced-configuration
+	eval "$(pyenv init -)"
+
 	declare -a linter_failures
 	declare -a linter_successes
 	declare -a linter_skipped
