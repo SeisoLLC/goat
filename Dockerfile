@@ -49,7 +49,7 @@ RUN pip install pipenv \
     cspell \
     jscpd \
     markdown-link-check \
-    && git clone https://github.com/pyenv/pyenv.git --depth=1 ~/.pyenv \
+    && git clone https://github.com/pyenv/pyenv.git --depth=1 "${PYENV_ROOT}" \
     && find "${PYENV_ROOT}" -type d -name ".git" -exec rm -rf {} + \
     && eval "$(pyenv init -)" \
     && mkdir -p /opt/goat/log \
