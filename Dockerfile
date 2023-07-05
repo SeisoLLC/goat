@@ -53,14 +53,12 @@ RUN pip install pipenv \
     && mkdir -p /.local \
     && chmod o+w /.local \
     && git clone https://github.com/pyenv/pyenv.git --depth=1 ~/.pyenv \
-    && echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile \
-    && echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile \
-    && echo 'eval "$(pyenv init -)"' >> ~/.profile \
     && find $PYENV_ROOT -type d -name ".git" -exec rm -rf {} +
 
 WORKDIR /goat/
 
 COPY etc/ /etc/opt/goat/
 COPY entrypoint.sh /opt/goat/bin/entrypoint.sh
+COPY 10pyenv.sh /root/.profile
 
 ENTRYPOINT ["tini", "-g", "--", "/opt/goat/bin/entrypoint.sh"]
