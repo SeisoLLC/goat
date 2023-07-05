@@ -22,7 +22,7 @@ LABEL org.opencontainers.image.licenses="MIT"
 WORKDIR /etc/opt/goat/
 ENV PIP_NO_CACHE_DIR=1
 ENV WORKON_HOME=/tmp
-ENV PYENV_ROOT="$HOME/.pyenv"
+ENV PYENV_ROOT="/root/.pyenv"
 ENV PATH="$PYENV_ROOT/bin:$PATH"
 COPY Pipfile Pipfile.lock ./
 COPY --from=kubeconform /kubeconform /usr/bin/
