@@ -127,8 +127,8 @@ function detect_kubernetes_file() {
 
 	if grep -q -v 'kustomize.config.k8s.io' "${file}" &&
 		grep -q -v "tekton" "${file}" &&
-		grep -q -E '(apiVersion):' "${file}" &&
-		grep -q -E '(kind):' "${file}"; then
+		grep -q -E '^apiVersion:' "${file}" &&
+		grep -q -E '^kind:' "${file}"; then
 		return 1
 	fi
 
