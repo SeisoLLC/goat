@@ -1,6 +1,7 @@
 aircrack
 aireplay
 airodump
+autofix
 axample
 bau
 bcrypt
@@ -10,12 +11,14 @@ bruteforce
 bruteforcing
 bssid
 bssids
+capricornis
 casp
 cissp
 cmmc
 connstring
 cors
 crackmapexec
+crispus
 csrf
 cvss
 damerau–levenshtein
@@ -56,6 +59,7 @@ gppa
 grafana
 grep
 gssp
+hadolint
 hashcat
 haveibeenpwned
 hcxpcaptool
@@ -75,6 +79,7 @@ johntheripper
 kerberoast
 kerberoasted
 kerberoasting
+kubeconform
 llmnr
 lm
 lsass
@@ -130,9 +135,9 @@ sast
 secretsdump
 seiso
 seiso's
+seiso’s
 seisollc
 seisosimpleshell
-seiso’s
 servdev
 sha256
 sha256sum
@@ -150,6 +155,7 @@ taskfile
 taskfiles
 telerik
 terrascan
+textlint
 tfsec
 thycotic
 totp
