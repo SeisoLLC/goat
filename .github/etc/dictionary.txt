@@ -1,6 +1,0 @@
-autofix
-capricornis
-crispus
-hadolint
-kubeconform
-textlint
