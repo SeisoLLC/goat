@@ -40,6 +40,8 @@ RUN pip install pipenv \
     tini \
     bash \
     git \
+    # The following apk package is necessary for pyenv functionality
+    tk-dev \
     && npm install --save-dev --no-cache -g dockerfile_lint \
     markdownlint-cli \
     textlint \
@@ -50,8 +52,8 @@ RUN pip install pipenv \
     jscpd \
     markdown-link-check \
     && git clone https://github.com/pyenv/pyenv.git --depth=1 "${PYENV_ROOT}" \
-    && echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile \
-    && echo 'eval "$(pyenv init -)"' >> ~/.profile \
+    && echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile \
+    && echo 'eval "$(pyenv init -)"' >> ~/.bash_profile \
     # This will cleanup the pyenv .git folder as well as any plugin .git folders
     && find "${PYENV_ROOT}" -type d -name ".git" -exec rm -rf {} + \
     && mkdir -p /opt/goat/log \
@@ -60,7 +62,7 @@ RUN pip install pipenv \
     && chmod o+w /opt/goat/log \
     && mkdir -p /.local \
     && chmod o+w /.local
-    #####################################################################################################
+#####################################################################################################
 
 WORKDIR /goat/
 
