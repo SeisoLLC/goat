@@ -3,7 +3,7 @@ FROM hadolint/hadolint:v2.12.0-alpine as hadolint
 FROM koalaman/shellcheck:v0.9.0 as shellcheck
 FROM rhysd/actionlint:1.6.24 as actionlint
 
-FROM python:3.10-alpine3.18 as base_image
+FROM python:3.11-alpine3.18 as base_image
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -52,8 +52,8 @@ RUN pip install pipenv \
     jscpd \
     markdown-link-check \
     && git clone https://github.com/pyenv/pyenv.git --depth=1 "${PYENV_ROOT}" \
-    && echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile \
-    && echo 'eval "$(pyenv init -)"' >> ~/.bash_profile \
+    && echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile \
+    && echo 'eval "$(pyenv init -)"' >> ~/.profile \
     # This will cleanup the pyenv .git folder as well as any plugin .git folders
     && find "${PYENV_ROOT}" -type d -name ".git" -exec rm -rf {} + \
     && mkdir -p /opt/goat/log \
