@@ -8,7 +8,7 @@ ruff = "*"
 mypy = "*"
 cfn-lint = "*"
 black = "*"
-yamllint = "*" 
+yamllint = "*"
 
 [dev-packages]
 docker = "*"
@@ -18,4 +18,4 @@ requests = "*"
 pre-commit = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3.11"
