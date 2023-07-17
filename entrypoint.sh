@@ -63,17 +63,24 @@ function setup_environment() {
 
 	export REPO_DICTIONARY="${RELATIVE_PATH}/.github/etc/dictionary.txt"
 
+  #############
+  # IMPORTANT: If you are changing any INPUT_ variables here, make sure to also update:
+  # - README.md
+  # - Task/**/Taskfile.yml (vars)
+  # - action.yml
+  #############
+
+	if [[ ${INPUT_AUTO_FIX:-true} == "false" ]]; then
+		# Let INPUT_AUTO_FIX override the autofix value. This allows for disabling autofix locally.
+		AUTO_FIX="false"
+	fi
+
 	if [[ ${INPUT_DISABLE_MYPY:-} == "true" ]]; then
 		export VALIDATE_PYTHON_MYPY="false"
 	fi
 
 	if [[ -n ${INPUT_EXCLUDE:+x} ]]; then
 		export FILTER_REGEX_EXCLUDE="${INPUT_EXCLUDE}"
-	fi
-
-	if [[ ${INPUT_AUTO_FIX:-true} == "false" ]]; then
-		# Let INPUT_AUTO_FIX override the autofix value. This allows for disabling autofix locally.
-		AUTO_FIX="false"
 	fi
 
 	if [[ ${INPUT_LOG_LEVEL:='VERBOSE'} =~ ^(ERROR|WARN|NOTICE|VERBOSE|DEBUG|TRACE)$ ]]; then
