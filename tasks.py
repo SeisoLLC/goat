@@ -274,10 +274,6 @@ def update(_c, debug=False):
     if debug:
         getLogger().setLevel("DEBUG")
 
-    repo = ""  # TODO Repurpose update to manage new dependencies
-    version = get_latest_release_from_github(repo=repo)
-    update_dockerfile_from(image=repo, tag=version)
-
     try:
         subprocess.run(["pipenv", "update"], capture_output=True, check=True)
     except subprocess.CalledProcessError:
