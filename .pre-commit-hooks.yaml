@@ -1,5 +1,5 @@
 ---
 - id: seiso-lint
   name: Lint (via the 🐐)
-  language: script
+  language: system
   entry: task lint
