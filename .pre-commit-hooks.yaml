@@ -3,3 +3,4 @@
   name: Lint (via the 🐐)
   language: system
   entry: task lint
+  pass_filenames: false
