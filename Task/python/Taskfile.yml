@@ -16,6 +16,10 @@ vars:
     sh: git tag -l
   VERSIONING:
     sh: grep versioning setup.cfg | cut -d '"' -f 2
+  INPUT_AUTO_FIX: null
+  INPUT_DISABLE_MYPY: null
+  INPUT_EXCLUDE: null
+  INPUT_LOG_LEVEL: null
 
 tasks:
   init:
@@ -28,11 +32,6 @@ tasks:
     preconditions:
       - sh: docker pull seiso/goat:latest || echo "Failed to pull the latest goat, continuing anyway..."
     # Adjustments are passed as vars, not envs, to avoid local workarounds
-    vars:
-      INPUT_AUTO_FIX: null
-      INPUT_DISABLE_MYPY: null
-      INPUT_EXCLUDE: null
-      INPUT_LOG_LEVEL: null
     cmds:
       - |
         docker run --env INPUT_AUTO_FIX="{{.INPUT_AUTO_FIX}}" \
