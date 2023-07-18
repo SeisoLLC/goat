@@ -5,7 +5,7 @@ version: '3'
 
 includes:
   py:
-    taskfile: ./Task/python/Taskfile.yml
+    taskfile: ./goat/Task/python/Taskfile.yml
     internal: true
 
 silent: true
