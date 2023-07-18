@@ -3,4 +3,4 @@ repos:
   - repo: https://github.com/seisollc/goat
     rev: 966ea880a35e922c2644f47d6b5f9fbdf68142d7  # frozen: latest
     hooks:
-      - id: seiso-goat
+      - id: seiso-lint
