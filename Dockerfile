@@ -1,7 +1,7 @@
-FROM ghcr.io/yannh/kubeconform:v0.6.1 as kubeconform
+FROM ghcr.io/yannh/kubeconform:v0.6.3 as kubeconform
 FROM hadolint/hadolint:v2.12.0-alpine as hadolint
 FROM koalaman/shellcheck:v0.9.0 as shellcheck
-FROM rhysd/actionlint:1.6.24 as actionlint
+FROM rhysd/actionlint:1.6.25 as actionlint
 
 FROM python:3.11-alpine3.18 as base_image
 

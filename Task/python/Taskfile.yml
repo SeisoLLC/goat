@@ -27,8 +27,19 @@ tasks:
   lint:
     preconditions:
       - sh: docker pull seiso/goat:latest || echo "Failed to pull the latest goat, continuing anyway..."
+    # Adjustments are passed as vars, not envs, to avoid local workarounds
+    vars:
+      INPUT_AUTO_FIX: null
+      INPUT_DISABLE_MYPY: null
+      INPUT_EXCLUDE: null
+      INPUT_LOG_LEVEL: null
     cmds:
-      - docker run --rm -v "${PWD}:/goat" seiso/goat:latest
+      - |
+        docker run --env INPUT_AUTO_FIX="{{.INPUT_AUTO_FIX}}" \
+                   --env INPUT_DISABLE_MYPY="{{.INPUT_DISABLE_MYPY}}" \
+                   --env INPUT_EXCLUDE="{{.INPUT_EXCLUDE}}" \
+                   --env INPUT_LOG_LEVEL="{{.INPUT_LOG_LEVEL}}" \
+                   --rm -v "${PWD}:/goat" seiso/goat:latest
 
   test:
     cmds:

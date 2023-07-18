@@ -1,5 +1,5 @@
 ---
-- id: seiso-goat
-  name: Seiso GOAT
-  language: docker_image
-  entry: docker.io/seiso/goat:latest
+- id: seiso-lint
+  name: Lint (via the 🐐)
+  language: script
+  entry: task lint
