@@ -4,6 +4,107 @@
 version: "3"
 
 tasks:
+  lint:
+    preconditions:
+      - sh: docker pull seiso/goat:latest || echo "Failed to pull the latest goat, continuing anyway..."
+    # Adjustments are passed as vars, not envs, to avoid local workarounds
+    vars:
+      INPUT_AUTO_FIX: '{{.INPUT_AUTO_FIX | default ""}}'
+      INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY | default ""}}'
+      INPUT_EXCLUDE: '{{.INPUT_EXCLUDE | default ""}}'
+      INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL | default ""}}'
+    cmds:
+      - |
+        docker run --env INPUT_AUTO_FIX="{{.INPUT_AUTO_FIX}}" \
+                   --env INPUT_DISABLE_MYPY="{{.INPUT_DISABLE_MYPY}}" \
+                   --env INPUT_EXCLUDE="{{.INPUT_EXCLUDE}}" \
+                   --env INPUT_LOG_LEVEL="{{.INPUT_LOG_LEVEL}}" \
+                   --rm -v "{{.ROOT_DIR}}:/goat" seiso/goat:latest
+
+  build:
+    vars:
+      VERSION: '{{.VERSION | default "UNKNOWN"}}'
+      TAG_COMMIT_HASH:
+        sh: git rev-list -1 "v{{.VERSION}}"
+      COMMIT_HASH:
+        sh: git rev-parse HEAD
+      COMMIT_HASH_SHORT:
+        sh: git rev-parse --short HEAD
+      REPO_TAGS:
+        sh: git tag -l
+      BUILD_VERSION:
+        sh: |
+          pipenv run python -c '
+          version_string = "{{.VERSION}}"
+          repo_tags = []
+          {{range $tag := .REPO_TAGS | splitLines -}}
+          repo_tags.append("{{$tag}}")
+          {{end}}
+          if (version_string in repo_tags and "{{.TAG_COMMIT_HASH}}" == "{{.COMMIT_HASH}}"):
+              build_version = "{{.VERSION}}"
+          else:
+              build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
+          print(build_version)'
+    cmds:
+      - docker buildx build --load --build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" --tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} {{.ROOT_DIR}}/.
+
+  release:
+    preconditions:
+      - sh: test `git status -s | wc -w` = "0"
+        msg: "There are untracked files, please commit before creating a release."
+    vars:
+      PYTHON_VERSION: '{{default null .PYTHON_VERSION}}'
+      RELEASE_TYPE: "{{.CLI_ARGS}}"
+      DATE_INFO: '{{now | date "2006.01"}}'
+      REPO_TAGS:
+        sh: git tag -l
+      VERSIONING:
+        sh: grep versioning setup.cfg | cut -d '"' -f 2
+      RELEASE_VERSION:
+        sh: |
+          docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}}-slim python -c '
+          import re
+          pattern = re.compile(r"v2[0-1][0-9]{2}.(0[0-9]|1[0-2]).[0-9]{2}")
+          repo_tags = []
+          {{range $tag := .REPO_TAGS | splitLines -}}
+          repo_tags.append("{{$tag}}")
+          {{end}}
+          for tag in reversed(repo_tags):
+              if pattern.fullmatch(tag):
+                  latest_release = tag
+                  break
+              else:
+                  latest_release = None
+          if latest_release and "{{.DATE_INFO}}" == latest_release[1:8]:
+              increment = str(int(latest_release[9:]) + 1).zfill(2)
+          else:
+              increment = "01"
+          new_version = f"{{.DATE_INFO}}.{increment}"
+          print(new_version)'
+    cmds:
+      # Better conditional syntax is pending https://github.com/go-task/task/issues/608
+      - '{{if eq .VERSIONING "CalVer"}}pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}} \
+        unusedpart{{else if eq .VERSIONING "SemVer"}}pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}{{end}}'
+
+  publish:
+    vars:
+      TAGS: '{{default "all" .TAGS}}'
+      IMAGE_NAME: '{{default null .IMAGE_NAME}}'
+    cmds:
+      # Better conditional syntax is pending https://github.com/go-task/task/issues/608
+      - '{{if eq .TAGS "all"}}docker push --all-tags {{.IMAGE_NAME}} \
+        {{else if eq .TAGS "latest"}}docker push {{.IMAGE_NAME}}:latest \
+        {{else}}echo "Invalid TAGS var"; exit 1{{end}}'
+
+  update:
+    cmds:
+      - task: base:update
+      - git submodule update --remote
+      - pipenv run pre-commit autoupdate --freeze --jobs 4
+      - >
+        docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}}-slim /bin/bash
+        -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
+
   clean:
     cmds:
       - find {{.ROOT_DIR}} -type f -name '.DS_Store' -delete

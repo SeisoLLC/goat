@@ -18,18 +18,14 @@ tasks:
           INPUT_EXCLUDE: '{{.INPUT_EXCLUDE | default ""}}'
           INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL | default ""}}'
 
-  test:
-    cmds:
-      - pipenv run pytest --cov={{.PROJECT_SLUG}} tests
-
   build:
     vars:
       VERSION:
-        sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
+        sh: cat VERSION
     cmds:
       - task: base:build
         vars:
-          VERSION: '{{.VERSION}'
+          VERSION: '{{.VERSION}}'
 
   update:
     cmds:
@@ -49,10 +45,3 @@ tasks:
   clean:
     cmds:
       - task: base:clean
-      - find {{.ROOT_DIR}} -type d -name '__pycache__' -exec rm -rf {} +
-      - find {{.ROOT_DIR}} -type d -name '.mypy_cache' -exec rm -rf {} +
-      - find {{.ROOT_DIR}} -type d -name '.pytest_cache' -exec rm -rf {} +
-      - find {{.ROOT_DIR}} -type f -name '*.pyc' -delete
-      - find {{.ROOT_DIR}} -type d -name 'coverage-reports' -exec rm -rf {} +
-      - find {{.ROOT_DIR}} -type f -name '.coverage' -delete
-      - find {{.ROOT_DIR}} -type d -name '.ruff_cache' -exec rm -rf {} +

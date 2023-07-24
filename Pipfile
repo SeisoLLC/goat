@@ -11,10 +11,6 @@ black = "*"
 yamllint = "*"
 
 [dev-packages]
-docker = "*"
-gitpython = "*"
-invoke = "*"
-requests = "*"
 pre-commit = "*"
 
 [requires]

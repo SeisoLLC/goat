@@ -4,13 +4,79 @@
 version: '3'
 
 includes:
-  py:
-    taskfile: ./goat/Task/python/Taskfile.yml
+  bash:
+    taskfile: ./goat/Task/bash/Taskfile.yml
     internal: true
+    vars:
+      IMAGE_NAME: seiso/goat
+      PROJECT_SLUG: goat
+      PYTHON_VERSION: 3.11
 
 silent: true
 
 tasks:
+  lock:
+    internal: true
+    sources:
+      - Pipfile
+    generates:
+      - Pipfile.lock
+    cmds:
+      - pipenv lock
+
+  init:
+    deps: [lock]
+    sources:
+      - Pipfile.lock
+    cmds:
+      - git submodule init
+      - pipenv install --deploy --ignore-pipfile --dev
+      - pipenv run pre-commit install
+
+  lint:
+    cmds:
+      - task: bash:lint
+        vars:
+          INPUT_AUTO_FIX: false
+
+  test:
+    env:
+      INPUT_DISABLE_MYPY: true
+    cmds:
+      - echo "Baaaaaaaaaaah! (Running the goat)"
+      - |
+        if [[ "${GITHUB_ACTIONS}" == "true" ]]; then
+          repo="${GITHUB_WORKSPACE}"
+          docker run --rm --env-file <(env | grep ^GITHUB_) \
+                          --env-file <(env | grep ^INPUT_) \
+                          -v "${repo}:/goat" \
+                          -v "${HOME}:${HOME}" \
+                          seiso/goat:latest
+        else
+          docker run --rm --env-file <(env | grep ^GITHUB_) \
+                          --env-file <(env | grep ^INPUT_) \
+                          -v "{{.ROOT_DIR}}:/goat" \
+                          seiso/goat:latest
+        fi
+
+  build:
+    cmds:
+      - task: bash:build
+
+  clean:
+    cmds:
+      - task: bash:clean
+
+  release:
+    cmds:
+      - task: bash:release
+
+  publish:
+    cmds:
+      - task: bash:publish
+        vars:
+          TAGS: 'latest'
+
   pre-commit-update:
     env:
       ACTION: "{{.CLI_ARGS}}"
@@ -24,7 +90,3 @@ tasks:
           echo "Unsupported action of ${ACTION} provided"
           exit 230
         fi
-
-  lint:
-    cmds:
-      - task: py:lint
