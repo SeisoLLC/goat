@@ -10,6 +10,7 @@ set -o pipefail
 	declare -r ERROR='\033[0;31m'
 	declare -r WARNING='\033[0;33m'
 	declare -r INFO='\033[0m'
+	declare -r DEBUG='\033[0m'
 	declare -r DEFAULT='\033[0m'
 }
 
@@ -23,7 +24,11 @@ function feedback() {
 		echo >&2 -e "${!color}${1}:  ${2}${DEFAULT}"
 		;;
 	*)
-		echo -e "${!color}${1}:  ${2}${DEFAULT}"
+		if [[ "${1^^}" != "DEBUG" ]]; then
+			echo -e "${!color}${1}:  ${2}${DEFAULT}"
+		elif [[ "${1^^}" == "DEBUG" && -n "${LOG_LEVEL:+x}" && "${LOG_LEVEL^^}" == "DEBUG" ]]; then
+			echo -e "${!color}${1}:  ${2}${DEFAULT}"
+		fi
 		;;
 	esac
 }
@@ -63,6 +68,15 @@ function setup_environment() {
 
 	export REPO_DICTIONARY="${RELATIVE_PATH}/.github/etc/dictionary.txt"
 
+	if [[ -n ${JSCPD_CONFIG:+x} ]]; then
+		feedback WARNING "JSCPD_CONFIG is set; not auto ignoring the goat submodule..."
+	else
+		# This should override the ignore in the coonfig file and is primarily needed so that we can pass in the correct relative path while not excluding all of
+		# the goat on the goat itself (i.e. we are avoiding **/goat/** in the config file)
+		export JSCPD_CONFIG="--config /etc/opt/goat/.jscpd.json --ignore \"**/.github/workflows/**,${RELATIVE_PATH}/goat/**\""
+		feedback DEBUG "JSCPD_CONFIG was dynamically set to ${JSCPD_CONFIG}"
+	fi
+
 	#############
 	# IMPORTANT: If you are changing any INPUT_ variables here, make sure to also update:
 	# - README.md
@@ -83,10 +97,22 @@ function setup_environment() {
 		export FILTER_REGEX_EXCLUDE="${INPUT_EXCLUDE}"
 	fi
 
-	if [[ ${INPUT_LOG_LEVEL:='VERBOSE'} =~ ^(ERROR|WARN|NOTICE|VERBOSE|DEBUG|TRACE)$ ]]; then
+	# Default to info
+	INPUT_LOG_LEVEL=${INPUT_LOG_LEVEL:-INFO}
+	if [[ ${INPUT_LOG_LEVEL^^} =~ ^(ERROR|WARN|INFO|DEBUG)$ ]]; then
 		export LOG_LEVEL="${INPUT_LOG_LEVEL}"
 		export ACTIONS_RUNNER_DEBUG="true"
 	fi
+
+	feedback DEBUG "Looking in ${REPO_DICTIONARY} for the dictionary.txt"
+	feedback DEBUG "INPUT_AUTO_FIX is ${INPUT_AUTO_FIX:-not set}"
+	feedback DEBUG "AUTO_FIX is ${AUTO_FIX:-not set}"
+	feedback DEBUG "INPUT_DISABLE_MYPY is ${INPUT_DISABLE_MYPY:-not set}"
+	feedback DEBUG "VALIDATE_PYTHON_MYPY is ${VALIDATE_PYTHON_MYPY:-not set}"
+	feedback DEBUG "INPUT_EXCLUDE is ${INPUT_EXCLUDE:-not set}"
+	feedback DEBUG "FILTER_REGEX_EXCLUDE is ${FILTER_REGEX_EXCLUDE:-not set}"
+	feedback DEBUG "INPUT_LOG_LEVEL is ${INPUT_LOG_LEVEL:-not set}"
+	feedback DEBUG "LOG_LEVEL is ${LOG_LEVEL:-not set}"
 
 	# Sets up pyenv so that any linters ran via pipenv run can have an arbitrary python version
 	# More details in https://github.com/pyenv/pyenv/tree/7b713a88c40f39139e1df4ed0ceb764f73767dac#advanced-configuration
@@ -288,11 +314,14 @@ function seiso_lint() {
 
 	while read -r file; do
 		if [[ -n ${FILTER_REGEX_EXCLUDE:+x} && "${file}" =~ ${FILTER_REGEX_EXCLUDE} ]]; then
+			feedback DEBUG "${file} matched the exclusion regex of ${FILTER_REGEX_EXCLUDE}"
 			excluded+=("${file}")
 			continue
+		else
+			feedback DEBUG "${file} didn't match the exclusion regex of ${FILTER_REGEX_EXCLUDE:-not set}"
 		fi
 		included+=("${file}")
-	done < <(find . \( -path "./.git" -prune \) -o \( -type f -print \))
+	done < <(find /goat \( -path "./.git" -prune \) -o \( -type f -print \))
 
 	declare -A pids
 

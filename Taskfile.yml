@@ -3,14 +3,25 @@
 
 version: '3'
 
+set:
+  - nounset
+  - errexit
+  - pipefail
+
 includes:
   bash:
     taskfile: ./goat/Task/bash/Taskfile.yml
     internal: true
+    optional: true
     vars:
-      IMAGE_NAME: seiso/goat
-      PROJECT_SLUG: goat
-      PYTHON_VERSION: 3.11
+      IMAGE_NAME: "{{.IMAGE_NAME}}"
+      PROJECT_SLUG: "{{.PROJECT_SLUG}}"
+      PYTHON_VERSION: "{{.PYTHON_VERSION}}"
+
+vars:
+  IMAGE_NAME: seiso/goat
+  PROJECT_SLUG: goat
+  PYTHON_VERSION: 3.11
 
 silent: true
 
@@ -38,10 +49,13 @@ tasks:
       - task: bash:lint
         vars:
           INPUT_AUTO_FIX: false
+          INPUT_EXCLUDE: '^/{{.PROJECT_SLUG}}/goat/.*'
+          INPUT_LOG_LEVEL: "{{.CLI_ARGS}}"
 
   test:
     env:
       INPUT_DISABLE_MYPY: true
+      INPUT_EXCLUDE: '^/{{.PROJECT_SLUG}}/goat/*'
     cmds:
       - echo "Baaaaaaaaaaah! (Running the goat)"
       - |
@@ -77,11 +91,16 @@ tasks:
         vars:
           TAGS: 'latest'
 
+  update:
+    cmds:
+      - task: bash:update
+      - task: pre-commit-update
+
   pre-commit-update:
     env:
       ACTION: "{{.CLI_ARGS}}"
     cmds:
-      - pipenv run pre-commit autoupdate --freeze --jobs 4
+      - pipenv run pre-commit autoupdate --bleeding-edge --freeze --jobs 4
       - |
         if [[ "${ACTION}" == "commit" ]]; then
           git add -A

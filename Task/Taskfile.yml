@@ -3,16 +3,28 @@
 
 version: "3"
 
+set:
+  - nounset
+  - errexit
+  - pipefail
+
 tasks:
   lint:
-    preconditions:
-      - sh: docker pull seiso/goat:latest || echo "Failed to pull the latest goat, continuing anyway..."
+    platforms: [linux, darwin]
     # Adjustments are passed as vars, not envs, to avoid local workarounds
     vars:
       INPUT_AUTO_FIX: '{{.INPUT_AUTO_FIX | default ""}}'
       INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY | default ""}}'
       INPUT_EXCLUDE: '{{.INPUT_EXCLUDE | default ""}}'
       INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL | default ""}}'
+      PLATFORM: '{{.PLATFORM | default ""}}'
+    preconditions:
+      # Temporary workaround until we have an arm64 image on docker hub
+      - sh: |
+          if [[ "$(uname -m)" -ne "arm64" ]]; then
+            docker pull --platform '{{.PLATFORM}}' seiso/goat:latest || \
+              echo "Failed to pull the {{.PLATFORM}} goat, continuing anyway..."
+          fi
     cmds:
       - |
         docker run --env INPUT_AUTO_FIX="{{.INPUT_AUTO_FIX}}" \
@@ -22,7 +34,9 @@ tasks:
                    --rm -v "{{.ROOT_DIR}}:/goat" seiso/goat:latest
 
   build:
+    platforms: [linux, darwin]
     vars:
+      PLATFORM: '{{.PLATFORM | default "UNKNOWN"}}'
       VERSION: '{{.VERSION | default "UNKNOWN"}}'
       TAG_COMMIT_HASH:
         sh: git rev-list -1 "v{{.VERSION}}"
@@ -46,12 +60,9 @@ tasks:
               build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
           print(build_version)'
     cmds:
-      - docker buildx build --load --build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" --tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} {{.ROOT_DIR}}/.
+      - docker buildx build --load --platform="{{.PLATFORM}}" --build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" --tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} {{.ROOT_DIR}}/.
 
   release:
-    preconditions:
-      - sh: test `git status -s | wc -w` = "0"
-        msg: "There are untracked files, please commit before creating a release."
     vars:
       PYTHON_VERSION: '{{default null .PYTHON_VERSION}}'
       RELEASE_TYPE: "{{.CLI_ARGS}}"
@@ -81,6 +92,9 @@ tasks:
               increment = "01"
           new_version = f"{{.DATE_INFO}}.{increment}"
           print(new_version)'
+    preconditions:
+      - sh: test `git status -s | wc -w` = "0"
+        msg: "There are untracked files, please commit before creating a release."
     cmds:
       # Better conditional syntax is pending https://github.com/go-task/task/issues/608
       - '{{if eq .VERSIONING "CalVer"}}pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}} \
@@ -98,9 +112,8 @@ tasks:
 
   update:
     cmds:
-      - task: base:update
       - git submodule update --remote
-      - pipenv run pre-commit autoupdate --freeze --jobs 4
+      - pipenv run pre-commit autoupdate --bleeding-edge --freeze --jobs 4
       - >
         docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}}-slim /bin/bash
         -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
@@ -109,3 +122,8 @@ tasks:
     cmds:
       - find {{.ROOT_DIR}} -type f -name '.DS_Store' -delete
       - find {{.ROOT_DIR}} -type f -name '.Thumbs.db' -delete
+      - find {{.ROOT_DIR}} -type d -name '__pycache__' -exec rm -rf {} +
+      - find {{.ROOT_DIR}} -type d -name '.mypy_cache' -exec rm -rf {} +
+      - find {{.ROOT_DIR}} -type d -name '.pytest_cache' -exec rm -rf {} +
+      - find {{.ROOT_DIR}} -type f -name '*.pyc' -delete
+      - find {{.ROOT_DIR}} -type d -name '.ruff_cache' -exec rm -rf {} +
