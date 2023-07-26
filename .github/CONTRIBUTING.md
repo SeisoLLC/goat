@@ -18,7 +18,7 @@ There are two ways of running the `goat` locally:
 1. To see how it will look in a pipeline:
 
     ```bash
-    task goat
+    task test
     ```
 
     Or add `--debug` for more information.
