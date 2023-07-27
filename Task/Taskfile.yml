@@ -8,6 +8,22 @@ set:
   - errexit
   - pipefail
 
+vars:
+  PLATFORM:
+    sh: |
+      os="linux"
+      arch="$(uname -m)"
+
+      case ${arch} in
+        # AMD64
+        x86_64)  echo "${os}/amd64" ;;
+        amd64)   echo "${os}/amd64" ;;
+
+        # ARM64
+        aarch64) echo "${os}/arm64" ;;
+        arm64)   echo "${os}/arm64" ;;
+      esac
+
 tasks:
   lock:
     internal: true
@@ -29,7 +45,6 @@ tasks:
       INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY | default ""}}'
       INPUT_EXCLUDE: '{{.INPUT_EXCLUDE | default ""}}'
       INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL | default ""}}'
-      PLATFORM: '{{.PLATFORM | default ""}}'
     preconditions:
       # Temporary workaround until we have an arm64 image on docker hub
       - sh: |
@@ -48,7 +63,6 @@ tasks:
   build:
     platforms: [linux, darwin]
     vars:
-      PLATFORM: '{{.PLATFORM | default "UNKNOWN"}}'
       VERSION: '{{.VERSION | default "UNKNOWN"}}'
       TAG_COMMIT_HASH:
         sh: git rev-list -1 "v{{.VERSION}}"
@@ -66,13 +80,23 @@ tasks:
           {{range $tag := .REPO_TAGS | splitLines -}}
           repo_tags.append("{{$tag}}")
           {{end}}
-          if (version_string in repo_tags and "{{.TAG_COMMIT_HASH}}" == "{{.COMMIT_HASH}}"):
+          if (
+              version_string in repo_tags
+              and "{{.TAG_COMMIT_HASH}}" == "{{.COMMIT_HASH}}"
+          ):
               build_version = "{{.VERSION}}"
           else:
               build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
           print(build_version)'
     cmds:
-      - docker buildx build --load --platform="{{.PLATFORM}}" --build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" --tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} {{.ROOT_DIR}}/.
+      - |
+        docker buildx build --load \
+                            --platform="{{.PLATFORM}}" \
+                            --build-arg VERSION="{{.BUILD_VERSION}}" \
+                            --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" \
+                            --tag {{.IMAGE_NAME}}:latest \
+                            --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} \
+                            {{.ROOT_DIR}}/.
 
   release:
     vars:
@@ -85,7 +109,11 @@ tasks:
         sh: grep versioning '{{.ROOT_DIR}}/setup.cfg' | cut -d '"' -f 2
       RELEASE_VERSION:
         sh: |
-          docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}}-slim python -c '
+          docker run --rm \
+                     -v "${PWD}:/usr/src/app" \
+                     -w /usr/src/app \
+                     python:{{.PYTHON_VERSION}}-slim \
+                     python -c '
           import re
           pattern = re.compile(r"v2[0-1][0-9]{2}.(0[0-9]|1[0-2]).[0-9]{2}")
           repo_tags = []
