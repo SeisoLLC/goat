@@ -38,7 +38,7 @@ jobs:
       - name: Build the goat
         run: task -v build
       - name: Run the tests
-        run: task -v test
+        run: task -v test -- debug
   bump-pre-commit:
     name: Bump pre-commit
     needs: [test]
