@@ -152,9 +152,9 @@ tasks:
     cmds:
       # Better conditional syntax is pending https://github.com/go-task/task/issues/608
       - >
-        '{{if eq .TAGS "all"}}docker push --all-tags {{.IMAGE_NAME}}
+        {{if eq .TAGS "all"}}docker push --all-tags {{.IMAGE_NAME}}
         {{else if eq .TAGS "latest"}}docker push {{.IMAGE_NAME}}:latest
-        {{else}}echo "Invalid TAGS var"; exit 1{{end}}'
+        {{else}}echo "Invalid TAGS var"; exit 1{{end}}
 
   update:
     # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.
