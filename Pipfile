@@ -12,6 +12,7 @@ yamllint = "*"
 
 [dev-packages]
 pre-commit = "*"
+bumpversion = "*"
 
 [requires]
 python_version = "3.11"
