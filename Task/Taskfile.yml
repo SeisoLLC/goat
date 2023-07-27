@@ -99,6 +99,7 @@ tasks:
                             {{.ROOT_DIR}}/.
 
   release:
+    dir: '{{.ROOT_DIR}}'
     vars:
       PYTHON_VERSION: '{{default "" .PYTHON_VERSION}}'
       RELEASE_TYPE: "{{.CLI_ARGS}}"
@@ -106,7 +107,7 @@ tasks:
       REPO_TAGS:
         sh: git tag -l
       VERSIONING:
-        sh: grep versioning '{{.ROOT_DIR}}/setup.cfg' | cut -d '"' -f 2
+        sh: grep versioning setup.cfg | cut -d '"' -f 2
       RELEASE_VERSION:
         sh: |
           docker run --rm \
@@ -135,7 +136,6 @@ tasks:
     preconditions:
       - sh: test `git status -s | wc -w` = "0"
         msg: "There are untracked files, please commit before creating a release."
-    dir: '{{.ROOT_DIR}}'
     cmds:
       # Better conditional syntax is pending https://github.com/go-task/task/issues/608
       - '{{if eq .VERSIONING "CalVer"}}pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}} \
