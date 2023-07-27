@@ -22,6 +22,9 @@ vars:
   IMAGE_NAME: seiso/goat
   PROJECT_SLUG: goat
   PYTHON_VERSION: 3.11
+  INPUT_DISABLE_MYPY: true
+  INPUT_EXCLUDE: '^/{{.PROJECT_SLUG}}/(goat|Task)/.*'
+  INPUT_LOG_LEVEL: "{{.CLI_ARGS}}"
 
 silent: true
 
@@ -57,14 +60,15 @@ tasks:
     cmds:
       - task: bash:lint
         vars:
-          INPUT_AUTO_FIX: false
-          INPUT_EXCLUDE: '^/{{.PROJECT_SLUG}}/(goat|Task)/.*'
-          INPUT_LOG_LEVEL: "{{.CLI_ARGS}}"
+          INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY}}'
+          INPUT_EXCLUDE: '{{.INPUT_EXCLUDE}}'
+          INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL}}'
 
   test:
     env:
-      INPUT_DISABLE_MYPY: true
-      INPUT_EXCLUDE: '^/{{.PROJECT_SLUG}}/goat/*'
+      INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY}}'
+      INPUT_EXCLUDE: '{{.INPUT_EXCLUDE}}'
+      INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL}}'
     cmds:
       - echo "Baaaaaaaaaaah! (Running the goat)"
       - |
