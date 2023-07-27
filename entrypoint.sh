@@ -71,10 +71,10 @@ function setup_environment() {
 	if [[ -n ${JSCPD_CONFIG:+x} ]]; then
 		feedback WARNING "JSCPD_CONFIG is set; not auto ignoring the goat submodule..."
 	else
-
 		# This should override the ignore in the config file and is primarily needed so that we can pass in the correct relative path while not excluding all of the
 		# goat on the goat itself (i.e. we are avoiding **/goat/** in the config file)
-		export JSCPD_CONFIG="--config /etc/opt/goat/.jscpd.json --ignore \"**/.github/workflows/**,${RELATIVE_PATH}/goat/**\""
+		export INTERNAL_JSCPD_CONFIG="--config /etc/opt/goat/.jscpd.json --ignore \"**/.github/workflows/**,${RELATIVE_PATH}/goat/**\""
+		export JSCPD_CONFIG="${INTERNAL_JSCPD_CONFIG}"
 		feedback DEBUG "JSCPD_CONFIG was dynamically set to ${JSCPD_CONFIG}"
 	fi
 
@@ -100,7 +100,7 @@ function setup_environment() {
 
 	# Default to info
 	INPUT_LOG_LEVEL=${INPUT_LOG_LEVEL:-INFO}
-	if [[ ${INPUT_LOG_LEVEL^^} =~ ^(ERROR|WARN|INFO|DEBUG)$ ]]; then
+	if [[ ${INPUT_LOG_LEVEL^^} =~ ^(ERROR|WARNING|INFO|DEBUG)$ ]]; then
 		export LOG_LEVEL="${INPUT_LOG_LEVEL}"
 		export ACTIONS_RUNNER_DEBUG="true"
 	fi
@@ -267,7 +267,11 @@ function lint_files() {
 
 	if [[ -v "${env_var_name}" ]]; then
 		linter_args="${!env_var_name}"
-		feedback WARNING "The linter runtime for ${linter_array[name]} has been customized, which might have unwanted side effects. Use with caution."
+		if [[ "${env_var_name}" == "JSCPD_CONFIG" && "${linter_args}" == "${INTERNAL_JSCPD_CONFIG}" ]]; then
+			feedback DEBUG "Hit special case for JSCPD_CONFIG internal customization to allow dynamic ignores at runtime; not printing a warning"
+		else
+			feedback WARNING "The linter runtime for ${linter_array[name]} has been customized, which might have unwanted side effects. Use with caution."
+		fi
 	fi
 
 	for type in "${filetypes_to_lint[@]}"; do
