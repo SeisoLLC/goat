@@ -110,7 +110,6 @@ tasks:
     vars:
       ACTION: "{{.CLI_ARGS}}"
     cmds:
-      - pwd
       - pipenv run pre-commit autoupdate --bleeding-edge --freeze --jobs 4
       - |
         if [[ '{{.ACTION}}' == 'commit' ]]; then

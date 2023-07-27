@@ -40,7 +40,6 @@ tasks:
 
   release:
     cmds:
-      - echo "{{.ROOT_DIR}} bash"
       - task: base:release
 
   publish:
