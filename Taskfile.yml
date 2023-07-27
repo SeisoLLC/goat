@@ -24,7 +24,6 @@ vars:
   PYTHON_VERSION: 3.11
   INPUT_DISABLE_MYPY: true
   INPUT_EXCLUDE: '^/{{.PROJECT_SLUG}}/(goat|Task)/.*'
-  INPUT_LOG_LEVEL: "{{.CLI_ARGS}}"
 
 silent: true
 
@@ -36,10 +35,8 @@ tasks:
     cmds:
       - pipenv install --deploy --ignore-pipfile --dev
 
-  init-goat:
+  init-submodules:
     internal: true
-    sources:
-      - '.git/modules/goat/refs/heads/refactor/taskfiles'
     cmds:
       - git submodule update --init
 
@@ -53,7 +50,7 @@ tasks:
   init:
     cmds:
       - task: init-pipenv
-      - task: init-goat
+      - task: init-submodules
       - task: init-pre-commit
 
   lint:
@@ -62,13 +59,13 @@ tasks:
         vars:
           INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY}}'
           INPUT_EXCLUDE: '{{.INPUT_EXCLUDE}}'
-          INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL}}'
+          INPUT_LOG_LEVEL: "{{.CLI_ARGS}}"
 
   test:
     env:
       INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY}}'
       INPUT_EXCLUDE: '{{.INPUT_EXCLUDE}}'
-      INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL}}'
+      INPUT_LOG_LEVEL: "{{.CLI_ARGS}}"
     cmds:
       - echo "Baaaaaaaaaaah! (Running the goat)"
       - |
