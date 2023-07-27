@@ -73,7 +73,7 @@ tasks:
 
   release:
     vars:
-      PYTHON_VERSION: '{{default null .PYTHON_VERSION}}'
+      PYTHON_VERSION: '{{default "" .PYTHON_VERSION}}'
       RELEASE_TYPE: "{{.CLI_ARGS}}"
       DATE_INFO: '{{now | date "2006.01"}}'
       REPO_TAGS:
