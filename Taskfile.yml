@@ -36,9 +36,9 @@ tasks:
       - pipenv lock
 
   init:
-    deps: [lock]
     sources:
-      - Pipfile
+      - Pipfile.lock
+      - goat
     cmds:
       - git submodule update --init
       - pipenv install --deploy --ignore-pipfile --dev
