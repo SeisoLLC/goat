@@ -40,7 +40,7 @@ tasks:
     sources:
       - Pipfile.lock
     cmds:
-      - git submodule update --init --recursive
+      - git submodule update --init
       - pipenv install --deploy --ignore-pipfile --dev
       - pipenv run pre-commit install
 
@@ -59,7 +59,7 @@ tasks:
     cmds:
       - echo "Baaaaaaaaaaah! (Running the goat)"
       - |
-        if [[ "${GITHUB_ACTIONS}" == "true" ]]; then
+        if [[ "${GITHUB_ACTIONS:-false}" == "true" ]]; then
           repo="${GITHUB_WORKSPACE}"
           docker run --rm --env-file <(env | grep ^GITHUB_) \
                           --env-file <(env | grep ^INPUT_) \
