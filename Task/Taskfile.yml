@@ -156,7 +156,7 @@ tasks:
       - git submodule update --remote
       - pipenv run pre-commit autoupdate --bleeding-edge --freeze --jobs 4
       - >
-        docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}}-slim /bin/bash
+        docker run --rm -v "{{.ROOT_DIR}}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}}-slim /bin/bash
         -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
 
   clean:
