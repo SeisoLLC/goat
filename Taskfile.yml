@@ -107,15 +107,15 @@ tasks:
       - task: pre-commit-update
 
   pre-commit-update:
-    env:
+    vars:
       ACTION: "{{.CLI_ARGS}}"
     cmds:
       - pipenv run pre-commit autoupdate --bleeding-edge --freeze --jobs 4
       - |
-        if [[ "${ACTION}" == "commit" ]]; then
+        if [[ '{{.ACTION}}' == 'commit' ]]; then
           git add -A
-          git commit -m "Bump pre-commit revision"
-        elif [[ "${ACTION:=empty}" != "empty" ]]; then
-          echo "Unsupported action of ${ACTION} provided"
+          git commit -m 'Bump pre-commit revision'
+        elif [[ '{{.ACTION | default "empty"}}' != 'empty' ]]; then
+          echo 'Unsupported action of {{.ACTION}} provided'
           exit 230
         fi
