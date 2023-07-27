@@ -63,6 +63,7 @@ tasks:
 
   build:
     platforms: [linux, darwin]
+    dir: ..
     vars:
       VERSION: '{{.VERSION | default "UNKNOWN"}}'
       TAG_COMMIT_HASH:
