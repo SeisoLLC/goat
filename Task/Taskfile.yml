@@ -84,7 +84,7 @@ tasks:
       REPO_TAGS:
         sh: git tag -l
       VERSIONING:
-        sh: grep versioning setup.cfg | cut -d '"' -f 2
+        sh: grep versioning '{{.ROOT_DIR}}/setup.cfg' | cut -d '"' -f 2
       RELEASE_VERSION:
         sh: |
           docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}}-slim python -c '
