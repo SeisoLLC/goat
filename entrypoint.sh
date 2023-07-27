@@ -71,8 +71,9 @@ function setup_environment() {
 	if [[ -n ${JSCPD_CONFIG:+x} ]]; then
 		feedback WARNING "JSCPD_CONFIG is set; not auto ignoring the goat submodule..."
 	else
-		# This should override the ignore in the coonfig file and is primarily needed so that we can pass in the correct relative path while not excluding all of
-		# the goat on the goat itself (i.e. we are avoiding **/goat/** in the config file)
+
+		# This should override the ignore in the config file and is primarily needed so that we can pass in the correct relative path while not excluding all of the
+		# goat on the goat itself (i.e. we are avoiding **/goat/** in the config file)
 		export JSCPD_CONFIG="--config /etc/opt/goat/.jscpd.json --ignore \"**/.github/workflows/**,${RELATIVE_PATH}/goat/**\""
 		feedback DEBUG "JSCPD_CONFIG was dynamically set to ${JSCPD_CONFIG}"
 	fi
@@ -314,14 +315,14 @@ function seiso_lint() {
 
 	while read -r file; do
 		if [[ -n ${FILTER_REGEX_EXCLUDE:+x} && "${file}" =~ ${FILTER_REGEX_EXCLUDE} ]]; then
-			feedback DEBUG "${file} matched the exclusion regex of ${FILTER_REGEX_EXCLUDE}"
+			feedback INFO "${file} matched the exclusion regex of ${FILTER_REGEX_EXCLUDE}"
 			excluded+=("${file}")
 			continue
 		else
 			feedback DEBUG "${file} didn't match the exclusion regex of ${FILTER_REGEX_EXCLUDE:-not set}"
 		fi
 		included+=("${file}")
-	done < <(find /goat \( -path "./.git" -prune \) -o \( -type f -print \))
+	done < <(find "${RELATIVE_PATH}" \( -path "${RELATIVE_PATH}/.git" -prune \) -o \( -type f -print \))
 
 	declare -A pids
 
