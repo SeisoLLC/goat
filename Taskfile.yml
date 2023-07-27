@@ -35,14 +35,32 @@ tasks:
     cmds:
       - pipenv lock
 
-  init:
+  init-pipenv:
+    internal: true
     sources:
       - Pipfile.lock
+    cmds:
+      - pipenv install --deploy --ignore-pipfile --dev
+
+  init-goat:
+    internal: true
+    sources:
       - '.git/modules/goat/refs/heads/refactor/taskfiles'
     cmds:
       - git submodule update --init
-      - pipenv install --deploy --ignore-pipfile --dev
+
+  init-pre-commit:
+    internal: true
+    sources:
+      - .pre-commit-config.yaml
+    cmds:
       - pipenv run pre-commit install
+
+  init:
+    cmds:
+      - task: init-pipenv
+      - task: init-goat
+      - task: init-pre-commit
 
   lint:
     cmds:
