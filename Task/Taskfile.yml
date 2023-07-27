@@ -38,6 +38,7 @@ tasks:
         && popd >/dev/null
 
   lint:
+    dir: '{{.ROOT_DIR}}'
     platforms: [linux, darwin]
     # Adjustments are passed as vars, not envs, to avoid local workarounds
     vars:
@@ -58,7 +59,7 @@ tasks:
                    --env INPUT_DISABLE_MYPY="{{.INPUT_DISABLE_MYPY}}" \
                    --env INPUT_EXCLUDE="{{.INPUT_EXCLUDE}}" \
                    --env INPUT_LOG_LEVEL="{{.INPUT_LOG_LEVEL}}" \
-                   --rm -v "{{.ROOT_DIR}}:/goat" seiso/goat:latest
+                   --rm -v "${PWD}:/goat" seiso/goat:latest
 
   build:
     platforms: [linux, darwin]
