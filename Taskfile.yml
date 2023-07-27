@@ -19,6 +19,7 @@ includes:
       PYTHON_VERSION: "{{.PYTHON_VERSION}}"
 
 vars:
+  REPO_DIR: '{{.ROOT_DIR}}'
   IMAGE_NAME: seiso/goat
   PROJECT_SLUG: goat
   PYTHON_VERSION: 3.11
@@ -59,7 +60,8 @@ tasks:
         vars:
           INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY}}'
           INPUT_EXCLUDE: '{{.INPUT_EXCLUDE}}'
-          INPUT_LOG_LEVEL: "{{.CLI_ARGS}}"
+          INPUT_LOG_LEVEL: '{{.CLI_ARGS}}'
+          REPO_DIR: '{{.REPO_DIR}}'
 
   build:
     cmds:

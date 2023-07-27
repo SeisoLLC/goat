@@ -38,7 +38,7 @@ tasks:
         && popd >/dev/null
 
   lint:
-    dir: '{{.ROOT_DIR}}'
+    dir: '{{.REPO_DIR}}'
     platforms: [linux, darwin]
     # Adjustments are passed as vars, not envs, to avoid local workarounds
     vars:
@@ -46,6 +46,7 @@ tasks:
       INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY | default ""}}'
       INPUT_EXCLUDE: '{{.INPUT_EXCLUDE | default ""}}'
       INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL | default ""}}'
+      REPO_DIR: '{{.REPO_DIR}}'
     preconditions:
       # Temporary workaround until we have an arm64 image on docker hub
       - sh: |
