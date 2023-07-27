@@ -104,8 +104,6 @@ tasks:
   update:
     cmds:
       - task: bash:update
-        vars:
-          UPDATE_ROOT_DIR: "{{.ROOT_DIR}}"
       - task: pre-commit-update
 
   pre-commit-update:

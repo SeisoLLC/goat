@@ -11,15 +11,13 @@ set:
 tasks:
   lock:
     internal: true
-    vars:
-      UPDATE_ROOT_DIR: '{{.UPDATE_ROOT_DIR}}'
     sources:
       - Pipfile
     generates:
       - Pipfile.lock
     cmds:
       - |
-        pushd '{{.UPDATE_ROOT_DIR}}' >/dev/null \
+        pushd '{{.ROOT_DIR}}' >/dev/null \
         && pipenv lock \
         && popd >/dev/null
 
@@ -125,12 +123,8 @@ tasks:
         {{else}}echo "Invalid TAGS var"; exit 1{{end}}'
 
   update:
-    vars:
-      UPDATE_ROOT_DIR: '{{.UPDATE_ROOT_DIR}}'
     cmds:
       - task: lock
-        vars:
-          UPDATE_ROOT_DIR: '{{.UPDATE_ROOT_DIR}}'
       - git submodule update --remote
       - pipenv run pre-commit autoupdate --bleeding-edge --freeze --jobs 4
       - >
