@@ -63,11 +63,12 @@ tasks:
 
   build:
     platforms: [linux, darwin]
+    # This is a relative path which should place us back into the calling repo.
     dir: ../../..
     vars:
       VERSION: '{{.VERSION | default "UNKNOWN"}}'
       TAG_COMMIT_HASH:
-        sh: git rev-list -1 "v{{.VERSION}}" && pwd
+        sh: git rev-list -1 "v{{.VERSION}}"
       COMMIT_HASH:
         sh: git rev-parse HEAD
       COMMIT_HASH_SHORT:
@@ -98,7 +99,7 @@ tasks:
                             --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" \
                             --tag {{.IMAGE_NAME}}:latest \
                             --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} \
-                            {{.ROOT_DIR}}/.
+                            "${PWD}/."
 
   release:
     vars:
