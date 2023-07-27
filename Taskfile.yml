@@ -38,7 +38,7 @@ tasks:
   init:
     sources:
       - Pipfile.lock
-      - goat
+      - '.git/modules/goat/refs/heads/refactor'
     cmds:
       - git submodule update --init
       - pipenv install --deploy --ignore-pipfile --dev
