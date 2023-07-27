@@ -1,7 +1,7 @@
 # Grand Opinionated AutoTester (GOAT)
 
 The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's policy as code. This project is designed to be easier to understand and more opinionated
-than other open source multi-linter projects, and easily extended to enforce Seiso-specific policies.
+than other open source multi-linter projects, and easily extended to programmatically enforce Seiso policies.
 
 ## Getting Started
 
