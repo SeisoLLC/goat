@@ -9,6 +9,15 @@ set:
   - pipefail
 
 tasks:
+  lock:
+    internal: true
+    sources:
+      - Pipfile
+    generates:
+      - Pipfile.lock
+    cmds:
+      - pipenv lock
+
   lint:
     platforms: [linux, darwin]
     # Adjustments are passed as vars, not envs, to avoid local workarounds
@@ -112,6 +121,7 @@ tasks:
 
   update:
     cmds:
+      - task: lock
       - git submodule update --remote
       - pipenv run pre-commit autoupdate --bleeding-edge --freeze --jobs 4
       - >

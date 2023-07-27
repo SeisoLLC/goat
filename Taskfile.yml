@@ -26,15 +26,6 @@ vars:
 silent: true
 
 tasks:
-  lock:
-    internal: true
-    sources:
-      - Pipfile
-    generates:
-      - Pipfile.lock
-    cmds:
-      - pipenv lock
-
   init-pipenv:
     internal: true
     sources:
