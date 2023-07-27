@@ -137,6 +137,7 @@ tasks:
         msg: "There are untracked files, please commit before creating a release."
     cmds:
       # Better conditional syntax is pending https://github.com/go-task/task/issues/608
+      - pwd
       - '{{if eq .VERSIONING "CalVer"}}pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}} \
         unusedpart{{else if eq .VERSIONING "SemVer"}}pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}{{end}}'
 
