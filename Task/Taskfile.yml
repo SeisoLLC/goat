@@ -38,7 +38,7 @@ tasks:
         && popd >/dev/null
 
   lint:
-    dir: '{{.REPO_DIR}}'
+    dir: '{{joinPath .REPO_DIR .ROOT_DIR}}'
     platforms: [linux, darwin]
     # Adjustments are passed as vars, not envs, to avoid local workarounds
     vars:
