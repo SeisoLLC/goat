@@ -99,7 +99,6 @@ tasks:
                             {{.ROOT_DIR}}/.
 
   release:
-    dir: '{{.ROOT_DIR}}'
     vars:
       PYTHON_VERSION: '{{default "" .PYTHON_VERSION}}'
       RELEASE_TYPE: "{{.CLI_ARGS}}"
@@ -137,6 +136,7 @@ tasks:
       - sh: test `git status -s | wc -w` = "0"
         msg: "There are untracked files, please commit before creating a release."
     cmds:
+      - echo "{{.ROOT_DIR}} base"
       # Better conditional syntax is pending https://github.com/go-task/task/issues/608
       - '{{if eq .VERSIONING "CalVer"}}pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}} \
         unusedpart{{else if eq .VERSIONING "SemVer"}}pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}{{end}}'

@@ -93,6 +93,7 @@ tasks:
 
   release:
     cmds:
+      - echo "{{.ROOT_DIR}} project"
       - task: bash:release
 
   publish:
