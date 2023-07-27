@@ -65,10 +65,8 @@ tasks:
     platforms: [linux, darwin]
     vars:
       VERSION: '{{.VERSION | default "UNKNOWN"}}'
-      PWD:
-        sh: pwd
       TAG_COMMIT_HASH:
-        sh: git rev-list -1 "v{{.VERSION}}"
+        sh: git rev-list -1 "v{{.VERSION}}" && pwd
       COMMIT_HASH:
         sh: git rev-parse HEAD
       COMMIT_HASH_SHORT:
