@@ -47,7 +47,7 @@ tasks:
       - task: base:publish
         vars:
           TAGS: '{{default "all" .TAGS}}'
-          IMAGE_NAME: '{{default null .IMAGE_NAME}}'
+          IMAGE_NAME: '{{default "" .IMAGE_NAME}}'
 
   clean:
     cmds:
