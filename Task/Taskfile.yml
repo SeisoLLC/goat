@@ -151,8 +151,9 @@ tasks:
       IMAGE_NAME: '{{default "" .IMAGE_NAME}}'
     cmds:
       # Better conditional syntax is pending https://github.com/go-task/task/issues/608
-      - '{{if eq .TAGS "all"}}docker push --all-tags {{.IMAGE_NAME}} \
-        {{else if eq .TAGS "latest"}}docker push {{.IMAGE_NAME}}:latest \
+      - >
+        '{{if eq .TAGS "all"}}docker push --all-tags {{.IMAGE_NAME}}
+        {{else if eq .TAGS "latest"}}docker push {{.IMAGE_NAME}}:latest
         {{else}}echo "Invalid TAGS var"; exit 1{{end}}'
 
   update:
