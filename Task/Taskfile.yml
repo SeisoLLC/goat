@@ -11,12 +11,17 @@ set:
 tasks:
   lock:
     internal: true
+    vars:
+      UPDATE_ROOT_DIR: '{{.UPDATE_ROOT_DIR}}'
     sources:
       - Pipfile
     generates:
       - Pipfile.lock
     cmds:
-      - pipenv lock
+      - |
+        pushd '{{.UPDATE_ROOT_DIR}}' >/dev/null \
+        && pipenv lock \
+        && popd >/dev/null
 
   lint:
     platforms: [linux, darwin]
@@ -112,7 +117,7 @@ tasks:
   publish:
     vars:
       TAGS: '{{default "all" .TAGS}}'
-      IMAGE_NAME: '{{default null .IMAGE_NAME}}'
+      IMAGE_NAME: '{{default "" .IMAGE_NAME}}'
     cmds:
       # Better conditional syntax is pending https://github.com/go-task/task/issues/608
       - '{{if eq .TAGS "all"}}docker push --all-tags {{.IMAGE_NAME}} \
@@ -120,8 +125,12 @@ tasks:
         {{else}}echo "Invalid TAGS var"; exit 1{{end}}'
 
   update:
+    vars:
+      UPDATE_ROOT_DIR: '{{.UPDATE_ROOT_DIR}}'
     cmds:
       - task: lock
+        vars:
+          UPDATE_ROOT_DIR: '{{.UPDATE_ROOT_DIR}}'
       - git submodule update --remote
       - pipenv run pre-commit autoupdate --bleeding-edge --freeze --jobs 4
       - >

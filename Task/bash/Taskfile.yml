@@ -42,8 +42,12 @@ tasks:
           VERSION: '{{.VERSION}}'
 
   update:
+    vars:
+      UPDATE_ROOT_DIR: '{{.UPDATE_ROOT_DIR}}'
     cmds:
       - task: base:update
+        vars:
+          UPDATE_ROOT_DIR: '{{.UPDATE_ROOT_DIR}}'
 
   release:
     cmds:
