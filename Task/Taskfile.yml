@@ -26,15 +26,14 @@ vars:
 
 tasks:
   lock:
+    dir: ../../..
     internal: true
     sources:
       - Pipfile
     generates:
       - Pipfile.lock
     cmds:
-      - pushd '{{.ROOT_DIR}}'
       - pipenv lock
-      - popd
 
   lint:
     platforms: [linux, darwin]
