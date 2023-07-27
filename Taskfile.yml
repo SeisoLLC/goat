@@ -19,7 +19,6 @@ includes:
       PYTHON_VERSION: "{{.PYTHON_VERSION}}"
 
 vars:
-  REPO_DIR: '{{.ROOT_DIR}}'
   IMAGE_NAME: seiso/goat
   PROJECT_SLUG: goat
   PYTHON_VERSION: 3.11
@@ -61,7 +60,6 @@ tasks:
           INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY}}'
           INPUT_EXCLUDE: '{{.INPUT_EXCLUDE}}'
           INPUT_LOG_LEVEL: '{{.CLI_ARGS}}'
-          REPO_DIR: '{{.REPO_DIR}}'
 
   build:
     cmds:
@@ -95,7 +93,6 @@ tasks:
 
   release:
     cmds:
-      - echo "{{.ROOT_DIR}} project"
       - task: bash:release
 
   publish:
@@ -113,6 +110,7 @@ tasks:
     vars:
       ACTION: "{{.CLI_ARGS}}"
     cmds:
+      - pwd
       - pipenv run pre-commit autoupdate --bleeding-edge --freeze --jobs 4
       - |
         if [[ '{{.ACTION}}' == 'commit' ]]; then
