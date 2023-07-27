@@ -61,6 +61,10 @@ tasks:
           INPUT_EXCLUDE: '{{.INPUT_EXCLUDE}}'
           INPUT_LOG_LEVEL: "{{.CLI_ARGS}}"
 
+  build:
+    cmds:
+      - task: bash:build
+
   test:
     env:
       INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY}}'
@@ -82,10 +86,6 @@ tasks:
                           -v "{{.ROOT_DIR}}:/goat" \
                           seiso/goat:latest
         fi
-
-  build:
-    cmds:
-      - task: bash:build
 
   clean:
     cmds:
