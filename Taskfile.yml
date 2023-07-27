@@ -49,7 +49,7 @@ tasks:
       - task: bash:lint
         vars:
           INPUT_AUTO_FIX: false
-          INPUT_EXCLUDE: '^/{{.PROJECT_SLUG}}/goat/.*'
+          INPUT_EXCLUDE: '^/{{.PROJECT_SLUG}}/(goat|Task)/.*'
           INPUT_LOG_LEVEL: "{{.CLI_ARGS}}"
 
   test:
