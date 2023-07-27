@@ -63,7 +63,7 @@ tasks:
 
   build:
     platforms: [linux, darwin]
-    # This is a relative path which should place us back into the calling repo.
+    # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.
     dir: ../../..
     vars:
       VERSION: '{{.VERSION | default "UNKNOWN"}}'
@@ -102,6 +102,8 @@ tasks:
                             "${PWD}/."
 
   release:
+    # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.
+    dir: ../../..
     vars:
       PYTHON_VERSION: '{{default "" .PYTHON_VERSION}}'
       RELEASE_TYPE: "{{.CLI_ARGS}}"
@@ -139,7 +141,6 @@ tasks:
       - sh: test `git status -s | wc -w` = "0"
         msg: "There are untracked files, please commit before creating a release."
     cmds:
-      - echo "{{.ROOT_DIR}} base"
       # Better conditional syntax is pending https://github.com/go-task/task/issues/608
       - '{{if eq .VERSIONING "CalVer"}}pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}} \
         unusedpart{{else if eq .VERSIONING "SemVer"}}pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}{{end}}'
@@ -155,12 +156,14 @@ tasks:
         {{else}}echo "Invalid TAGS var"; exit 1{{end}}'
 
   update:
+    # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.
+    dir: ../../..
     cmds:
       - task: lock
       - git submodule update --remote
       - pipenv run pre-commit autoupdate --bleeding-edge --freeze --jobs 4
       - >
-        docker run --rm -v "{{.ROOT_DIR}}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}}-slim /bin/bash
+        docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}}-slim /bin/bash
         -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
 
   clean:
