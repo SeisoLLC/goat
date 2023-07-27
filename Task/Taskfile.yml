@@ -127,3 +127,4 @@ tasks:
       - find {{.ROOT_DIR}} -type d -name '.pytest_cache' -exec rm -rf {} +
       - find {{.ROOT_DIR}} -type f -name '*.pyc' -delete
       - find {{.ROOT_DIR}} -type d -name '.ruff_cache' -exec rm -rf {} +
+      - find {{.ROOT_DIR}} -type d -name '.task' -exec rm -rf {} +
