@@ -17,7 +17,7 @@ jobs:
     name: Generate the supported platforms for future use in pipelines
     runs-on: ubuntu-20.04
     outputs:
-      supported-platforms: ${{ steps.get-supported-platforms.outputs.supported-platforms }}
+      supported-platforms: ${{ steps.get-supported-platforms.outputs.supported-platforms) }}
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: ${{ fromJSON(needs.generate-supported-platforms.outputs.supported-platforms }}
+        platform: ${{ fromJSON(needs.generate-supported-platforms.outputs.supported-platforms) }}
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
@@ -122,7 +122,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: ${{ fromJSON(needs.generate-supported-platforms.outputs.supported-platforms }}
+        platform: ${{ fromJSON(needs.generate-supported-platforms.outputs.supported-platforms) }}
     permissions:
       contents: write
     steps:
