@@ -17,7 +17,7 @@ jobs:
     name: Generate the supported platforms for future use in pipelines
     runs-on: ubuntu-20.04
     outputs:
-      supported-platforms: ${{ steps.get-supported-platforms.outputs.supported-platforms) }}
+      supported-platforms: ${{ steps.get-supported-platforms.outputs.supported-platforms }}
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
