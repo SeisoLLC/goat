@@ -70,6 +70,8 @@ jobs:
         uses: arduino/setup-task@v1
       - name: Initialize the repo
         run: task init
+      - name: Build the goat
+        run: task build
       - name: Bump the pre-commit revision
         run: |
           git config --global user.name 'Seiso Automation'
