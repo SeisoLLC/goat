@@ -21,7 +21,7 @@ There are two ways of running the `goat` locally:
     task test
     ```
 
-    Or add `--debug` for more information.
+    Or run `task test -- debug` run it in debug mode.
 
 2. For speed during development, `docker` caching can be helpful:
 
