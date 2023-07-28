@@ -120,3 +120,7 @@ tasks:
           echo 'Unsupported action of {{.ACTION}} provided'
           exit 230
         fi
+
+  supported-platforms:
+    cmds:
+      - echo '["linux/amd64", "linux/arm64"]'
