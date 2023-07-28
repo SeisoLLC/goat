@@ -123,4 +123,4 @@ tasks:
 
   supported-platforms:
     cmds:
-      - echo 'platform-matrix={"include":[{"platform":"linux/amd64"}, {"platform":"linux/arm64"}]}'
+      - echo 'supported-platforms={"include":[{"platform":"linux/amd64"}, {"platform":"linux/arm64"}]}'
