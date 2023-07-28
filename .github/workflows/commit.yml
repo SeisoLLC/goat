@@ -25,7 +25,7 @@ jobs:
         uses: arduino/setup-task@v1
       - name: Generate the supported platforms
         id: get-supported-platforms
-        run: task supported-platforms
+        run: task supported-platforms >> "${GITHUB_OUTPUT}"
   test:
     name: Test
     needs: [generate-supported-platforms]
