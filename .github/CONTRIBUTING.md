@@ -6,7 +6,7 @@ Ensure you have `docker` and `pipenv` installed locally, and the `docker` daemon
 your local system:
 
 ```bash
-pipenv install --deploy --ignore-pipfile --dev
+task init
 ```
 
 We are also in the process of migrating from `Invoke` to `Taskfile`; if you want to use the `task` commands, you must install `Taskfile`
@@ -18,10 +18,10 @@ There are two ways of running the `goat` locally:
 1. To see how it will look in a pipeline:
 
     ```bash
-    pipenv run invoke goat
+    task test
     ```
 
-    Or add `--debug` for more information.
+    Or run `task test -- debug` to run it in debug mode.
 
 2. For speed during development, `docker` caching can be helpful:
 
@@ -86,9 +86,9 @@ There are two ways of running the `goat` locally:
     and the values supplied will take precedence over the default autofix or standard arguments supplied in the goat.
     Any desired autofix arguments must be explicitly supplied as part of the new env variable value.
 
-4. Autofix is available for certain linters and is enabled by default. To disable autofix, use:
+4. Autofix is available for certain linters and is enabled by default. To disable autofix, use one of these approaches:
    1. `docker run -e INPUT_AUTO_FIX="false" -v "$PWD:/goat/" --rm <hash>` or
-   2. `pipenv run invoke goat --disable-autofix`
+   2. `INPUT_AUTO_FIX=false task test`
 
 ### Linter Update Considerations
 

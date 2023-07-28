@@ -11,11 +11,8 @@ black = "*"
 yamllint = "*"
 
 [dev-packages]
-docker = "*"
-gitpython = "*"
-invoke = "*"
-requests = "*"
 pre-commit = "*"
+bumpversion = "*"
 
 [requires]
 python_version = "3.11"

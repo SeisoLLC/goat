@@ -20,19 +20,15 @@ tasks:
       - task: base:lint
         vars:
           INPUT_AUTO_FIX: '{{.INPUT_AUTO_FIX | default ""}}'
-          INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY | default "true"}}'
+          INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY | default ""}}'
           INPUT_EXCLUDE: '{{.INPUT_EXCLUDE | default ""}}'
           INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL | default ""}}'
-
-  test:
-    cmds:
-      - pipenv run pytest --cov={{.PROJECT_SLUG}} tests
 
   build:
     platforms: [linux, darwin]
     vars:
       VERSION:
-        sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
+        sh: cat '{{.ROOT_DIR}}/VERSION'
     cmds:
       - task: base:build
         vars:
@@ -56,5 +52,3 @@ tasks:
   clean:
     cmds:
       - task: base:clean
-      - find {{.ROOT_DIR}} -type d -name 'coverage-reports' -exec rm -rf {} +
-      - find {{.ROOT_DIR}} -type f -name '.coverage' -delete

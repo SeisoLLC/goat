@@ -1,7 +1,7 @@
 # Grand Opinionated AutoTester (GOAT)
 
-The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's standard testing.
-This project has been designed to be easier to understand and more opinionated than other open source multi-linter projects.
+The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's policy as code. This project is designed to be easier to understand and more opinionated
+than other open source multi-linter projects, and easily extended to enforce Seiso policies programmatically.
 
 ## Getting Started
 
@@ -121,7 +121,7 @@ jobs:
 
 #### Debugging
 
-To debug an issue with the goat, configure the log level to either `ERROR`, `WARN`, `NOTICE`, `VERBOSE`, `DEBUG`, or `TRACE`.
+To debug an issue with the goat, configure the log level to either `ERROR`, `WARN`, `INFO`, or `DEBUG`.
 
 ```bash
 uses: seisollc/goat@main
@@ -136,4 +136,4 @@ situations, pin to the commit hash tag that is published with each commit.
 
 ## GOAT Development
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md)
+See [CONTRIBUTING.md](./.github/CONTRIBUTING.md)
