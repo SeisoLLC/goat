@@ -55,7 +55,7 @@ jobs:
       - name: Initialize the repo
         run: task -v init
       - name: Build the goat
-        run: task -v build -- ${{ matrix }}
+        run: task -v build -- ${{ matrix.platform }}
       - name: Run the tests
         run: task -v test -- debug
   bump-version:
@@ -117,10 +117,7 @@ jobs:
     name: Distribute
     if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-20.04
-    needs: [test, bump-version, generate-platforms]
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.generate-platforms.outputs.platform-matrix) }}
+    needs: [test, bump-version]
     permissions:
       contents: write
     steps:
