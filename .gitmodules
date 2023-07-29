@@ -1,4 +1,4 @@
 [submodule "goat"]
 	path = goat
 	url = https://github.com/seisollc/goat
-	branch = main
+	branch = feat/multiplatform-goats
