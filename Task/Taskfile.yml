@@ -16,12 +16,12 @@ vars:
 
       case ${arch} in
         # AMD64
-        x86_64)  echo "${os}/amd641" ;;
-        amd64)   echo "${os}/amd641" ;;
+        x86_64)  echo "${os}/amd64" ;;
+        amd64)   echo "${os}/amd64" ;;
 
         # ARM64
-        aarch64) echo "${os}/arm641" ;;
-        arm64)   echo "${os}/arm641" ;;
+        aarch64) echo "${os}/arm64" ;;
+        arm64)   echo "${os}/arm64" ;;
       esac
 
 tasks:
