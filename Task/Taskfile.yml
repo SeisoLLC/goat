@@ -8,20 +8,20 @@ set:
   - errexit
   - pipefail
 
-env:
-  PLATFORM:
+vars:
+  LOCAL_PLATFORM:
     sh: |
       os="linux"
       arch="$(uname -m)"
 
       case ${arch} in
         # AMD64
-        x86_64)  echo "${os}/amd64" ;;
-        amd64)   echo "${os}/amd64" ;;
+        x86_64)  echo "${os}/amd641" ;;
+        amd64)   echo "${os}/amd641" ;;
 
         # ARM64
-        aarch64) echo "${os}/arm64" ;;
-        arm64)   echo "${os}/arm64" ;;
+        aarch64) echo "${os}/arm641" ;;
+        arm64)   echo "${os}/arm641" ;;
       esac
 
 tasks:
@@ -44,12 +44,13 @@ tasks:
       INPUT_EXCLUDE: '{{.INPUT_EXCLUDE | default ""}}'
       INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL | default ""}}'
       REPO_DIR: '{{.REPO_DIR}}'
+      PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
     preconditions:
       # Temporary workaround until we have an arm64 image on docker hub
       - sh: |
           if [[ "$(uname -m)" -ne "arm64" ]]; then
-            docker pull --platform '${PLATFORM}' seiso/goat:latest || \
-              echo "Failed to pull the ${PLATFORM} goat, continuing anyway..."
+            docker pull --platform '{{.PLATFORM}}' seiso/goat:latest || \
+              echo "Failed to pull the {{.PLATFORM}} goat, continuing anyway..."
           fi
     cmds:
       - pwd
@@ -66,6 +67,7 @@ tasks:
     dir: ../../..
     vars:
       VERSION: '{{.VERSION | default "UNKNOWN"}}'
+      PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
       TAG_COMMIT_HASH:
         sh: git rev-list -1 "v{{.VERSION}}"
       COMMIT_HASH:
@@ -93,7 +95,7 @@ tasks:
     cmds:
       - |
         docker buildx build --load \
-                            --platform="${PLATFORM}" \
+                            --platform="{{.PLATFORM}}" \
                             --build-arg VERSION="{{.BUILD_VERSION}}" \
                             --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" \
                             --tag {{.IMAGE_NAME}}:latest \
