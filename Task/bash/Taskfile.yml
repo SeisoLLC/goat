@@ -33,6 +33,7 @@ tasks:
       - task: base:build
         vars:
           VERSION: '{{.VERSION}}'
+          PLATFORM: '{{.PLATFORM}}'
 
   update:
     cmds:

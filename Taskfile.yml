@@ -64,6 +64,8 @@ tasks:
   build:
     cmds:
       - task: bash:build
+        vars:
+          PLATFORM: '{{.PLATFORM}}'
 
   test:
     env:
