@@ -44,7 +44,9 @@ jobs:
       - name: Initialize the repo
         run: task -v init
       - name: Build the goat
-        run: task -v build -- ${{ matrix.platform }}
+        run: task -v build
+        env:
+          PLATFORM: ${{ matrix.platform }}
       - name: Run the tests
         run: task -v test -- debug
   bump-version:
@@ -132,6 +134,7 @@ jobs:
       - name: Initialize the repo
         run: task init
       - name: Build the goat images
+        # TODO: Make this build both?
         run: task build
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
