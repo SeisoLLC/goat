@@ -101,8 +101,8 @@ tasks:
     cmds:
       - task: bash:publish
         vars:
-          TAGS: 'latest'
           IMAGE_NAME: '{{.IMAGE_NAME}}'
+          TAGS: 'latest'
 
   update:
     cmds:

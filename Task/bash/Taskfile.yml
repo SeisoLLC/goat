@@ -32,8 +32,8 @@ tasks:
     cmds:
       - task: base:build
         vars:
+          PLATFORM: '{{.PLATFORM | default ""}}'
           VERSION: '{{.VERSION}}'
-          PLATFORM: '{{.PLATFORM}}'
 
   update:
     cmds:
@@ -47,8 +47,8 @@ tasks:
     cmds:
       - task: base:publish
         vars:
-          TAGS: '{{default "all" .TAGS}}'
-          IMAGE_NAME: '{{default "" .IMAGE_NAME}}'
+          IMAGE_NAME: '{{.IMAGE_NAME | default ""}}'
+          TAGS: '{{.TAGS | default "all"}}'
 
   clean:
     cmds:
