@@ -12,8 +12,6 @@ includes:
   base:
     taskfile: ../Taskfile.yml
     internal: true
-    vars:
-      PLATFORM: '{{.PLATFORM | default "linux/amd64"}}'
 
 tasks:
   lint:

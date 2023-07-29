@@ -120,7 +120,3 @@ tasks:
           echo 'Unsupported action of {{.ACTION}} provided'
           exit 230
         fi
-
-  supported-platforms:
-    cmds:
-      - echo 'supported-platforms={"include":[{"platform":"linux/amd64"}, {"platform":"linux/arm64"}]}'

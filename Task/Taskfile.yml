@@ -8,7 +8,7 @@ set:
   - errexit
   - pipefail
 
-vars:
+env:
   PLATFORM:
     sh: |
       os="linux"
@@ -48,8 +48,8 @@ tasks:
       # Temporary workaround until we have an arm64 image on docker hub
       - sh: |
           if [[ "$(uname -m)" -ne "arm64" ]]; then
-            docker pull --platform '{{.PLATFORM}}' seiso/goat:latest || \
-              echo "Failed to pull the {{.PLATFORM}} goat, continuing anyway..."
+            docker pull --platform '${PLATFORM}' seiso/goat:latest || \
+              echo "Failed to pull the ${PLATFORM} goat, continuing anyway..."
           fi
     cmds:
       - pwd
@@ -93,7 +93,7 @@ tasks:
     cmds:
       - |
         docker buildx build --load \
-                            --platform="{{.PLATFORM}}" \
+                            --platform="${PLATFORM}" \
                             --build-arg VERSION="{{.BUILD_VERSION}}" \
                             --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" \
                             --tag {{.IMAGE_NAME}}:latest \
