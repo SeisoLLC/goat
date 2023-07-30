@@ -1,0 +1,17 @@
+PLATFORM=abc task build
+
+should build platform abc
+
+task build
+
+should build the local platform
+
+task build -- all
+
+should build all the supported platforms
+
+PLATFORM=abc task publish
+task publish
+task publish -- all
+
+Should work the same way, just build && publish

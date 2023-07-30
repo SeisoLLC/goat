@@ -67,6 +67,7 @@ tasks:
     vars:
       VERSION: '{{.VERSION | default "UNKNOWN"}}'
       PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
+      PUBLISH: '{{.PUBLISH | default "false"}}'
       TAG_COMMIT_HASH:
         sh: git rev-list -1 "v{{.VERSION}}"
       COMMIT_HASH:
@@ -92,9 +93,10 @@ tasks:
               build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
           print(build_version)'
     cmds:
+      # TODO: --load and --platform=x,y is not compat
       - |
-        docker buildx build --load \
-                            --platform="{{.PLATFORM}}" \
+        docker buildx build --platform="{{.PLATFORM}}" \
+                            {{if eq .PUBLISH "true"}}--push{{else}}--load{{end}} \
                             --build-arg VERSION="{{.BUILD_VERSION}}" \
                             --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" \
                             --tag {{.IMAGE_NAME}}:latest \
@@ -147,15 +149,10 @@ tasks:
         unusedpart{{else if eq .VERSIONING "SemVer"}}pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}{{end}}
 
   publish:
-    vars:
-      TAGS: '{{.TAGS | default "all"}}'
-      IMAGE_NAME: '{{.IMAGE_NAME | default ""}}'
     cmds:
-      # Better conditional syntax is pending https://github.com/go-task/task/issues/608
-      - >
-        {{if eq .TAGS "all"}}docker push --all-tags {{.IMAGE_NAME}}
-        {{else if eq .TAGS "latest"}}docker push {{.IMAGE_NAME}}:latest
-        {{else}}echo "Invalid TAGS var"; exit 1{{end}}
+      - task: build
+        vars:
+          PUBLISH: 'true'
 
   update:
     # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.

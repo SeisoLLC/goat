@@ -94,3 +94,12 @@ There are two ways of running the `goat` locally:
 
 1. If adding linters to `linters.json`, the `executor` is an optional member of the linter object.
 2. The `autofix` member is also optional. If a linter has an autofix command-line option, this field holds those arguments.
+
+## Other Taskfile helpers
+
+If you want to build and push all of the supported platforms, run `task publish -- all`
+
+This needs to be in one step so that `docker` handles the multi-platform manifest creation for us.
+
+If you want to build all of the supported platforms, run `task build -- all`, otherwise it will detect your local platform and build that. If you only want to
+build a specific platform, pass the `PLATFORM` env var, like `PLATFORM=linux/arm64 task build`.

@@ -23,6 +23,7 @@ tasks:
           INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY | default ""}}'
           INPUT_EXCLUDE: '{{.INPUT_EXCLUDE | default ""}}'
           INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL | default ""}}'
+          IMAGE_NAME: '{{.IMAGE_NAME | default ""}}'
 
   build:
     platforms: [linux, darwin]
@@ -46,9 +47,6 @@ tasks:
   publish:
     cmds:
       - task: base:publish
-        vars:
-          IMAGE_NAME: '{{.IMAGE_NAME | default ""}}'
-          TAGS: '{{.TAGS | default "all"}}'
 
   clean:
     cmds:
