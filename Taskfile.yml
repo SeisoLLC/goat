@@ -25,6 +25,20 @@ vars:
   INPUT_DISABLE_MYPY: true
   INPUT_EXCLUDE: '^/{{.PROJECT_SLUG}}/(goat|Task)/.*'
   SUPPORTED_PLATFORMS: 'linux/amd64,linux/arm64'
+  LOCAL_PLATFORM:
+    sh: |
+      os="linux"
+      arch="$(uname -m)"
+
+      case ${arch} in
+        # AMD64
+        x86_64)  echo "${os}/amd64" ;;
+        amd64)   echo "${os}/amd64" ;;
+
+        # ARM64
+        aarch64) echo "${os}/arm64" ;;
+        arm64)   echo "${os}/arm64" ;;
+      esac
 
 silent: true
 
@@ -66,11 +80,7 @@ tasks:
     cmds:
       - task: bash:build
         vars:
-          # If a platform is passed, use it
-          # or if CLI_ARGS is all, pass supported platforms
-          # Else pass platform
-          PLATFORM: |
-            {{if .PLATFORM}}{{.PLATFORM}}{{else if eq .CLI_ARGS "all"}}{{.SUPPORTED_PLATFORMS}}{{else}}{{.PLATFORM}}{{end}}
+          PLATFORM: '{{if .PLATFORM}}{{.PLATFORM}}{{else if eq .CLI_ARGS "all"}}{{.SUPPORTED_PLATFORMS}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
 
   test:
     env:
@@ -107,8 +117,7 @@ tasks:
       - task: bash:publish
         vars:
           TAGS: 'latest'
-          # TODO: Does this work? We want task publish -- all to build and publish both supported platforms, otherwise it just passes the PLATFORM (env) var along
-          PLATFORM: '{{if eq .CLI_ARGS "all"}}{{.SUPPORTED_PLATFORMS}}{{else}}{{.PLATFORM}}{{end}}'
+          PLATFORM: '{{if .PLATFORM}}{{.PLATFORM}}{{else if eq .CLI_ARGS "all"}}{{.SUPPORTED_PLATFORMS}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
 
   update:
     cmds:

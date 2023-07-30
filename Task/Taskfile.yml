@@ -37,13 +37,11 @@ tasks:
 
   lint:
     platforms: [linux, darwin]
-    # Adjustments are passed as vars, not envs, to avoid local workarounds
     vars:
       INPUT_AUTO_FIX: '{{.INPUT_AUTO_FIX | default ""}}'
       INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY | default ""}}'
       INPUT_EXCLUDE: '{{.INPUT_EXCLUDE | default ""}}'
       INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL | default ""}}'
-      REPO_DIR: '{{.REPO_DIR}}'
     preconditions:
       # Temporary workaround until we have an arm64 image on docker hub
       - sh: |
@@ -64,9 +62,11 @@ tasks:
     platforms: [linux, darwin]
     # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.
     dir: ../../..
+    requires:
+      vars: ['VERSION', 'PLATFORM']
     vars:
-      VERSION: '{{.VERSION | default "UNKNOWN"}}'
-      PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
+      VERSION: '{{.VERSION}}'
+      PLATFORM: '{{.PLATFORM}}'
       PUBLISH: '{{.PUBLISH | default "false"}}'
       TAG_COMMIT_HASH:
         sh: git rev-list -1 "v{{.VERSION}}"
@@ -93,10 +93,13 @@ tasks:
               build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
           print(build_version)'
     cmds:
-      # TODO: --load and --platform=x,y is not compat
+      # We only load when the provided platform equals the detected local platform. This is for two reasons:
+      # 1. We assume you don't want to load a cross-platform build
+      # 2. Currently (2023-07-30) you cannot --load if you are building multiple platforms
       - |
         docker buildx build --platform="{{.PLATFORM}}" \
-                            {{if eq .PUBLISH "true"}}--push{{else}}--load{{end}} \
+                            {{if eq .PLATFORM .LOCAL_PLATFORM}}--load \{{end}}
+                            {{if eq .PUBLISH "true"}}--push \{{end}}
                             --build-arg VERSION="{{.BUILD_VERSION}}" \
                             --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" \
                             --tag {{.IMAGE_NAME}}:latest \
@@ -106,8 +109,10 @@ tasks:
   release:
     # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.
     dir: ../../..
+    requires:
+      vars: ['PYTHON_VERSION']
     vars:
-      PYTHON_VERSION: '{{.PYTHON_VERSION | default ""}}'
+      PYTHON_VERSION: '{{.PYTHON_VERSION}}'
       RELEASE_TYPE: "{{.CLI_ARGS}}"
       DATE_INFO: '{{now | date "2006.01"}}'
       REPO_TAGS:
