@@ -13,8 +13,8 @@ env:
   python_version: "3.11"
 
 jobs:
-  test:
-    name: Test
+  build:
+    name: Build
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
@@ -47,6 +47,33 @@ jobs:
         run: task -v build
         env:
           PLATFORM: ${{ matrix.platform }}
+  test:
+    name: Test
+    needs: [build]
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.python_version }}
+      - uses: actions/cache@v3
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-python-${{ env.python_version }}-pipenv-${{ hashFiles('Pipfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-python-${{ env.python_version }}-pipenv-
+            ${{ runner.os }}-python-
+      - name: Install the dependencies
+        run: python -m pip install --upgrade pipenv
+      - name: Install Task
+        uses: arduino/setup-task@v1
+      - name: Initialize the repo
+        run: task init
+      - name: Build the goat
+        run: task build
       - name: Run the tests
         run: task -v test -- debug
   bump-version:
