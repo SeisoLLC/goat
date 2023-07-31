@@ -111,7 +111,8 @@ tasks:
                             --tag {{.IMAGE_NAME}}:latest \
                             --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} \
                             "${PWD}/."
-      - '{{if and ne .PLATFORM .LOCAL_PLATFORM ne .PUBLISH "true"}}echo "WARNING: Avoided loading {{.IMAGE_NAME}}:latest and {{.IMAGE_NAME}}:{{.BUILD_VERSION}} into your docker daemon because you built a cross-platform image of {{.PLATFORM}}"{{end}}'
+      # ne .PUBLISH "true"}}echo "WARNING: Avoided loading {{.IMAGE_NAME}}:latest and {{.IMAGE_NAME}}:{{.BUILD_VERSION}} into your docker daemon because you built a cross-platform image of {{.PLATFORM}}"{{end}}'
+      - '{{if ne .PLATFORM .LOCAL_PLATFORM}}echo "WARNING: Avoided loading {{.IMAGE_NAME}}:latest and {{.IMAGE_NAME}}:{{.BUILD_VERSION}} into your docker daemon because you built a cross-platform image of {{.PLATFORM}}"{{end}}'
 
   release:
     desc: Cut a project release
