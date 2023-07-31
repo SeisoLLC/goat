@@ -8,6 +8,10 @@ set:
   - errexit
   - pipefail
 
+vars:
+  VERSION:
+    sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
+
 includes:
   base:
     taskfile: ../Taskfile.yml
@@ -15,6 +19,7 @@ includes:
 
 tasks:
   lint:
+    desc: Run the linter(s); paved road projects use the Seiso goat 🐐
     platforms: [linux, darwin]
     cmds:
       - task: base:lint
@@ -26,32 +31,40 @@ tasks:
           IMAGE_NAME: '{{.IMAGE_NAME | default ""}}'
 
   test:
+    desc: Run the project tests
     cmds:
       - pipenv run pytest --cov={{.PROJECT_SLUG}} tests
 
   build:
+    desc: Build the project; docker images, compiled binaries, etc.
     platforms: [linux, darwin]
-    vars:
-      VERSION:
-        sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
     cmds:
       - task: base:build
         vars:
+          PLATFORM: '{{.PLATFORM}}'
           VERSION: '{{.VERSION}}'
 
   update:
+    desc: >
+      Update the project dev and runtime dependencies, and other misc components
     cmds:
       - task: base:update
 
   release:
+    desc: Cut a project release
     cmds:
       - task: base:release
 
   publish:
+    desc: Publish the project artifacts; docker images, compiled binaries, etc.
     cmds:
       - task: base:publish
+        vars:
+          PLATFORM: '{{.PLATFORM}}'
+          VERSION: '{{.VERSION}}'
 
   clean:
+    desc: Clean up build artifacts, cache files/directories, temp files, etc.
     cmds:
       - task: base:clean
       - find {{.ROOT_DIR}} -type d -name 'coverage-reports' -exec rm -rf {} +

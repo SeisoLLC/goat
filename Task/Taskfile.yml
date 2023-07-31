@@ -26,6 +26,7 @@ vars:
 
 tasks:
   lock:
+    desc: Generate a Pipfile.lock if Pipfile changed from last run
     dir: ../../..
     internal: true
     sources:
@@ -36,6 +37,7 @@ tasks:
       - pipenv lock
 
   lint:
+    desc: Run the linter(s); paved road projects use the Seiso goat 🐐
     platforms: [linux, darwin]
     vars:
       INPUT_AUTO_FIX: '{{.INPUT_AUTO_FIX | default ""}}'
@@ -59,6 +61,7 @@ tasks:
                    --rm -v "{{.ROOT_DIR}}:/goat" seiso/goat:latest
 
   build:
+    desc: Build the project; docker images, compiled binaries, etc.
     platforms: [linux, darwin]
     # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.
     dir: ../../..
@@ -96,7 +99,11 @@ tasks:
       # We only load when the provided platform equals the detected local platform. This is for two reasons:
       # 1. We assume you don't want to load a cross-platform build
       # 2. Currently (2023-07-30) you cannot --load if you are building multiple platforms
+      #
       # Also, we make load and push mutually exclusive because docker says "ERROR: push and load may not be set together at the moment"
+      #
+      # Finally, we combine this all together in one `docker buildx build` with `--push` when {{.PUBLISH}} is true so that it handles the multi-platform
+      # manifest creation for us. Otherwise we'd need to push per-platform tags and artisanally craft the manifest with `crane`, `docker manifest`, or similar
       - |
         docker buildx build --platform="{{.PLATFORM}}" \
                             {{if eq .PUBLISH "true"}}--push{{else if eq .PLATFORM .LOCAL_PLATFORM}}--load{{end}} \
@@ -105,9 +112,10 @@ tasks:
                             --tag {{.IMAGE_NAME}}:latest \
                             --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} \
                             "${PWD}/."
-      - '{{if and ne .PLATFORM .LOCAL_PLATFORM ne .PUBLISH "true"}}echo "WARNING: Avoided loading the image {{.IMAGE_NAME}}:latest and {{.IMAGE_NAME}}:{{.BUILD_VERSION}} into your docker daemon because you built a cross-platform image of {{.PLATFORM}}"{{end}}'
+      - '{{if and ne .PLATFORM .LOCAL_PLATFORM ne .PUBLISH "true"}}echo "WARNING: Avoided loading {{.IMAGE_NAME}}:latest and {{.IMAGE_NAME}}:{{.BUILD_VERSION}} into your docker daemon because you built a cross-platform image of {{.PLATFORM}}"{{end}}'
 
   release:
+    desc: Cut a project release
     # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.
     dir: ../../..
     requires:
@@ -155,6 +163,7 @@ tasks:
         unusedpart{{else if eq .VERSIONING "SemVer"}}pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}{{end}}
 
   publish:
+    desc: Publish the project artifacts; docker images, compiled binaries, etc.
     requires:
       vars: ['VERSION', 'PLATFORM']
     cmds:
@@ -165,6 +174,8 @@ tasks:
           VERSION: '{{.VERSION}}'
 
   update:
+    desc: >
+      Update the project dev and runtime dependencies, and other misc components
     # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.
     dir: ../../..
     cmds:
@@ -176,6 +187,7 @@ tasks:
         -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
 
   clean:
+    desc: Clean up build artifacts, cache files/directories, temp files, etc.
     cmds:
       - find {{.ROOT_DIR}} -type f -name '.DS_Store' -delete
       - find {{.ROOT_DIR}} -type f -name '.Thumbs.db' -delete

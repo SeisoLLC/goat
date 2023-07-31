@@ -19,6 +19,7 @@ includes:
 
 tasks:
   lint:
+    desc: Run the linter(s); paved road projects use the Seiso goat 🐐
     platforms: [linux, darwin]
     cmds:
       - task: base:lint
@@ -30,6 +31,7 @@ tasks:
           IMAGE_NAME: '{{.IMAGE_NAME | default ""}}'
 
   build:
+    desc: Build the project; docker images, compiled binaries, etc.
     platforms: [linux, darwin]
     cmds:
       - task: base:build
@@ -38,14 +40,18 @@ tasks:
           VERSION: '{{.VERSION}}'
 
   update:
+    desc: >
+      Update the project dev and runtime dependencies, and other misc components
     cmds:
       - task: base:update
 
   release:
+    desc: Cut a project release
     cmds:
       - task: base:release
 
   publish:
+    desc: Publish the project artifacts; docker images, compiled binaries, etc.
     cmds:
       - task: base:publish
         vars:
@@ -53,5 +59,6 @@ tasks:
           VERSION: '{{.VERSION}}'
 
   clean:
+    desc: Clean up build artifacts, cache files/directories, temp files, etc.
     cmds:
       - task: base:clean

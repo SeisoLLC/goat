@@ -52,11 +52,15 @@ tasks:
       - pipenv install --deploy --ignore-pipfile --dev
 
   init-submodules:
+    desc: >
+      Initializes git submodules; paved road projects include the Seiso goat 🐐
+      for its shared configs, etc.
     internal: true
     cmds:
       - git submodule update --init
 
   init-pre-commit:
+    desc: Install the pre-commit hooks
     internal: true
     sources:
       - .pre-commit-config.yaml
@@ -64,12 +68,14 @@ tasks:
       - pipenv run pre-commit install
 
   init:
+    desc: Initialize the repo for local use; intended to be run after git clone
     cmds:
       - task: init-pipenv
       - task: init-submodules
       - task: init-pre-commit
 
   lint:
+    desc: Run the linter(s); paved road projects use the Seiso goat 🐐
     cmds:
       - task: bash:lint
         vars:
@@ -78,10 +84,11 @@ tasks:
           INPUT_LOG_LEVEL: '{{.CLI_ARGS}}'
 
   build:
+    desc: Build the project; docker images, compiled binaries, etc.
     cmds:
       - task: bash:build
         vars:
-          PLATFORM: '{{if .PLATFORM}}{{.PLATFORM}}{{else if eq .CLI_ARGS "all"}}{{.SUPPORTED_PLATFORMS}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
+          PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
 # If you want to build and push all of the supported platforms, run `task publish -- all`
 #
 # This needs to be in one step so that `docker` handles the multi-platform manifest creation for us.
@@ -91,6 +98,7 @@ tasks:
 
 # TODO: Add a precondition to ensure you're testing .LOCAL_PLATFORM
   test:
+    desc: Run the project tests
     env:
       INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY}}'
       INPUT_EXCLUDE: '{{.INPUT_EXCLUDE}}'
@@ -113,31 +121,31 @@ tasks:
         fi
 
   clean:
+    desc: Clean up build artifacts, cache files/directories, temp files, etc.
     cmds:
       - task: bash:clean
 
   release:
+    desc: Cut a project release
     cmds:
       - task: bash:release
 
   publish:
+    desc: Publish the project artifacts; docker images, compiled binaries, etc.
     cmds:
       - task: bash:publish
         vars:
-          PLATFORM: '{{if .PLATFORM}}{{.PLATFORM}}{{else if eq .CLI_ARGS "all"}}{{.SUPPORTED_PLATFORMS}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
-# If you want to build and push all of the supported platforms, run `task publish -- all`
-#
-# This needs to be in one step so that `docker` handles the multi-platform manifest creation for us.
-#
-# If you want to build all of the supported platforms, run `task build -- all`, otherwise it will detect your local platform and build that. If you only want to
-# build a specific platform, pass the `PLATFORM` env var, like `PLATFORM=linux/arm64 task build`.
+          PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
 
   update:
+    desc: >
+      Update the project dev and runtime dependencies, and other misc components
     cmds:
       - task: bash:update
       - task: pre-commit-update
 
   pre-commit-update:
+    desc: Update the hash in .pre-commit-config.yml to HEAD of the main branch
     vars:
       ACTION: "{{.CLI_ARGS}}"
     cmds:

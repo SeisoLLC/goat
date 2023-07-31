@@ -94,3 +94,12 @@ There are two ways of running the `goat` locally:
 
 1. If adding linters to `linters.json`, the `executor` is an optional member of the linter object.
 2. The `autofix` member is also optional. If a linter has an autofix command-line option, this field holds those arguments.
+
+### Iterating on Taskfile.yml files
+
+Make sure you are:
+
+1. Update the submodule to point to your branch
+1. Implement something similar to `updategoat='git add -A && git commit -m "Update goat" && ggp && cd goat && ggpull && cd .. && git add -A && git commit -m
+   "Update submodule" && ggp'` otherwise the included taskfiles will be older than the ones in your `Task/` dir.
+1. Repoint the submodule back to `main` after merging your PR
