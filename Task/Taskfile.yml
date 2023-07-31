@@ -105,6 +105,7 @@ tasks:
                             --tag {{.IMAGE_NAME}}:latest \
                             --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} \
                             "${PWD}/."
+      - '{{if ne .PLATFORM .LOCAL_PLATFORM && ne .PUBLISH "true"}}echo "WARNING: Avoided loading the image {{.IMAGE_NAME}}:latest and {{.IMAGE_NAME}}:{{.BUILD_VERSION}} into your docker daemon because you built a cross-platform image of {{.PLATFORM}}"{{end}}'
 
   release:
     # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.

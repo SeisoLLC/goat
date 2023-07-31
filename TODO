@@ -1,5 +1,0 @@
-PLATFORM=abc task publish
-task publish
-task publish -- all
-
-Should work the same way, just build && publish

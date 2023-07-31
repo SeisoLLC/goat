@@ -44,6 +44,7 @@ silent: true
 
 tasks:
   init-pipenv:
+    desc: Initializes the pipenv virtual environment if Pipfile.lock changes
     internal: true
     sources:
       - Pipfile.lock
@@ -81,7 +82,14 @@ tasks:
       - task: bash:build
         vars:
           PLATFORM: '{{if .PLATFORM}}{{.PLATFORM}}{{else if eq .CLI_ARGS "all"}}{{.SUPPORTED_PLATFORMS}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
+# If you want to build and push all of the supported platforms, run `task publish -- all`
+#
+# This needs to be in one step so that `docker` handles the multi-platform manifest creation for us.
+#
+# If you want to build all of the supported platforms, run `task build -- all`, otherwise it will detect your local platform and build that. If you only want to
+# build a specific platform, pass the `PLATFORM` env var, like `PLATFORM=linux/arm64 task build`.
 
+# TODO: Add a precondition to ensure you're testing .LOCAL_PLATFORM
   test:
     env:
       INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY}}'
@@ -117,6 +125,12 @@ tasks:
       - task: bash:publish
         vars:
           PLATFORM: '{{if .PLATFORM}}{{.PLATFORM}}{{else if eq .CLI_ARGS "all"}}{{.SUPPORTED_PLATFORMS}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
+# If you want to build and push all of the supported platforms, run `task publish -- all`
+#
+# This needs to be in one step so that `docker` handles the multi-platform manifest creation for us.
+#
+# If you want to build all of the supported platforms, run `task build -- all`, otherwise it will detect your local platform and build that. If you only want to
+# build a specific platform, pass the `PLATFORM` env var, like `PLATFORM=linux/arm64 task build`.
 
   update:
     cmds:
