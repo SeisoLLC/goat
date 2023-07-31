@@ -98,8 +98,8 @@ tasks:
       # 2. Currently (2023-07-30) you cannot --load if you are building multiple platforms
       - |
         docker buildx build --platform="{{.PLATFORM}}" \
-                            {{if eq .PLATFORM .LOCAL_PLATFORM}}--load \{{end}}
-                            {{if eq .PUBLISH "true"}}--push \{{end}}
+                            {{if eq .PLATFORM .LOCAL_PLATFORM}}--load{{end}} \
+                            {{if eq .PUBLISH "true"}}--push{{end}} \
                             --build-arg VERSION="{{.BUILD_VERSION}}" \
                             --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" \
                             --tag {{.IMAGE_NAME}}:latest \
