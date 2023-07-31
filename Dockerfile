@@ -41,8 +41,7 @@ COPY --from=actionlint /usr/local/bin/actionlint /usr/bin/
 RUN pip install pipenv \
     && pipenv install --system --deploy --ignore-pipfile \
     && apk upgrade \
-    && apk --no-cache add go \
-                          jq \
+    && apk --no-cache add jq \
                           npm \
                           tini \
                           bash \
