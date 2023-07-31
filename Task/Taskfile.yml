@@ -63,7 +63,6 @@ tasks:
   build:
     desc: Build the project; docker images, compiled binaries, etc.
     platforms: [linux, darwin]
-    # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.
     dir: ../../..
     requires:
       vars: ['VERSION', 'PLATFORM']
