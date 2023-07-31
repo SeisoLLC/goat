@@ -96,10 +96,10 @@ tasks:
       # We only load when the provided platform equals the detected local platform. This is for two reasons:
       # 1. We assume you don't want to load a cross-platform build
       # 2. Currently (2023-07-30) you cannot --load if you are building multiple platforms
+      # Also, we make load and push mutually exclusive because docker says "ERROR: push and load may not be set together at the moment"
       - |
         docker buildx build --platform="{{.PLATFORM}}" \
-                            {{if eq .PLATFORM .LOCAL_PLATFORM}}--load{{end}} \
-                            {{if eq .PUBLISH "true"}}--push{{end}} \
+                            {{if eq .PUBLISH "true"}}--push{{else if eq .PLATFORM .LOCAL_PLATFORM}}--load{{end}} \
                             --build-arg VERSION="{{.BUILD_VERSION}}" \
                             --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" \
                             --tag {{.IMAGE_NAME}}:latest \
