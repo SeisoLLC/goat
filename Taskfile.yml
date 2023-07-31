@@ -116,7 +116,6 @@ tasks:
     cmds:
       - task: bash:publish
         vars:
-          TAGS: 'latest'
           PLATFORM: '{{if .PLATFORM}}{{.PLATFORM}}{{else if eq .CLI_ARGS "all"}}{{.SUPPORTED_PLATFORMS}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
 
   update:

@@ -154,10 +154,14 @@ tasks:
         unusedpart{{else if eq .VERSIONING "SemVer"}}pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}{{end}}
 
   publish:
+    requires:
+      vars: ['VERSION', 'PLATFORM']
     cmds:
       - task: build
         vars:
+          PLATFORM: '{{if .PLATFORM}}{{.PLATFORM}}{{else if eq .CLI_ARGS "all"}}{{.SUPPORTED_PLATFORMS}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
           PUBLISH: 'true'
+          VERSION: '{{.VERSION}}'
 
   update:
     # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.
