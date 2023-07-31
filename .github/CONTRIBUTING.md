@@ -11,6 +11,16 @@ task init
 
 We are also in the process of migrating from `Invoke` to `Taskfile`; if you want to use the `task` commands, you must install `Taskfile`
 
+### Helpful tasks
+
+Build all of the supported docker images:
+
+```bash
+PLATFORM='all' task build
+```
+
+To build a docker image for a specific platform, set `PLATFORM` to either `linux/arm64` or `linux/amd64`.
+
 ## Running the goat against the goat project locally
 
 There are two ways of running the `goat` locally:
@@ -97,9 +107,14 @@ There are two ways of running the `goat` locally:
 
 ### Iterating on Taskfile.yml files
 
-Make sure you are:
+Make sure you:
 
-1. Update the submodule to point to your branch
-1. Implement something similar to `updategoat='git add -A && git commit -m "Update goat" && ggp && cd goat && ggpull && cd .. && git add -A && git commit -m
-   "Update submodule" && ggp'` otherwise the included taskfiles will be older than the ones in your `Task/` dir.
+1. Update the submodule to point to your branch, otherwise your changes under `Task/` will not be effective for the parent `Taskfile.yml`. We can't avoid this
+   because the `Task/**/Taskfile.yml` files have a relative `dir:` and if the `goat` uses it directly (avoiding a submodule) then the relative dir is one folder
+   level different than every project that uses it. Consider a helper alias like this for use when developing:
+
+   ```bash
+   alias updategoat='git add -A && git commit -m "Update goat" && ggp && cd goat && ggpull && cd .. && git add -A && git commit -m "Update submodule" && ggp
+   ```
+
 1. Repoint the submodule back to `main` after merging your PR

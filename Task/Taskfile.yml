@@ -168,7 +168,7 @@ tasks:
     cmds:
       - task: build
         vars:
-          PLATFORM: '{{if .PLATFORM}}{{.PLATFORM}}{{else if eq .CLI_ARGS "all"}}{{.SUPPORTED_PLATFORMS}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
+          PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
           PUBLISH: 'true'
           VERSION: '{{.VERSION}}'
 

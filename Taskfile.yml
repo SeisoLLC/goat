@@ -84,19 +84,23 @@ tasks:
           INPUT_LOG_LEVEL: '{{.CLI_ARGS}}'
 
   build:
-    desc: Build the project; docker images, compiled binaries, etc.
+    desc: Build the docker image; set PLATFORM env var for cross-platform builds
     cmds:
       - task: bash:build
         vars:
           PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
 
-# TODO: Add a precondition to ensure you're testing .LOCAL_PLATFORM
   test:
     desc: Run the project tests
     env:
       INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY}}'
       INPUT_EXCLUDE: '{{.INPUT_EXCLUDE}}'
       INPUT_LOG_LEVEL: "{{.CLI_ARGS}}"
+    vars:
+      PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
+    # If a cross-platform image is provided via in the PLATFORM var, exit (succeed) immediately
+    status:
+      - '{{if eq .PLATFORM .LOCAL_PLATFORM}}exit 1{{end}}'
     cmds:
       - echo "Baaaaaaaaaaah! (Running the goat)"
       - |
