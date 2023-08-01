@@ -146,7 +146,8 @@ tasks:
       - task: bash:release
       - task: component-update
       - git add -A
-      - git commit --amend --no-edit
+      - 'git commit --amend --no-edit'
+      - git tag -a v$(cat VERSION) -m "$(cat VERSION) release"
 
   publish:
     desc: Publish the project artifacts; docker images, compiled binaries, etc.
