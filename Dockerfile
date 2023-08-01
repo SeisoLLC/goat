@@ -2,7 +2,7 @@
 
 FROM --platform=$TARGETPLATFORM ghcr.io/yannh/kubeconform:v0.6.3 as kubeconform
 ARG TARGETPLATFORM
-FROM --platform=$TARGETPLATFORM hadolint/hadolint:v2.12.0-alpine as hadolint
+FROM --platform=$TARGETPLATFORM hadolint/hadolint:v2.12.0-debian as hadolint
 ARG TARGETPLATFORM
 FROM --platform=$TARGETPLATFORM koalaman/shellcheck:v0.9.0 as shellcheck
 ARG TARGETPLATFORM
