@@ -105,7 +105,7 @@ tasks:
       - task: bash:build
         vars:
           PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
-          DOCKER_BUILD_CUSTOM_ARGS: '--build-arg PYTHON_PLATFORM="{{.PYTHON_PLATFORM}}"'
+          # DOCKER_BUILDX_CUSTOM_ARGS: '--build-arg PYTHON_PLATFORM="{{.PYTHON_PLATFORM}}"'
 
   test:
     desc: Run the project tests

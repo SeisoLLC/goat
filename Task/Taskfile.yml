@@ -70,7 +70,7 @@ tasks:
       VERSION: '{{.VERSION}}'
       PLATFORM: '{{.PLATFORM}}'
       PUBLISH: '{{.PUBLISH | default "false"}}'
-      DOCKER_BUILD_CUSTOM_ARGS: '{{.DOCKER_BUILD_CUSTOM_ARGS | default ""}}'
+      DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
       TAG_COMMIT_HASH:
         sh: git rev-list -1 "v{{.VERSION}}"
       COMMIT_HASH:

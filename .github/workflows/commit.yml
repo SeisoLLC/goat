@@ -92,7 +92,6 @@ jobs:
       - name: Update and bump the version
         id: bump-version
         run: |
-          task component-update
           task release
           TAG="$(git describe --tags)"
           BRANCH="$(git branch --show-current)"
