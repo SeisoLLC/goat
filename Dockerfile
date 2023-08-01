@@ -2,16 +2,12 @@
 
 # TARGETPLATFORM is special cased by docker and doesn't need the inital ARG
 ARG PYTHON_PLATFORM
-# hadolint ignore=DL3029
 FROM --platform=$TARGETPLATFORM ghcr.io/yannh/kubeconform:v0.6.3 as kubeconform
 ARG TARGETPLATFORM
-# hadolint ignore=DL3029
 FROM --platform=$TARGETPLATFORM hadolint/hadolint:v2.12.0-alpine as hadolint
 ARG TARGETPLATFORM
-# hadolint ignore=DL3029
 FROM --platform=$TARGETPLATFORM koalaman/shellcheck:v0.9.0 as shellcheck
 ARG TARGETPLATFORM
-# hadolint ignore=DL3029
 FROM --platform=$TARGETPLATFORM rhysd/actionlint:1.6.25 as actionlint
 
 ARG PYTHON_PLATFORM
