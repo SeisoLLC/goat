@@ -172,10 +172,11 @@ tasks:
     dir: goat
     desc: Ensure the goat submodule is pointing to main and up-to-date
     cmds:
-      - git fetch origin main
-      - git checkout main
-      - git pull origin main
-      - cd .. && git submodule update --remote && git add goat && git commit -m "Autoupdate the goat"
+      - rm -rf .gitmodules goat/ || true
+      - touch .gitmodules
+      - git submodule add --force -b main https://github.com/SeisoLLC/goat
+      - git add goat
+      - git commit -m "Autoupdate the goat"
 
   pre-commit-update:
     desc: Update the hash in .pre-commit-config.yml to HEAD of the main branch
