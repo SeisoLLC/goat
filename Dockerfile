@@ -2,7 +2,7 @@
 
 FROM --platform=$TARGETPLATFORM ghcr.io/yannh/kubeconform:v0.6.3 as kubeconform
 ARG TARGETPLATFORM
-FROM --platform=$TARGETPLATFORM hadolint/hadolint:v2.12.0-debian as hadolint
+FROM --platform=$TARGETPLATFORM hadolint/hadolint:v2.12.0-alpine as hadolint
 ARG TARGETPLATFORM
 FROM --platform=$TARGETPLATFORM koalaman/shellcheck:v0.9.0 as shellcheck
 ARG TARGETPLATFORM
@@ -37,7 +37,6 @@ COPY --from=hadolint /bin/hadolint /usr/bin/
 COPY --from=shellcheck /bin/shellcheck /usr/bin/
 COPY --from=actionlint /usr/local/bin/actionlint /usr/bin/
 
-SHELL ["/bin/bash", "-c"]
 # hadolint ignore=DL3016,DL3018,DL3013
 RUN pip install pipenv \
     && pipenv install --system --deploy --ignore-pipfile \
