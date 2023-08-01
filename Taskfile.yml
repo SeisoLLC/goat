@@ -113,7 +113,7 @@ tasks:
       INPUT_LOG_LEVEL: "{{.CLI_ARGS}}"
     vars:
       PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
-    # If a cross-platform image is provided via in the PLATFORM var, exit (succeed) immediately
+    # If a cross-platform image is provided via in the PLATFORM var, exit 1 here which bypasses tests
     status:
       - '{{if eq .PLATFORM .LOCAL_PLATFORM}}exit 1{{end}}'
     cmds:
@@ -150,9 +150,11 @@ tasks:
   publish:
     desc: Publish the project artifacts; docker images, compiled binaries, etc.
     cmds:
+      # We call into the bash:publish instead of across to build to simplify centralized policy assessments (i.e. "is the project using a goat-provided task?")
       - task: bash:publish
         vars:
           PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
+          DOCKER_BUILDX_CUSTOM_ARGS: '--build-arg PYTHON_PLATFORM="{{.PYTHON_PLATFORM}}"'
 
   update:
     desc: Update the project dev and runtime dependencies, project submodule, and pre-commit hash

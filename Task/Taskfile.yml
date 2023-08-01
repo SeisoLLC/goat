@@ -173,6 +173,7 @@ tasks:
           PUBLISH: 'true'
           VERSION: '{{.VERSION}}'
           PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
+          DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 
   update:
     desc: >
