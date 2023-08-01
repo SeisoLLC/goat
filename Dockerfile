@@ -38,17 +38,17 @@ COPY --from=shellcheck /bin/shellcheck /usr/bin/
 COPY --from=actionlint /usr/local/bin/actionlint /usr/bin/
 
 # hadolint ignore=DL3016,DL3018,DL3013
-RUN pip install pipenv
-RUN pipenv install --system --deploy --ignore-pipfile
-RUN apk upgrade
-RUN apk --no-cache add jq \
+RUN pip install pipenv \
+    && pipenv install --system --deploy --ignore-pipfile \
+    && apk upgrade \
+    && apk --no-cache add jq \
                           npm \
                           tini \
                           bash \
                           git \
                           # The following apk package is necessary for pyenv functionality
-                          tk-dev
-RUN npm install --save-dev --no-cache -g dockerfile_lint \
+                          tk-dev \
+    && npm install --save-dev --no-cache -g dockerfile_lint \
                                             markdownlint-cli \
                                             textlint \
                                             textlint-filter-rule-allowlist \
@@ -56,18 +56,18 @@ RUN npm install --save-dev --no-cache -g dockerfile_lint \
                                             textlint-rule-terminology \
                                             cspell \
                                             jscpd \
-                                            markdown-link-check
-RUN git clone https://github.com/pyenv/pyenv.git --depth=1 "${PYENV_ROOT}"
-RUN echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
-RUN echo 'eval "$(pyenv init -)"' >> ~/.profile
+                                            markdown-link-check \
+    && git clone https://github.com/pyenv/pyenv.git --depth=1 "${PYENV_ROOT}" \
+    && echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile \
+    && echo 'eval "$(pyenv init -)"' >> ~/.profile \
     # This will cleanup the pyenv .git folder as well as any plugin .git folders
-RUN find "${PYENV_ROOT}" -type d -name ".git" -exec rm -rf {} +
-RUN mkdir -p /opt/goat/log
+    && find "${PYENV_ROOT}" -type d -name ".git" -exec rm -rf {} + \
+    && mkdir -p /opt/goat/log \
     #####################################################################################################
     # The following commands are necessary because pre-commit adds -u os.uid():os.gid() to the docker run
-RUN chmod o+w /opt/goat/log
-RUN mkdir -p /.local
-RUN chmod o+w /.local
+    && chmod o+w /opt/goat/log \
+    && mkdir -p /.local \
+    && chmod o+w /.local
     #####################################################################################################
 
 WORKDIR /goat/
