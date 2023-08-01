@@ -70,6 +70,7 @@ tasks:
       VERSION: '{{.VERSION}}'
       PLATFORM: '{{.PLATFORM}}'
       PUBLISH: '{{.PUBLISH | default "false"}}'
+      DOCKER_BUILD_CUSTOM_ARGS: '{{.DOCKER_BUILD_CUSTOM_ARGS | default ""}}'
       TAG_COMMIT_HASH:
         sh: git rev-list -1 "v{{.VERSION}}"
       COMMIT_HASH:
@@ -106,6 +107,7 @@ tasks:
       - |
         docker buildx build --platform="{{.PLATFORM}}" \
                             {{if eq .PUBLISH "true"}}--push{{else if eq .PLATFORM .LOCAL_PLATFORM}}--load{{end}} \
+                            {{if .DOCKER_BUILD_CUSTOM_ARGS}}{{.DOCKER_BUILD_CUSTOM_ARGS}}{{end}} \
                             --build-arg VERSION="{{.BUILD_VERSION}}" \
                             --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" \
                             --tag {{.IMAGE_NAME}}:latest \

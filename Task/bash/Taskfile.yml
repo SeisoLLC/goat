@@ -38,6 +38,7 @@ tasks:
         vars:
           PLATFORM: '{{.PLATFORM}}'
           VERSION: '{{.VERSION}}'
+          DOCKER_BUILD_CUSTOM_ARGS: '{{.DOCKER_BUILD_CUSTOM_ARGS | default ""}}'
 
   update:
     desc: >

@@ -9,7 +9,9 @@ ARG TARGETPLATFORM
 FROM --platform=$TARGETPLATFORM rhysd/actionlint:1.6.25 as actionlint
 
 ARG TARGETPLATFORM
-FROM --platform=$TARGETPLATFORM python:3.11-alpine3.18 as base_image
+ARG PYTHON_PLATFORM
+# The python project doesn't have a linux/arm64 image, so we special case it
+FROM --platform=$PYTHON_PLATFORM python:3.11-alpine3.18 as base_image
 ARG TARGETPLATFORM
 
 ENV LANG=C.UTF-8

@@ -12,6 +12,10 @@ on:  # yamllint disable-line rule:truthy
 env:
   python_version: "3.11"
 
+defaults:
+  run:
+    shell: 'bash --noprofile --norc -Eeuo pipefail {0}'
+
 jobs:
   test:
     name: Test
