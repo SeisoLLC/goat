@@ -118,3 +118,20 @@ Make sure you:
    ```
 
 1. Repoint the submodule back to `main` after merging your PR
+
+## Common Errors
+
+When attempting a `PLATFORM=all task build` you may encounter this error:
+
+```
+ERROR: Multiple platforms feature is currently not supported for docker driver. Please switch to a different driver (eg. "docker buildx create --use")
+
+task: Failed to run task "build": exit status 1
+```
+
+Recreating your `desktop-linux` builder instance may fix it:
+
+```bash
+docker context rm -f desktop-linux
+docker buildx create --name desktop-linux --driver docker-container --use
+```
