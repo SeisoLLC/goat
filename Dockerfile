@@ -37,7 +37,6 @@ COPY --from=hadolint /bin/hadolint /usr/bin/
 COPY --from=shellcheck /bin/shellcheck /usr/bin/
 COPY --from=actionlint /usr/local/bin/actionlint /usr/bin/
 
-SHELL ["/bin/bash", "-c"]
 # hadolint ignore=DL3016,DL3018,DL3013
 RUN pip install pipenv \
     && pipenv install --system --deploy --ignore-pipfile \
