@@ -9,7 +9,7 @@ ARG TARGETPLATFORM
 FROM --platform=$TARGETPLATFORM rhysd/actionlint:1.6.25 as actionlint
 
 ARG TARGETPLATFORM
-FROM --platform=$TARGETPLATFORM python:3.11-alpine3.18 as base_image
+FROM --platform=$TARGETPLATFORM python:3.11-slim-bookworm as base_image
 ARG TARGETPLATFORM
 
 ENV LANG=C.UTF-8
@@ -37,18 +37,17 @@ COPY --from=hadolint /bin/hadolint /usr/bin/
 COPY --from=shellcheck /bin/shellcheck /usr/bin/
 COPY --from=actionlint /usr/local/bin/actionlint /usr/bin/
 
-SHELL ["/bin/bash", "-c"]
 # hadolint ignore=DL3016,DL3018,DL3013
 RUN pip install pipenv \
     && pipenv install --system --deploy --ignore-pipfile \
-    && apk upgrade \
-    && apk --no-cache add jq \
-                          npm \
-                          tini \
-                          bash \
-                          git \
-                          # The following apk package is necessary for pyenv functionality
-                          tk-dev \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends jq \
+                                                  npm \
+                                                  tini \
+                                                  bash \
+                                                  git \
+                                                  # The following package is necessary for pyenv functionality
+                                                  tk-dev \
     && npm install --save-dev --no-cache -g dockerfile_lint \
                                             markdownlint-cli \
                                             textlint \
