@@ -143,8 +143,10 @@ tasks:
   release:
     desc: Cut a project release
     cmds:
-      - task: component-update
       - task: bash:release
+      - task: component-update
+      - git add -A
+      - git commit --amend
 
   publish:
     desc: Publish the project artifacts; docker images, compiled binaries, etc.
