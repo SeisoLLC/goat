@@ -65,10 +65,10 @@ tasks:
     platforms: [linux, darwin]
     dir: ../../..
     requires:
-      vars: ['VERSION', 'PLATFORM']
+      vars: ['VERSION']
     vars:
       VERSION: '{{.VERSION}}'
-      PLATFORM: '{{.PLATFORM}}'
+      PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
       PUBLISH: '{{.PUBLISH | default "false"}}'
       DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
       TAG_COMMIT_HASH:
@@ -107,7 +107,7 @@ tasks:
       - |
         docker buildx build --platform="{{.PLATFORM}}" \
                             {{if eq .PUBLISH "true"}}--push{{else if eq .PLATFORM .LOCAL_PLATFORM}}--load{{end}} \
-                            {{if .DOCKER_BUILD_CUSTOM_ARGS}}{{.DOCKER_BUILD_CUSTOM_ARGS}}{{end}} \
+                            {{if .DOCKER_BUILDX_CUSTOM_ARGS}}{{.DOCKER_BUILDX_CUSTOM_ARGS}}{{end}} \
                             --build-arg VERSION="{{.BUILD_VERSION}}" \
                             --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" \
                             --tag {{.IMAGE_NAME}}:latest \
@@ -154,6 +154,9 @@ tasks:
               increment = "01"
           new_version = f"{{.DATE_INFO}}.{increment}"
           print(new_version)'
+    preconditions:
+      - sh: test `git status -s | wc -w` = "0"
+        msg: "There are untracked files, please commit before creating a release."
     cmds:
       # Better conditional syntax is pending https://github.com/go-task/task/issues/608
       - >
@@ -163,13 +166,13 @@ tasks:
   publish:
     desc: Publish the project artifacts; docker images, compiled binaries, etc.
     requires:
-      vars: ['VERSION', 'PLATFORM']
+      vars: ['VERSION']
     cmds:
       - task: build
         vars:
-          PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
           PUBLISH: 'true'
           VERSION: '{{.VERSION}}'
+          PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
 
   update:
     desc: >

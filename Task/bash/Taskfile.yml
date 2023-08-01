@@ -33,12 +33,14 @@ tasks:
   build:
     desc: Build the project; docker images, compiled binaries, etc.
     platforms: [linux, darwin]
+    requires:
+      vars: ['VERSION']
     cmds:
       - task: base:build
         vars:
-          PLATFORM: '{{.PLATFORM}}'
           VERSION: '{{.VERSION}}'
-          DOCKER_BUILD_CUSTOM_ARGS: '{{.DOCKER_BUILD_CUSTOM_ARGS | default ""}}'
+          PLATFORM: '{{.PLATFORM | default ""}}'
+          DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 
   update:
     desc: >
@@ -53,10 +55,12 @@ tasks:
 
   publish:
     desc: Publish the project artifacts; docker images, compiled binaries, etc.
+    requires:
+      vars: ['VERSION']
     cmds:
       - task: base:publish
         vars:
-          PLATFORM: '{{.PLATFORM}}'
+          PLATFORM: '{{.PLATFORM | default ""}}'
           VERSION: '{{.VERSION}}'
 
   clean:
