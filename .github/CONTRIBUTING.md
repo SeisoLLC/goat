@@ -123,7 +123,7 @@ Make sure you:
 
 When attempting a `PLATFORM=all task build` you may encounter this error:
 
-```
+```bash
 ERROR: Multiple platforms feature is currently not supported for docker driver. Please switch to a different driver (eg. "docker buildx create --use")
 
 task: Failed to run task "build": exit status 1
