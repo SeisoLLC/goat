@@ -107,17 +107,16 @@ There are two ways of running the `goat` locally:
 
 ### Iterating on Taskfile.yml files
 
-Make sure you:
+Make sure you update the submodule to point to your working branch, otherwise your changes under `Task/` will not affect the parent `Taskfile.yml` tasks that
+`include` the `goat/Task/**/Taskfile.yml` files. We can't avoid this because the `Task/**/Taskfile.yml` files have a relative `dir:` and if the `goat` uses it
+directly (avoiding a submodule) then the relative dir is one folder level different than every project that uses it. Consider a helper alias like this for use
+when developing:
 
-1. Update the submodule to point to your branch, otherwise your changes under `Task/` will not be effective for the parent `Taskfile.yml`. We can't avoid this
-   because the `Task/**/Taskfile.yml` files have a relative `dir:` and if the `goat` uses it directly (avoiding a submodule) then the relative dir is one folder
-   level different than every project that uses it. Consider a helper alias like this for use when developing:
+```bash
+alias updategoat='git add -A && git commit -m "Update goat" && ggp && cd goat && ggpull && cd .. && git add -A && git commit -m "Update submodule" && ggp
+```
 
-   ```bash
-   alias updategoat='git add -A && git commit -m "Update goat" && ggp && cd goat && ggpull && cd .. && git add -A && git commit -m "Update submodule" && ggp
-   ```
-
-1. Repoint the submodule back to `main` after merging your PR
+This should automatically get reset after your code is merge into `main`.
 
 ## Common Errors
 

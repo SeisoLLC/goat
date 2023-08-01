@@ -92,10 +92,7 @@ jobs:
       - name: Bump the version
         id: bump-version
         run: |
-          git config --global user.name 'Seiso Automation'
-          git config --global user.email 'automation@seisollc.com'
-          # Non-string variables are pending https://github.com/go-task/task/issues/140
-          task pre-commit-update -- commit
+          task pipeline-update -- commit
           task release
           TAG="$(git describe --tags)"
           BRANCH="$(git branch --show-current)"
