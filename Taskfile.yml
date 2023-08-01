@@ -153,23 +153,30 @@ tasks:
           PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
 
   update:
-    desc: >
-      Update the project dev and runtime dependencies, and other misc components
+    desc: Update the project dev and runtime dependencies, and other misc components
     cmds:
       - task: bash:update
+      - task: update-goat-submodule
       - task: pre-commit-update
+      - task: commit-working-dir
 
-  pre-commit-update:
-    desc: Update the hash in .pre-commit-config.yml to HEAD of the main branch
+  commit-working-dir:
+    desc: This commits the working dir when "commit" is passed in the CLI_ARGS
     vars:
       ACTION: "{{.CLI_ARGS}}"
     cmds:
+      - git add -A
+      - git commit -m 'Automatic update'
+
+  update-goat-submodule:
+    dir: goat
+    desc: Ensure the goat submodule is pointing to main and up-to-date
+    cmds:
+      - git fetch origin main
+      - git checkout main
+      - cd .. && git submodule update --remote && git add goat && git commit -m "Autoupdate the goat"
+
+  pre-commit-update:
+    desc: Update the hash in .pre-commit-config.yml to HEAD of the main branch
+    cmds:
       - pipenv run pre-commit autoupdate --bleeding-edge --freeze --jobs 4
-      - |
-        if [[ '{{.ACTION}}' == 'commit' ]]; then
-          git add -A
-          git commit -m 'Bump pre-commit revision'
-        elif [[ '{{.ACTION | default "empty"}}' != 'empty' ]]; then
-          echo 'Unsupported action of {{.ACTION}} provided'
-          exit 230
-        fi
