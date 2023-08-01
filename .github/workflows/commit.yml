@@ -15,7 +15,7 @@ env:
 jobs:
   test:
     name: Test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -57,7 +57,7 @@ jobs:
     if: "${{ github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'Bump version: 2') }}"
     permissions:
       contents: write
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       tag: ${{ steps.bump-version.outputs.tag }}
     steps:
@@ -109,7 +109,7 @@ jobs:
   distribute:
     name: Distribute
     if: ${{ github.event_name == 'push' }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [test, bump-version]
     permissions:
       contents: write
