@@ -146,7 +146,7 @@ tasks:
       - task: bash:release
       - task: component-update
       - git add -A
-      - git commit --amend
+      - git commit --amend --no-edit
 
   publish:
     desc: Publish the project artifacts; docker images, compiled binaries, etc.
