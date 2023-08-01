@@ -89,10 +89,10 @@ jobs:
         run: task init
       - name: Build the goat
         run: task build
-      - name: Bump the version
+      - name: Update and bump the version
         id: bump-version
         run: |
-          task pipeline-update -- commit
+          task component-update
           task release
           TAG="$(git describe --tags)"
           BRANCH="$(git branch --show-current)"

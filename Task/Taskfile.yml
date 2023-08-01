@@ -154,9 +154,6 @@ tasks:
               increment = "01"
           new_version = f"{{.DATE_INFO}}.{increment}"
           print(new_version)'
-    preconditions:
-      - sh: test `git status -s | wc -w` = "0"
-        msg: "There are untracked files, please commit before creating a release."
     cmds:
       # Better conditional syntax is pending https://github.com/go-task/task/issues/608
       - >

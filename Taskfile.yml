@@ -143,6 +143,7 @@ tasks:
   release:
     desc: Cut a project release
     cmds:
+      - task: component-update
       - task: bash:release
 
   publish:
@@ -156,22 +157,25 @@ tasks:
     desc: Update the project dev and runtime dependencies, project submodule, and pre-commit hash
     cmds:
       - task: bash:update
-      - task: pipeline-update
-        vars:
-          COMMIT: 'false'
+      - task: component-update
 
-  pipeline-update:
+  component-update:
     desc: Update the project submodule and pre-commit hash
-    vars:
-      COMMIT: 'true'
     cmds:
-      - '{{if eq .GITHUB_ACTIONS "true"}}git config --global user.name "Seiso Automation"{{end}}'
-      - '{{if eq .GITHUB_ACTIONS "true"}}git config --global user.email "automation@seisollc.com"{{end}}'
-      - {{if eq .COMMIT "true"}}git config --global credential.helper '!f() { sleep 1 && echo "username=${GITHUB_USER}" && echo "password=${GITHUB_PAT}"; }; f'{{end}}
+      - task: pipeline-init
       - task: update-goat-submodule
+      - git add .gitmodules goat
       - task: update-pre-commit
-      - git add -A
-      - git commit -m 'Automatic update'
+      - git add .pre-commit-config.yaml
+
+  pipeline-init:
+    desc: todo
+    status:
+      - '{{if eq .GITHUB_ACTIONS "true"}}exit 1{{end}}'
+    cmds:
+      - git config --global user.name "Seiso Automation"
+      - git config --global user.email "automation@seisollc.com"
+      - git config --global credential.helper '!f() { sleep 1 && echo "username=${GITHUB_USER}" && echo "password=${GITHUB_PAT}"; }; f'
 
   update-goat-submodule:
     desc: Ensure the goat submodule is pointing to main and up-to-date
