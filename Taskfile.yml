@@ -172,6 +172,8 @@ tasks:
     dir: goat
     desc: Ensure the goat submodule is pointing to main and up-to-date
     cmds:
+      - git fetch origin main
+      - git checkout main
       - git pull origin main
       - cd .. && git submodule update --remote && git add goat && git commit -m "Autoupdate the goat"
 
