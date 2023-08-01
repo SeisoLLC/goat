@@ -36,8 +36,8 @@ vars:
         amd64)   echo "${os}/amd64" ;;
 
         # ARM64
-        aarch64) echo "${os}/arm64v8" ;;
-        arm64)   echo "${os}/arm64v8" ;;
+        aarch64) echo "${os}/arm64/v8" ;;
+        arm64)   echo "${os}/arm64/v8" ;;
       esac
   LOCAL_PLATFORM:
     sh: |
