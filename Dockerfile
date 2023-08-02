@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # TARGETPLATFORM is special cased by docker and doesn't need the inital ARG
+# https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
 FROM --platform=$TARGETPLATFORM ghcr.io/yannh/kubeconform:v0.6.3 as kubeconform
 ARG TARGETPLATFORM
 FROM --platform=$TARGETPLATFORM hadolint/hadolint:v2.12.0-alpine as hadolint
