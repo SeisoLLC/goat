@@ -2,16 +2,21 @@
 
 # TARGETPLATFORM is special cased by docker and doesn't need the inital ARG
 # https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
+ARG FIX_PYTHON
 FROM --platform=$TARGETPLATFORM ghcr.io/yannh/kubeconform:v0.6.3 as kubeconform
 ARG TARGETPLATFORM
+ARG FIX_PYTHON
 FROM --platform=$TARGETPLATFORM hadolint/hadolint:v2.12.0-alpine as hadolint
 ARG TARGETPLATFORM
+ARG FIX_PYTHON
 FROM --platform=$TARGETPLATFORM koalaman/shellcheck:v0.9.0 as shellcheck
 ARG TARGETPLATFORM
+ARG FIX_PYTHON
 FROM --platform=$TARGETPLATFORM rhysd/actionlint:1.6.25 as actionlint
 
-ARG TARGETPLATFORM
-FROM --platform=$TARGETPLATFORM python:3.11-alpine3.18 as base_image
+ARG FIX_PYTHON
+# hadolint ignore=DL3029
+FROM --platform=$FIX_PYTHON python:3.11-alpine3.18 as base_image
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
