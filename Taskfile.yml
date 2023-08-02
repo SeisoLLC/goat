@@ -26,7 +26,7 @@ vars:
   INPUT_EXCLUDE: '^/{{.PROJECT_SLUG}}/(goat|Task)/.*'
   SUPPORTED_PLATFORMS: 'linux/amd64,linux/arm64'
   LOCAL_PLATFORM:
-    # Inspired by https://github.com/containerd/containerd/blob/e0912c068b131b33798ae45fd447a1624a6faf0a/platforms/platforms.go#L88-L94
+    # Inspired by https://github.com/containerd/containerd/blob/e0912c068b131b33798ae45fd447a1624a6faf0a/platforms/database.go#L76
     sh: |
       os="linux"
       arch="$(uname -m)"
