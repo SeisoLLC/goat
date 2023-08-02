@@ -24,21 +24,7 @@ vars:
   PYTHON_VERSION: 3.11
   INPUT_DISABLE_MYPY: true
   INPUT_EXCLUDE: '^/{{.PROJECT_SLUG}}/(goat|Task)/.*'
-  SUPPORTED_PLATFORMS: 'linux/amd64,linux/arm64'
-  PYTHON_PLATFORM:
-    sh: |
-      os="linux"
-      arch="$(uname -m)"
-
-      case ${arch} in
-        # AMD64
-        x86_64)  echo "${os}/amd64" ;;
-        amd64)   echo "${os}/amd64" ;;
-
-        # ARM64 special case for https://hub.docker.com/_/python
-        aarch64) echo "${os}/arm64/v8" ;;
-        arm64)   echo "${os}/arm64/v8" ;;
-      esac
+  SUPPORTED_PLATFORMS: 'linux/amd64,linux/arm64/v8'
   LOCAL_PLATFORM:
     sh: |
       os="linux"
@@ -49,9 +35,9 @@ vars:
         x86_64)  echo "${os}/amd64" ;;
         amd64)   echo "${os}/amd64" ;;
 
-        # ARM64
-        aarch64) echo "${os}/arm64" ;;
-        arm64)   echo "${os}/arm64" ;;
+        # ARM64 special case due to https://hub.docker.com/_/python platforms
+        aarch64) echo "${os}/arm64/v8" ;;
+        arm64)   echo "${os}/arm64/v8" ;;
       esac
 
 silent: true
@@ -103,7 +89,6 @@ tasks:
       - task: bash:build
         vars:
           PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
-          DOCKER_BUILDX_CUSTOM_ARGS: '--build-arg PYTHON_PLATFORM="{{.PYTHON_PLATFORM}}"'
 
   test:
     desc: Run the project tests
@@ -154,7 +139,6 @@ tasks:
       - task: bash:publish
         vars:
           PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
-          DOCKER_BUILDX_CUSTOM_ARGS: '--build-arg PYTHON_PLATFORM="{{.PYTHON_PLATFORM}}"'
 
   update:
     desc: Update the project dev and runtime dependencies, project submodule, and pre-commit hash
