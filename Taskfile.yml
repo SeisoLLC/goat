@@ -25,21 +25,6 @@ vars:
   INPUT_DISABLE_MYPY: true
   INPUT_EXCLUDE: '^/{{.PROJECT_SLUG}}/(goat|Task)/.*'
   SUPPORTED_PLATFORMS: 'linux/amd64,linux/arm64'
-  FIX_PYTHON:
-    # Inspired by https://github.com/containerd/containerd/blob/e0912c068b131b33798ae45fd447a1624a6faf0a/platforms/database.go#L76
-    sh: |
-      os="linux"
-      arch="$(uname -m)"
-
-      case ${arch} in
-        # AMD64
-        x86_64)  echo "${os}/amd64" ;;
-        amd64)   echo "${os}/amd64" ;;
-
-        # ARM64 special case due to https://hub.docker.com/_/python platforms
-        aarch64) echo "${os}/arm64/v8" ;;
-        arm64)   echo "${os}/arm64/v8" ;;
-      esac
   LOCAL_PLATFORM:
     # Inspired by https://github.com/containerd/containerd/blob/e0912c068b131b33798ae45fd447a1624a6faf0a/platforms/database.go#L76
     sh: |
@@ -105,7 +90,6 @@ tasks:
       - task: bash:build
         vars:
           PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
-          DOCKER_BUILDX_CUSTOM_ARGS: '--build-arg FIX_PYTHON={{.FIX_PYTHON}}'
 
   test:
     desc: Run the project tests
