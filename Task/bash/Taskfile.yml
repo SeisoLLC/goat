@@ -8,14 +8,14 @@ set:
   - errexit
   - pipefail
 
-vars:
-  VERSION:
-    sh: cat '{{.ROOT_DIR}}/VERSION'
-
 includes:
   base:
     taskfile: ../Taskfile.yml
     internal: true
+
+vars:
+  VERSION:
+    sh: cat '{{.ROOT_DIR}}/VERSION'
 
 tasks:
   lint:

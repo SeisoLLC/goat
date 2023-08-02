@@ -8,14 +8,14 @@ set:
   - errexit
   - pipefail
 
-vars:
-  VERSION:
-    sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
-
 includes:
   base:
     taskfile: ../Taskfile.yml
     internal: true
+
+vars:
+  VERSION:
+    sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
 
 tasks:
   lint:
