@@ -158,6 +158,7 @@ tasks:
       - sh: test `git status -s | wc -w` = "0"
         msg: "There are untracked files, please commit before creating a release."
     cmds:
+      - task: pipeline-git-init
       # Better conditional syntax is pending https://github.com/go-task/task/issues/608
       - >
         {{if eq .VERSIONING "CalVer"}}pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}}
@@ -187,6 +188,15 @@ tasks:
       - >
         docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}}-slim /bin/bash
         -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
+
+  pipeline-git-init:
+    desc: Initialize git configs in the pipeline
+    status:
+      - '{{if eq .GITHUB_ACTIONS "true"}}exit 1{{end}}'
+    cmds:
+      - git config --global user.name "Seiso Automation"
+      - git config --global user.email "automation@seisollc.com"
+      - git config --global credential.helper '!f() { sleep 1 && echo "username=${GITHUB_USER}" && echo "password=${GITHUB_PAT}"; }; f'
 
   clean:
     desc: Clean up build artifacts, cache files/directories, temp files, etc.
