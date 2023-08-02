@@ -49,7 +49,7 @@ jobs:
         uses: arduino/setup-task@v1
       - name: Initialize the repo
         run: task -v init
-      - name: Set up QEMU
+      - name: Set up QEMU for cross-platform emulation
         uses: docker/setup-qemu-action@v2
       - name: Build the goat
         run: task -v build
@@ -151,7 +151,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: seiso/goat
           short-description: Seiso's Grand Opinionated AutoTester (GOAT)
-      - name: Set up QEMU
+      - name: Set up QEMU for cross-platform emulation
         uses: docker/setup-qemu-action@v2
       - name: Build and publish all the supported images to Docker Hub
         run: task publish
