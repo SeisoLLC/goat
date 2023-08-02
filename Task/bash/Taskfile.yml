@@ -59,6 +59,7 @@ tasks:
     requires:
       vars: ['VERSION']
     cmds:
+      - task: bash:pipeline-docker-multiplatform-init
       - task: base:publish
         vars:
           VERSION: '{{.VERSION}}'

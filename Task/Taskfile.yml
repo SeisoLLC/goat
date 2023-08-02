@@ -198,6 +198,14 @@ tasks:
       - git config --global user.email "automation@seisollc.com"
       - git config --global credential.helper '!f() { sleep 1 && echo "username=${GITHUB_USER}" && echo "password=${GITHUB_PAT}"; }; f'
 
+  pipeline-docker-multiplatform-init:
+    desc: Setup docker in a GitHub Actions pipeline for multiplatform builds
+    status:
+      - '{{if eq .GITHUB_ACTIONS "true"}}exit 1{{end}}'
+    cmds:
+      # This fixes an "ERROR: Multiple platforms feature is currently not supported for docker driver" pipeline error
+      - docker buildx create --name multiplatform --driver docker-container --use
+
   clean:
     desc: Clean up build artifacts, cache files/directories, temp files, etc.
     cmds:
