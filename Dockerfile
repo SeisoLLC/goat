@@ -13,7 +13,7 @@ FROM --platform=$TARGETPLATFORM rhysd/actionlint:1.6.25 as actionlint
 ARG TARGETPLATFORM
 FROM --platform=$TARGETPLATFORM python:3.11-alpine3.18 as base_image
 ARG TARGETPLATFORM
-RUN ["echo", "${TARGETPLATFORM}"]
+RUN echo ${TARGETPLATFORM}
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
