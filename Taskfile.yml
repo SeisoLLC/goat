@@ -24,11 +24,28 @@ vars:
   PYTHON_VERSION: 3.11
   INPUT_DISABLE_MYPY: true
   INPUT_EXCLUDE: '^/{{.PROJECT_SLUG}}/(goat|Task)/.*'
+  SUPPORTED_PLATFORMS: 'linux/amd64,linux/arm64'
+  LOCAL_PLATFORM:
+    # Inspired by https://github.com/containerd/containerd/blob/e0912c068b131b33798ae45fd447a1624a6faf0a/platforms/database.go#L76
+    sh: |
+      os="linux"
+      arch="$(uname -m)"
+
+      case ${arch} in
+        # AMD64
+        x86_64)  echo "${os}/amd64" ;;
+        amd64)   echo "${os}/amd64" ;;
+
+        # ARM64 special case due to https://hub.docker.com/_/python platforms
+        aarch64) echo "${os}/arm64" ;;
+        arm64)   echo "${os}/arm64" ;;
+      esac
 
 silent: true
 
 tasks:
   init-pipenv:
+    desc: Initializes the pipenv virtual environment if Pipfile.lock changes
     internal: true
     sources:
       - Pipfile.lock
@@ -36,11 +53,15 @@ tasks:
       - pipenv install --deploy --ignore-pipfile --dev
 
   init-submodules:
+    desc: >
+      Initializes git submodules; paved road projects include the Seiso goat 🐐
+      for its shared configs, etc.
     internal: true
     cmds:
       - git submodule update --init
 
   init-pre-commit:
+    desc: Install the pre-commit hooks
     internal: true
     sources:
       - .pre-commit-config.yaml
@@ -48,12 +69,14 @@ tasks:
       - pipenv run pre-commit install
 
   init:
+    desc: Initialize the repo for local use; intended to be run after git clone
     cmds:
       - task: init-pipenv
       - task: init-submodules
       - task: init-pre-commit
 
   lint:
+    desc: Run the linter(s); paved road projects use the Seiso goat 🐐
     cmds:
       - task: bash:lint
         vars:
@@ -62,14 +85,23 @@ tasks:
           INPUT_LOG_LEVEL: '{{.CLI_ARGS}}'
 
   build:
+    desc: Build the docker image; set PLATFORM env var for cross-platform builds
     cmds:
       - task: bash:build
+        vars:
+          PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
 
   test:
+    desc: Run the project tests
     env:
       INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY}}'
       INPUT_EXCLUDE: '{{.INPUT_EXCLUDE}}'
       INPUT_LOG_LEVEL: "{{.CLI_ARGS}}"
+    vars:
+      PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
+    # If a cross-platform image is provided via in the PLATFORM var, exit 1 here which bypasses tests
+    status:
+      - '{{if eq .PLATFORM .LOCAL_PLATFORM}}exit 1{{end}}'
     cmds:
       - echo "Baaaaaaaaaaah! (Running the goat)"
       - |
@@ -88,35 +120,49 @@ tasks:
         fi
 
   clean:
+    desc: Clean up build artifacts, cache files/directories, temp files, etc.
     cmds:
       - task: bash:clean
 
   release:
+    desc: Cut a project release
     cmds:
       - task: bash:release
+      - task: component-update
+      - git add -A
+      - 'git commit --amend --no-edit'
+      - git tag -a v$(cat VERSION) -m "$(cat VERSION) release"
 
   publish:
+    desc: Publish the project artifacts; docker images, compiled binaries, etc.
     cmds:
+      # We call into the bash:publish instead of across to build to simplify centralized policy assessments (i.e. "is the project using a goat-provided task?")
       - task: bash:publish
         vars:
-          TAGS: 'latest'
-          IMAGE_NAME: '{{.IMAGE_NAME}}'
+          PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
 
   update:
+    desc: Update the project dev and runtime dependencies, project submodule, and pre-commit hash
     cmds:
       - task: bash:update
-      - task: pre-commit-update
+      - task: component-update
 
-  pre-commit-update:
-    vars:
-      ACTION: "{{.CLI_ARGS}}"
+  component-update:
+    desc: Update the project submodule and pre-commit hash
+    cmds:
+      - task: update-goat-submodule
+      - git add .gitmodules goat
+      - task: update-pre-commit
+      - git add .pre-commit-config.yaml
+
+  update-goat-submodule:
+    desc: Ensure the goat submodule is pointing to main and up-to-date
+    cmds:
+      - rm -rf .gitmodules goat/
+      - touch .gitmodules
+      - git submodule add --force -b main https://github.com/SeisoLLC/goat
+
+  update-pre-commit:
+    desc: Update the hash in .pre-commit-config.yml to HEAD of the main branch
     cmds:
       - pipenv run pre-commit autoupdate --bleeding-edge --freeze --jobs 4
-      - |
-        if [[ '{{.ACTION}}' == 'commit' ]]; then
-          git add -A
-          git commit -m 'Bump pre-commit revision'
-        elif [[ '{{.ACTION | default "empty"}}' != 'empty' ]]; then
-          echo 'Unsupported action of {{.ACTION}} provided'
-          exit 230
-        fi

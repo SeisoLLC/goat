@@ -11,6 +11,17 @@ task init
 
 We are also in the process of migrating from `Invoke` to `Taskfile`; if you want to use the `task` commands, you must install `Taskfile`
 
+### Helpful tasks
+
+Build all of the supported docker images:
+
+```bash
+PLATFORM='all' task build
+```
+
+To build a docker image for a specific platform, set `PLATFORM` to either `linux/arm64` or `linux/amd64`. In order for this to work, you must have QEMU or a
+similar emulation package setup (which is usually there by default); this is why we use `docker/setup-qemu-action@v2` in the GitHub Actions pipeline.
+
 ## Running the goat against the goat project locally
 
 There are two ways of running the `goat` locally:
@@ -94,3 +105,33 @@ There are two ways of running the `goat` locally:
 
 1. If adding linters to `linters.json`, the `executor` is an optional member of the linter object.
 2. The `autofix` member is also optional. If a linter has an autofix command-line option, this field holds those arguments.
+
+### Iterating on Taskfile.yml files
+
+Make sure you update the submodule to point to your working branch, otherwise your changes under `Task/` will not affect the parent `Taskfile.yml` tasks that
+`include` the `goat/Task/**/Taskfile.yml` files. We can't avoid this because the `Task/**/Taskfile.yml` files have a relative `dir:` and if the `goat` uses it
+directly (avoiding a submodule) then the relative dir is one folder level different than every project that uses it. Consider a helper alias like this for use
+when developing:
+
+```bash
+alias updategoat='git add -A && git commit -m "Update goat" && ggp && cd goat && ggpull && cd .. && git add -A && git commit -m "Update submodule" && ggp
+```
+
+This should automatically get reset after your code is merge into `main`.
+
+## Common Errors
+
+When attempting a `PLATFORM=all task build` you may encounter this error:
+
+```bash
+ERROR: Multiple platforms feature is currently not supported for docker driver. Please switch to a different driver (eg. "docker buildx create --use")
+
+task: Failed to run task "build": exit status 1
+```
+
+Recreating your `desktop-linux` builder instance may fix it:
+
+```bash
+docker context rm -f desktop-linux
+docker buildx create --name desktop-linux --driver docker-container --use
+```

@@ -1,4 +1,4 @@
 [submodule "goat"]
 	path = goat
-	url = https://github.com/seisollc/goat
-	branch = main
+	url = https://github.com/SeisoLLC/goat
+	branch = feature/multiplatform-goats

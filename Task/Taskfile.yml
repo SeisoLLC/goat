@@ -9,7 +9,7 @@ set:
   - pipefail
 
 vars:
-  PLATFORM:
+  LOCAL_PLATFORM:
     sh: |
       os="linux"
       arch="$(uname -m)"
@@ -26,6 +26,7 @@ vars:
 
 tasks:
   lock:
+    desc: Generate a Pipfile.lock if Pipfile changed from last run
     dir: ../../..
     internal: true
     sources:
@@ -36,20 +37,19 @@ tasks:
       - pipenv lock
 
   lint:
+    desc: Run the linter(s); paved road projects use the Seiso goat 🐐
     platforms: [linux, darwin]
-    # Adjustments are passed as vars, not envs, to avoid local workarounds
     vars:
       INPUT_AUTO_FIX: '{{.INPUT_AUTO_FIX | default ""}}'
       INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY | default ""}}'
       INPUT_EXCLUDE: '{{.INPUT_EXCLUDE | default ""}}'
       INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL | default ""}}'
-      REPO_DIR: '{{.REPO_DIR}}'
     preconditions:
       # Temporary workaround until we have an arm64 image on docker hub
       - sh: |
           if [[ "$(uname -m)" -ne "arm64" ]]; then
-            docker pull --platform '{{.PLATFORM}}' seiso/goat:latest || \
-              echo "Failed to pull the {{.PLATFORM}} goat, continuing anyway..."
+            docker pull seiso/goat:latest || \
+              echo "Failed to pull the goat, continuing anyway..."
           fi
     cmds:
       - pwd
@@ -61,11 +61,16 @@ tasks:
                    --rm -v "{{.ROOT_DIR}}:/goat" seiso/goat:latest
 
   build:
+    desc: Build the project; docker images, compiled binaries, etc.
     platforms: [linux, darwin]
-    # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.
     dir: ../../..
+    requires:
+      vars: ['VERSION']
     vars:
-      VERSION: '{{.VERSION | default "UNKNOWN"}}'
+      VERSION: '{{.VERSION}}'
+      PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
+      PUBLISH: '{{.PUBLISH | default "false"}}'
+      DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
       TAG_COMMIT_HASH:
         sh: git rev-list -1 "v{{.VERSION}}"
       COMMIT_HASH:
@@ -91,20 +96,33 @@ tasks:
               build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
           print(build_version)'
     cmds:
+      # We only load when the provided platform equals the detected local platform. This is for two reasons:
+      # 1. We assume you don't want to load a cross-platform build
+      # 2. Currently (2023-07-30) you cannot --load if you are building multiple platforms
+      #
+      # Also, we make load and push mutually exclusive because docker says "ERROR: push and load may not be set together at the moment"
+      #
+      # Finally, we combine this all together in one `docker buildx build` with `--push` when {{.PUBLISH}} is true so that it handles the multi-platform
+      # manifest creation for us. Otherwise we'd need to push per-platform tags and artisanally craft the manifest with `crane`, `docker manifest`, or similar
       - |
-        docker buildx build --load \
-                            --platform="{{.PLATFORM}}" \
+        docker buildx build --platform="{{.PLATFORM}}" \
+                            {{if eq .PUBLISH "true"}}--push{{else if eq .PLATFORM .LOCAL_PLATFORM}}--load{{end}} \
+                            {{if .DOCKER_BUILDX_CUSTOM_ARGS}}{{.DOCKER_BUILDX_CUSTOM_ARGS}}{{end}} \
                             --build-arg VERSION="{{.BUILD_VERSION}}" \
                             --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" \
                             --tag {{.IMAGE_NAME}}:latest \
                             --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} \
                             "${PWD}/."
+      - '{{if ne .PLATFORM .LOCAL_PLATFORM}}{{if ne .PUBLISH "true"}}echo "WARNING: Avoided loading {{.IMAGE_NAME}}:latest and {{.IMAGE_NAME}}:{{.BUILD_VERSION}} into your docker daemon because you built a cross-platform image of {{.PLATFORM}}"{{end}}{{end}}'
 
   release:
+    desc: Cut a project release
     # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.
     dir: ../../..
+    requires:
+      vars: ['PYTHON_VERSION']
     vars:
-      PYTHON_VERSION: '{{default "" .PYTHON_VERSION}}'
+      PYTHON_VERSION: '{{.PYTHON_VERSION}}'
       RELEASE_TYPE: "{{.CLI_ARGS}}"
       DATE_INFO: '{{now | date "2006.01"}}'
       REPO_TAGS:
@@ -140,23 +158,27 @@ tasks:
       - sh: test `git status -s | wc -w` = "0"
         msg: "There are untracked files, please commit before creating a release."
     cmds:
+      - task: pipeline-git-init
       # Better conditional syntax is pending https://github.com/go-task/task/issues/608
       - >
         {{if eq .VERSIONING "CalVer"}}pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}}
         unusedpart{{else if eq .VERSIONING "SemVer"}}pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}{{end}}
 
   publish:
-    vars:
-      TAGS: '{{default "all" .TAGS}}'
-      IMAGE_NAME: '{{default "" .IMAGE_NAME}}'
+    desc: Publish the project artifacts; docker images, compiled binaries, etc.
+    requires:
+      vars: ['VERSION']
     cmds:
-      # Better conditional syntax is pending https://github.com/go-task/task/issues/608
-      - >
-        {{if eq .TAGS "all"}}docker push --all-tags {{.IMAGE_NAME}}
-        {{else if eq .TAGS "latest"}}docker push {{.IMAGE_NAME}}:latest
-        {{else}}echo "Invalid TAGS var"; exit 1{{end}}
+      - task: build
+        vars:
+          PUBLISH: 'true'
+          VERSION: '{{.VERSION}}'
+          PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
+          DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 
   update:
+    desc: >
+      Update the project dev and runtime dependencies, and other misc components
     # This is a relative path which should place us back into the calling repo, assuming this is called from a goat/Task/*/Taskfile.yml.
     dir: ../../..
     cmds:
@@ -167,7 +189,17 @@ tasks:
         docker run --rm -v "${PWD}:/usr/src/app" -w /usr/src/app python:{{.PYTHON_VERSION}}-slim /bin/bash
         -c "python3 -m pip install --upgrade pipenv &>/dev/null && pipenv update"
 
+  pipeline-git-init:
+    desc: Initialize git configs in the pipeline
+    status:
+      - '{{if eq .GITHUB_ACTIONS "true"}}exit 1{{end}}'
+    cmds:
+      - git config --global user.name "Seiso Automation"
+      - git config --global user.email "automation@seisollc.com"
+      - git config --global credential.helper '!f() { sleep 1 && echo "username=${GITHUB_USER}" && echo "password=${GITHUB_PAT}"; }; f'
+
   clean:
+    desc: Clean up build artifacts, cache files/directories, temp files, etc.
     cmds:
       - find {{.ROOT_DIR}} -type f -name '.DS_Store' -delete
       - find {{.ROOT_DIR}} -type f -name '.Thumbs.db' -delete

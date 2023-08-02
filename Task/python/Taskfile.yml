@@ -13,8 +13,13 @@ includes:
     taskfile: ../Taskfile.yml
     internal: true
 
+vars:
+  VERSION:
+    sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
+
 tasks:
   lint:
+    desc: Run the linter(s); paved road projects use the Seiso goat 🐐
     platforms: [linux, darwin]
     cmds:
       - task: base:lint
@@ -23,37 +28,50 @@ tasks:
           INPUT_DISABLE_MYPY: '{{.INPUT_DISABLE_MYPY | default "true"}}'
           INPUT_EXCLUDE: '{{.INPUT_EXCLUDE | default ""}}'
           INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL | default ""}}'
+          IMAGE_NAME: '{{.IMAGE_NAME | default ""}}'
 
   test:
+    desc: Run the project tests
     cmds:
       - pipenv run pytest --cov={{.PROJECT_SLUG}} tests
 
   build:
+    desc: Build the project; docker images, compiled binaries, etc.
     platforms: [linux, darwin]
-    vars:
-      VERSION:
-        sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
+    requires:
+      vars: ['VERSION']
     cmds:
       - task: base:build
         vars:
           VERSION: '{{.VERSION}}'
+          PLATFORM: '{{.PLATFORM | default ""}}'
+          DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 
   update:
+    desc: >
+      Update the project dev and runtime dependencies, and other misc components
     cmds:
       - task: base:update
 
   release:
+    desc: Cut a project release
     cmds:
       - task: base:release
 
   publish:
+    desc: Publish the project artifacts; docker images, compiled binaries, etc.
+    platforms: [linux, darwin]
+    requires:
+      vars: ['VERSION']
     cmds:
       - task: base:publish
         vars:
-          TAGS: '{{default "all" .TAGS}}'
-          IMAGE_NAME: '{{default "" .IMAGE_NAME}}'
+          VERSION: '{{.VERSION}}'
+          PLATFORM: '{{.PLATFORM | default ""}}'
+          DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 
   clean:
+    desc: Clean up build artifacts, cache files/directories, temp files, etc.
     cmds:
       - task: base:clean
       - find {{.ROOT_DIR}} -type d -name 'coverage-reports' -exec rm -rf {} +
