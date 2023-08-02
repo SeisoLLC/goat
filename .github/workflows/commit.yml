@@ -25,7 +25,7 @@ jobs:
       matrix:
         platform:
           - linux/amd64
-          - linux/arm64
+          - linux/arm64/v8
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
