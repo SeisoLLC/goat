@@ -79,7 +79,7 @@ tasks:
       BUILD_VERSION:
         sh: |
           pipenv run python -c '
-          version_string = "{{.VERSION}}"
+          version_string = "v{{.VERSION}}"
           repo_tags = []
           {{range $tag := .REPO_TAGS | splitLines -}}
           repo_tags.append("{{$tag}}")
