@@ -11,6 +11,7 @@ bruteforce
 bruteforcing
 bssid
 bssids
+buildx
 capricornis
 casp
 cissp
@@ -51,6 +52,7 @@ flameshot
 gcux
 gcwn
 getuserspns
+ggpull
 giac
 gitleaks
 gitpython
@@ -135,9 +137,9 @@ sast
 secretsdump
 seiso
 seiso's
-seiso’s
 seisollc
 seisosimpleshell
+seiso’s
 servdev
 sha256
 sha256sum
@@ -165,6 +167,7 @@ typosquat
 typosquatting
 unmarshal
 unmarshalling
+updategoat
 vectr
 vimrc
 vishing

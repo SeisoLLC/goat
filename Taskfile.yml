@@ -14,11 +14,12 @@ includes:
     internal: true
     optional: true
     vars:
-      IMAGE_NAME: "{{.IMAGE_NAME}}"
-      PROJECT_SLUG: "{{.PROJECT_SLUG}}"
-      PYTHON_VERSION: "{{.PYTHON_VERSION}}"
+      IMAGE_NAME: seiso/goat
+      PROJECT_SLUG: goat
+      PYTHON_VERSION: 3.11
 
 vars:
+  # This unfortunately needs to be duplicated, pending https://github.com/go-task/task/issues/1295
   IMAGE_NAME: seiso/goat
   PROJECT_SLUG: goat
   PYTHON_VERSION: 3.11

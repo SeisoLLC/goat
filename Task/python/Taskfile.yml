@@ -13,10 +13,6 @@ includes:
     taskfile: ../Taskfile.yml
     internal: true
 
-vars:
-  VERSION:
-    sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
-
 tasks:
   lint:
     desc: Run the linter(s); paved road projects use the Seiso goat 🐐
@@ -38,12 +34,11 @@ tasks:
   build:
     desc: Build the project; docker images, compiled binaries, etc.
     platforms: [linux, darwin]
-    requires:
-      vars: ['VERSION']
     cmds:
       - task: base:build
         vars:
-          VERSION: '{{.VERSION}}'
+          # Unable to make this global due to https://taskfile.dev/usage/#variables see https://github.com/go-task/task/issues/1295
+          VERSION: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
           PLATFORM: '{{.PLATFORM | default ""}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 
@@ -61,13 +56,12 @@ tasks:
   publish:
     desc: Publish the project artifacts; docker images, compiled binaries, etc.
     platforms: [linux, darwin]
-    requires:
-      vars: ['VERSION']
     cmds:
       - task: base:pipeline-docker-multiplatform-init
       - task: base:publish
         vars:
-          VERSION: '{{.VERSION}}'
+          # Unable to make this global due to https://taskfile.dev/usage/#variables see https://github.com/go-task/task/issues/1295
+          VERSION: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
           PLATFORM: '{{.PLATFORM | default ""}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 
