@@ -89,8 +89,6 @@ jobs:
         uses: arduino/setup-task@v1
       - name: Initialize the repo
         run: task -v init
-      - name: Build the goat
-        run: task -v build
       - name: Update and bump the version
         id: bump-version
         run: |
