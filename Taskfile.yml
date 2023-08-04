@@ -66,6 +66,9 @@ tasks:
     internal: true
     sources:
       - .pre-commit-config.yaml
+    status:
+      # Don't run this in pipelines
+      - '{{if eq .GITHUB_ACTIONS "true"}}exit 1{{end}}'
     cmds:
       - pipenv run pre-commit install
 
