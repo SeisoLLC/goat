@@ -17,6 +17,7 @@ includes:
       IMAGE_NAME: seiso/goat
       PROJECT_SLUG: goat
       PYTHON_VERSION: 3.11
+      VERSION: '{{.VERSION}}'
 
 vars:
   # This unfortunately needs to be duplicated, pending https://github.com/go-task/task/issues/1295
@@ -26,6 +27,8 @@ vars:
   INPUT_DISABLE_MYPY: true
   INPUT_EXCLUDE: '^/{{.PROJECT_SLUG}}/(goat|Task)/.*'
   SUPPORTED_PLATFORMS: 'linux/amd64,linux/arm64'
+  VERSION:
+    sh: cat '{{.ROOT_DIR}}/VERSION'
   LOCAL_PLATFORM:
     # Inspired by https://github.com/containerd/containerd/blob/e0912c068b131b33798ae45fd447a1624a6faf0a/platforms/database.go#L76
     sh: |
