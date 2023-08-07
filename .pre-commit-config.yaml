@@ -5,6 +5,6 @@ repos:
     hooks:
       - id: seiso-lint
   - repo: https://github.com/pre-commit/pre-commit
-    rev: v4.4.0
+    rev: v3.3.0
     hooks:
       - id: validate_manifest
