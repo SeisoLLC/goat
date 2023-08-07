@@ -155,27 +155,6 @@ tasks:
           PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
 
   update:
-    desc: Update the project dev and runtime dependencies, project submodule, and pre-commit hash
+    desc: Update the project dev and runtime dependencies, and pre-commit hash
     cmds:
       - task: bash:update
-      - task: component-update
-
-  component-update:
-    desc: Update the project submodule and pre-commit hash
-    cmds:
-      - task: update-goat-submodule
-      - git add .gitmodules goat
-      - task: update-pre-commit
-      - git add .pre-commit-config.yaml
-
-  update-goat-submodule:
-    desc: Ensure the goat submodule is pointing to main and up-to-date
-    cmds:
-      - rm -rf .gitmodules goat/
-      - touch .gitmodules
-      - git submodule add --force -b main https://github.com/SeisoLLC/goat
-
-  update-pre-commit:
-    desc: Update the hash in .pre-commit-config.yml to HEAD of the main branch
-    cmds:
-      - pipenv run pre-commit autoupdate --bleeding-edge --freeze --jobs 4
