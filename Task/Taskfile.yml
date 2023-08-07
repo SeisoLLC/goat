@@ -93,6 +93,7 @@ tasks:
               build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
           print(build_version)'
     cmds:
+      - task: pipeline-docker-multiplatform-init
       # We only load when the provided platform equals the detected local platform. This is for two reasons:
       # 1. We assume you don't want to load a cross-platform build
       # 2. Currently (2023-07-30) you cannot --load if you are building multiple platforms
