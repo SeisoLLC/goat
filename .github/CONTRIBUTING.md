@@ -106,19 +106,6 @@ There are two ways of running the `goat` locally:
 1. If adding linters to `linters.json`, the `executor` is an optional member of the linter object.
 2. The `autofix` member is also optional. If a linter has an autofix command-line option, this field holds those arguments.
 
-### Iterating on Taskfile.yml files
-
-Make sure you update the submodule to point to your working branch, otherwise your changes under `Task/` will not affect the parent `Taskfile.yml` tasks that
-`include` the `goat/Task/**/Taskfile.yml` files. We can't avoid this because the `Task/**/Taskfile.yml` files have a relative `dir:` and if the `goat` uses it
-directly (avoiding a submodule) then the relative dir is one folder level different than every project that uses it. Consider a helper alias like this for use
-when developing:
-
-```bash
-alias updategoat='git add -A && git commit -m "Update goat" && ggp && cd goat && ggpull && cd .. && git add -A && git commit -m "Update submodule" && ggp
-```
-
-This should automatically get reset after your code is merge into `main`.
-
 ## Common Errors
 
 When attempting a `PLATFORM=all task build` you may encounter this error:
