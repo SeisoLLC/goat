@@ -61,6 +61,10 @@ tasks:
       Initializes git submodules; paved road projects include the Seiso goat 🐐
       for its shared configs, etc.
     internal: true
+    status:
+      # Don't update submodules if you aren't in a git repository; quote to avoid yaml intrepretering the ! as a node tag
+      # https://yaml.org/spec/1.2.2/#691-node-tags
+      - '! test -d .git'
     cmds:
       - git submodule update --init
 
@@ -69,6 +73,10 @@ tasks:
     internal: true
     sources:
       - .pre-commit-config.yaml
+    status:
+      # Don't install the pre-commit hooks if you aren't in a git repository; quote to avoid yaml intrepretering the ! as a node tag
+      # https://yaml.org/spec/1.2.2/#691-node-tags
+      - '! test -d .git'
     cmds:
       # Don't run this in pipelines
       - '{{if ne .GITHUB_ACTIONS "true"}}pipenv run pre-commit install{{end}}'
