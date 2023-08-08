@@ -104,28 +104,6 @@ tasks:
         vars:
           PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
 
-  validate-pre-commit-config:
-    desc: Validate the pre-commit configuration file
-    cmds:
-      - echo "-Validating pre-commit config file"
-      - pipenv run pre-commit validate-config '.pre-commit-config.yaml'
-    status:
-      - test -f {{.CONFIG_FILE}}
-    vars:
-      CONFIG_FILE:
-        sh: find . -name ".pre-commit-config.yaml"
-
-  validate-pre-commit-manifest:
-    desc: Validate the pre-commit hooks file
-    cmds:
-      - echo "-Validating pre-commit hooks file"
-      - pipenv run pre-commit validate-manifest '.pre-commit-hooks.yaml'
-    status:
-      - test -f {{.MANIFEST_FILE}}
-    vars:
-      MANIFEST_FILE:
-        sh: find . -name ".pre-commit-hooks.yaml"
-  
   test:
     desc: Run the project tests
     env:
@@ -139,8 +117,7 @@ tasks:
       - '{{if eq .PLATFORM .LOCAL_PLATFORM}}exit 1{{end}}'
     cmds:
       - echo "Baaaaaaaaaaah! (Running the goat)"
-      - task: validate-pre-commit-manifest
-      - task: validate-pre-commit-config
+      - task: bash:validate
       - |
         if [[ "${GITHUB_ACTIONS:-false}" == "true" ]]; then
           repo="${GITHUB_WORKSPACE}"
