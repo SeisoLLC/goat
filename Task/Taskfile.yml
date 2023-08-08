@@ -201,7 +201,8 @@ tasks:
       - '{{if eq .GITHUB_ACTIONS "true"}}exit 1{{end}}'
     cmds:
       # This fixes an "ERROR: Multiple platforms feature is currently not supported for docker driver" pipeline error
-      - docker buildx create --name multiplatform --driver docker-container --use
+      # Only create our multiplatform builder if it doesn't already exist; otherwise list information about the one that exists
+      - docker buildx inspect multiplatform || docker buildx create --name multiplatform --driver docker-container --use
 
   clean:
     desc: Clean up build artifacts, cache files/directories, temp files, etc.

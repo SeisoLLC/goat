@@ -36,10 +36,12 @@ tasks:
     desc: Build the project; docker images, compiled binaries, etc.
     platforms: [linux, darwin]
     cmds:
+      - task: base:pipeline-docker-multiplatform-init
       - task: base:build
         vars:
           # Unable to make this global due to https://taskfile.dev/usage/#variables see https://github.com/go-task/task/issues/1295
-          VERSION: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
+          VERSION:
+            sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
           PLATFORM: '{{.PLATFORM | default ""}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 
@@ -62,7 +64,8 @@ tasks:
       - task: base:publish
         vars:
           # Unable to make this global due to https://taskfile.dev/usage/#variables see https://github.com/go-task/task/issues/1295
-          VERSION: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
+          VERSION:
+            sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
           PLATFORM: '{{.PLATFORM | default ""}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 

@@ -167,7 +167,6 @@ typosquat
 typosquatting
 unmarshal
 unmarshalling
-updategoat
 vectr
 vimrc
 vishing
