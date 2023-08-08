@@ -117,6 +117,7 @@ tasks:
       - '{{if eq .PLATFORM .LOCAL_PLATFORM}}exit 1{{end}}'
     cmds:
       - echo "Baaaaaaaaaaah! (Running the goat)"
+      - task: bash:validate
       - |
         if [[ "${GITHUB_ACTIONS:-false}" == "true" ]]; then
           repo="${GITHUB_WORKSPACE}"

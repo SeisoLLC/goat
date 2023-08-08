@@ -26,6 +26,11 @@ tasks:
           INPUT_LOG_LEVEL: '{{.INPUT_LOG_LEVEL | default ""}}'
           VERSION: '{{.VERSION}}'
 
+  validate:
+    desc: Validate the pre-commit config and hooks files
+    cmds:
+      - task: base:validate
+
   build:
     desc: Build the project; docker images, compiled binaries, etc.
     platforms: [linux, darwin]

@@ -57,6 +57,30 @@ tasks:
                    --env INPUT_LOG_LEVEL="{{.INPUT_LOG_LEVEL}}" \
                    --rm -v "{{.ROOT_DIR}}:/goat" seiso/goat:latest
 
+  validate:
+    desc: Validate pre-commit config and hooks files
+    cmds:
+      - task: validate-pre-commit-config
+      - task: validate-pre-commit-manifest
+
+  validate-pre-commit-config:
+    desc: Validate the pre-commit configuration file
+    dir: ../../..
+    cmds:
+      - echo "-Validating pre-commit config file"
+      - pipenv run pre-commit validate-config '.pre-commit-config.yaml'
+    status:
+      - test -f ../../.pre-commit-config.yaml
+
+  validate-pre-commit-manifest:
+    desc: Validate the pre-commit hooks file
+    dir: ../../..
+    cmds:
+      - echo "-Validating pre-commit hooks file"
+      - pipenv run pre-commit validate-manifest '.pre-commit-hooks.yaml'
+    status:
+      - test -f ../../.pre-commit-hooks.yaml
+ 
   build:
     desc: Build the project; docker images, compiled binaries, etc.
     platforms: [linux, darwin]
