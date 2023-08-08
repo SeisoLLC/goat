@@ -79,7 +79,7 @@ tasks:
       - echo "-Validating pre-commit hooks file"
       - pipenv run pre-commit validate-manifest '.pre-commit-hooks.yaml'
     status:
-      - test -f "../../.pre-commit-hooks.yaml"
+      - test -f ../../.pre-commit-hooks.yaml
  
   build:
     desc: Build the project; docker images, compiled binaries, etc.
