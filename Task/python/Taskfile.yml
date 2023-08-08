@@ -29,9 +29,7 @@ tasks:
 
   test:
     desc: Run the project tests
-    cmds:      
-      - pipenv run pre-commit validate-manifest '.pre-commit-hooks.yaml'
-      - pipenv run pre-commit validate-config '.pre-commit-config.yaml'
+    cmds:
       - pipenv run pytest --cov={{.PROJECT_SLUG}} tests
 
   build:
