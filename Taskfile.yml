@@ -109,6 +109,9 @@ tasks:
       - '{{if eq .PLATFORM .LOCAL_PLATFORM}}exit 1{{end}}'
     cmds:
       - echo "Baaaaaaaaaaah! (Running the goat)"
+      - echo " -Validating pre-commit YAML"
+      - pipenv run pre-commit validate-manifest '.pre-commit-hooks.yaml'
+      - pipenv run pre-commit validate-config '.pre-commit-config.yaml'
       - |
         if [[ "${GITHUB_ACTIONS:-false}" == "true" ]]; then
           repo="${GITHUB_WORKSPACE}"
