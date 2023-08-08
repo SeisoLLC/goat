@@ -69,10 +69,7 @@ tasks:
       - echo "-Validating pre-commit config file"
       - pipenv run pre-commit validate-config '.pre-commit-config.yaml'
     status:
-      - test -f {{.CONFIG_FILE}}
-    vars:
-      CONFIG_FILE:
-        sh: find . -name ".pre-commit-config.yaml"
+      - test -f ../../.pre-commit-config.yaml
 
   validate-pre-commit-manifest:
     desc: Validate the pre-commit hooks file
@@ -81,10 +78,7 @@ tasks:
       - echo "-Validating pre-commit hooks file"
       - pipenv run pre-commit validate-manifest '.pre-commit-hooks.yaml'
     status:
-      - test -f {{.MANIFEST_FILE}}
-    vars:
-      MANIFEST_FILE:
-        sh: find . -name ".pre-commit-hooks.yaml"
+      - test -f "../../.pre-commit-hooks.yaml"
  
   build:
     desc: Build the project; docker images, compiled binaries, etc.
