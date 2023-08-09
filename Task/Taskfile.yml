@@ -68,16 +68,22 @@ tasks:
     dir: ../../..
     cmds:
       - echo "-Validating pre-commit config file"
-      - cmd: pipenv run pre-commit validate-config .pre-commit-config.yaml
-        ignore_error: true
+      - |
+        if test -f .pre-commit-config.yaml; 
+        then pipenv run pre-commit validate-config .pre-commit-config.yaml; 
+        else echo ".pre-commit-config.yaml does not exist"; 
+        fi
 
   validate-pre-commit-manifest:
     desc: Validate the pre-commit hooks file
     dir: ../../..
     cmds:
       - echo "-Validating pre-commit hooks file"
-      - cmd: pipenv run pre-commit validate-manifest .pre-commit-hooks.yaml
-        ignore_error: true
+      - |
+        if test -f .pre-commit-hooks.yaml;
+        then pipenv run pre-commit validate-manifest .pre-commit-hooks.yaml;
+        else echo ".pre-commit-hooks.yaml does not exist";
+        fi
  
   build:
     desc: Build the project; docker images, compiled binaries, etc.
