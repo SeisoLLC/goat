@@ -68,7 +68,7 @@ tasks:
     dir: ../../..
     cmds:
       - echo "-Validating pre-commit config file"
-      - pipenv run pre-commit validate-config .pre-commit-config.yaml; 
+      - pipenv run pre-commit validate-config .pre-commit-config.yaml
     status:
       - '! test -f .pre-commit-config.yaml'
 
