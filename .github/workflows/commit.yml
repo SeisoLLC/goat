@@ -104,6 +104,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: seiso/goat
           short-description: Seiso's Grand Opinionated AutoTester (GOAT)
+      - name: Push the release commit
+        run: |
+          BRANCH="$(git branch --show-current)"
+          git push --atomic origin "${BRANCH}" "${{ env.TAG }}"
       - name: Publish the release to GitHub
         uses: softprops/action-gh-release@v1
         env:
@@ -113,7 +117,3 @@ jobs:
           tag_name: ${{ env.TAG }}
           draft: false
           prerelease: false
-      - name: Push the release commit
-        run: |
-          BRANCH="$(git branch --show-current)"
-          git push --atomic origin "${BRANCH}" "${{ env.TAG }}"
