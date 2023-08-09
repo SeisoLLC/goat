@@ -82,7 +82,6 @@ jobs:
       - name: Initialize the repo
         run: task -v init
       - name: Update and bump the version
-        id: new-tag
         run: |
           task -v release
           TAG="$(git describe --tags)"
@@ -116,6 +115,5 @@ jobs:
           prerelease: false
       - name: Push the release commit
         run: |
-          TAG="$(git describe --tags)"
           BRANCH="$(git branch --show-current)"
-          git push --atomic origin "${BRANCH}" "${TAG}"
+          git push --atomic origin "${BRANCH}" "${{ env.TAG }}"
