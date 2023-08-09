@@ -62,7 +62,7 @@ tasks:
       for its shared configs, etc.
     internal: true
     status:
-      # Don't update submodules if you aren't in a git repository; quote to avoid yaml intrepretering the ! as a node tag
+      # Only update submodules if you are in a git repository; quote to avoid yaml intrepretering the ! as a node tag
       # https://yaml.org/spec/1.2.2/#691-node-tags
       - '! test -d .git'
     cmds:
@@ -74,7 +74,7 @@ tasks:
     sources:
       - .pre-commit-config.yaml
     status:
-      # Don't install the pre-commit hooks if you aren't in a git repository; quote to avoid yaml intrepretering the ! as a node tag
+      # Only install the pre-commit hooks if you are in a git repository; quote to avoid yaml intrepretering the ! as a node tag
       # https://yaml.org/spec/1.2.2/#691-node-tags
       - '! test -d .git'
     cmds:
