@@ -479,7 +479,7 @@ fi
 if [[ -n "${rerun_linter_successes[*]}" && -n $(git status -s) ]]; then
 	for success in "${rerun_linter_successes[@]}"; do
 		if [[ ${CI:-false} == "true" ]]; then
-			feedback ERROR "$success detected issues but they can be **automatically fixed**; run 'pipenv run invoke lint' locally, commit, and push."
+			feedback ERROR "$success detected issues but they can be **automatically fixed**; run 'task lint' locally, commit, and push."
 			continue
 		fi
 
