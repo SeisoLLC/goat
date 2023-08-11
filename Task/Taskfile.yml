@@ -277,7 +277,7 @@ tasks:
           split: ','
           as: platform
         cmd: |
-          export sanitized_platform=$(echo "{{.platform}}" | sed "s%/%_%g")    \
+          export sanitized_platform=$(echo "{{.platform}}" | sed "s%/%_%g")            \
           && grype sbom:sbom.{{.PROJECT_SLUG}}.{{.VERSION}}.${sanitized_platform}.json \
-               --output json                                                   \
+               --output json                                                           \
                --file vulns.{{.PROJECT_SLUG}}.{{.VERSION}}.${sanitized_platform}.json
