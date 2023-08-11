@@ -72,3 +72,13 @@ tasks:
     desc: Clean up build artifacts, cache files/directories, temp files, etc.
     cmds:
       - task: base:clean
+
+  sbom:
+    desc: Generate project SBOMs
+    cmds:
+      - task: base:sbom
+
+  vulnscan:
+    desc: Vuln scan the SBOM
+    cmds:
+      - task: base:vulnscan

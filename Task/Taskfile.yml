@@ -80,7 +80,7 @@ tasks:
       - pipenv run pre-commit validate-manifest .pre-commit-hooks.yaml
     status:
       - '! test -f .pre-commit-hooks.yaml'
- 
+
   build:
     desc: Build the project; docker images, compiled binaries, etc.
     platforms: [linux, darwin]
@@ -89,7 +89,7 @@ tasks:
       vars: ['VERSION']
     vars:
       VERSION: '{{.VERSION}}'
-      PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
+      PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
       PUBLISH: '{{.PUBLISH | default "false"}}'
       DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
       TAG_COMMIT_HASH:
@@ -239,3 +239,45 @@ tasks:
       - find {{.ROOT_DIR}} -type f -name '*.pyc' -delete
       - find {{.ROOT_DIR}} -type d -name '.ruff_cache' -exec rm -rf {} +
       - find {{.ROOT_DIR}} -type d -name '.task' -exec rm -rf {} +
+      - find {{.ROOT_DIR}} -type f -name 'sbom.*.json' -delete
+      - find {{.ROOT_DIR}} -type f -name 'vulns.*.json' -delete
+
+  sbom:
+    desc: Generate project SBOMs
+    dir: ../../..
+    preconditions:
+      - sh: which syft
+        msg: "Syft must be installed and reasonably current"
+    vars:
+      IMAGE_AND_TAG: '{{.IMAGE_NAME}}:{{.VERSION}}'
+      PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
+    cmds:
+      - for:
+          var: PLATFORM
+          split: ','
+          as: platform
+        cmd: |
+          export sanitized_platform=$(echo "{{.platform}}" | sed "s%/%_%g")                                               \
+          && syft docker:{{.IMAGE_AND_TAG}} --platform {{.platform}}                                                      \
+                                         -o json=sbom.{{.PROJECT_SLUG}}.{{.VERSION}}.${sanitized_platform}.json           \
+                                         -o spdx-json=sbom.{{.PROJECT_SLUG}}.{{.VERSION}}.${sanitized_platform}.spdx.json \
+                                         -o cyclonedx-json=sbom.{{.PROJECT_SLUG}}.{{.VERSION}}.${sanitized_platform}.cyclonedx.json
+
+  vulnscan:
+    desc: Vuln scan the SBOM
+    dir: ../../..
+    vars:
+      PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
+    preconditions:
+      - sh: which grype
+        msg: "Grype must be installed and reasonably current"
+    cmds:
+      - for:
+          var: PLATFORM
+          split: ','
+          as: platform
+        cmd: |
+          export sanitized_platform=$(echo "{{.platform}}" | sed "s%/%_%g")    \
+          && grype sbom:sbom.{{.PROJECT_SLUG}}.{{.VERSION}}.${sanitized_platform}.json \
+               --output json                                                   \
+               --file vulns.{{.PROJECT_SLUG}}.{{.VERSION}}.${sanitized_platform}.json

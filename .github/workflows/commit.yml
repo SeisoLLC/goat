@@ -54,6 +54,26 @@ jobs:
         run: task -v test -- debug
         env:
           PLATFORM: ${{ matrix.platform }}
+      - name: Generate the SBOMs
+        run: task -v sbom
+        env:
+          PLATFORM: ${{ matrix.platform }}
+      - name: Upload the SBOMs to GitHub
+        uses: actions/upload-artifact@v3
+        with:
+          name: SBOM
+          path: sbom.*.json
+          if-no-files-found: error
+      - name: Generate vuln scan results
+        run: task -v vulnscan
+        env:
+          PLATFORM: ${{ matrix.platform }}
+      - name: Upload the vuln scan results to GitHub
+        uses: actions/upload-artifact@v3
+        with:
+          name: Vulns
+          path: vulns.*.json
+          if-no-files-found: error
   distribute:
     name: Distribute
     needs: [test]
@@ -97,6 +117,26 @@ jobs:
         run: task -v publish
         env:
           PLATFORM: all
+      - name: Generate the SBOMs
+        run: task -v sbom
+        env:
+          PLATFORM: all
+      - name: Upload the SBOMs to GitHub
+        uses: actions/upload-artifact@v3
+        with:
+          name: SBOM
+          path: sbom.*.json
+          if-no-files-found: error
+      - name: Generate vuln scan results
+        run: task -v vulnscan
+        env:
+          PLATFORM: all
+      - name: Upload the vuln scan results to GitHub
+        uses: actions/upload-artifact@v3
+        with:
+          name: Vulns
+          path: vulns.*.json
+          if-no-files-found: error
       - name: Publish the release README to Docker Hub
         uses: peter-evans/dockerhub-description@v3
         with:
