@@ -80,3 +80,13 @@ tasks:
       - task: base:clean
       - find {{.ROOT_DIR}} -type d -name 'coverage-reports' -exec rm -rf {} +
       - find {{.ROOT_DIR}} -type f -name '.coverage' -delete
+
+  sbom:
+    desc: Generate project SBOMs
+    cmds:
+      - task: base:sbom
+
+  vulnscan:
+    desc: Vuln scan the SBOM
+    cmds:
+      - task: base:vulnscan

@@ -102,7 +102,7 @@ tasks:
     cmds:
       - task: bash:build
         vars:
-          PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
+          PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
 
   test:
     desc: Run the project tests
@@ -149,9 +149,19 @@ tasks:
       # We call into the bash:publish instead of across to build to simplify centralized policy assessments (i.e. "is the project using a goat-provided task?")
       - task: bash:publish
         vars:
-          PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
+          PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
 
   update:
     desc: Update the project dev and runtime dependencies, and pre-commit hash
     cmds:
       - task: bash:update
+
+  sbom:
+    desc: Generate project SBOMs
+    cmds:
+      - task: bash:sbom
+
+  vulnscan:
+    desc: Vuln scan the SBOM
+    cmds:
+      - task: bash:vulnscan

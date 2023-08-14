@@ -1,6 +1,8 @@
 *.tar
 .ruff_cache
 .task/*
+sbom.*.json
+vulns.*.json
 
 # Created by https://www.toptal.com/developers/gitignore/api/vim,emacs,vs,python,node,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=vim,emacs,vs,python,node,macos

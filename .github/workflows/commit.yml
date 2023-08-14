@@ -39,7 +39,14 @@ jobs:
           path: ~/.local/share/virtualenvs
           key: ${{ runner.os }}-python-${{ env.python_version }}-pipenv-${{ hashFiles('Pipfile.lock') }}
       - name: Install the dependencies
-        run: python -m pip install --upgrade pipenv
+        run: |
+          python -m pip install --upgrade pipenv
+          mkdir "${RUNNER_TEMP}/bin"
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b "${RUNNER_TEMP}/bin"
+          chmod +x "${RUNNER_TEMP}/bin/syft"
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b "${RUNNER_TEMP}/bin"
+          chmod +x "${RUNNER_TEMP}/bin/grype"
+          echo "${RUNNER_TEMP}/bin" >> "${GITHUB_PATH}"
       - name: Install Task
         uses: arduino/setup-task@v1
       - name: Initialize the repo
@@ -54,6 +61,26 @@ jobs:
         run: task -v test -- debug
         env:
           PLATFORM: ${{ matrix.platform }}
+      - name: Generate the SBOMs
+        run: task -v sbom
+        env:
+          PLATFORM: ${{ matrix.platform }}
+      - name: Upload the SBOMs to GitHub
+        uses: actions/upload-artifact@v3
+        with:
+          name: SBOM
+          path: sbom.*.json
+          if-no-files-found: error
+      - name: Generate vuln scan results
+        run: task -v vulnscan
+        env:
+          PLATFORM: ${{ matrix.platform }}
+      - name: Upload the vuln scan results to GitHub
+        uses: actions/upload-artifact@v3
+        with:
+          name: Vulns
+          path: vulns.*.json
+          if-no-files-found: error
   distribute:
     name: Distribute
     needs: [test]
@@ -65,7 +92,7 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          token: ${{ secrets.SEISO_AUTOMATION_PAT }}
           fetch-depth: 0
       - name: Setup python
         uses: actions/setup-python@v4
@@ -76,7 +103,14 @@ jobs:
           path: ~/.local/share/virtualenvs
           key: ${{ runner.os }}-python-${{ env.python_version }}-pipenv-${{ hashFiles('Pipfile.lock') }}
       - name: Install the dependencies
-        run: python -m pip install --upgrade pipenv
+        run: |
+          python -m pip install --upgrade pipenv
+          mkdir "${RUNNER_TEMP}/bin"
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b "${RUNNER_TEMP}/bin"
+          chmod +x "${RUNNER_TEMP}/bin/syft"
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b "${RUNNER_TEMP}/bin"
+          chmod +x "${RUNNER_TEMP}/bin/grype"
+          echo "${RUNNER_TEMP}/bin" >> "${GITHUB_PATH}"
       - name: Install Task
         uses: arduino/setup-task@v1
       - name: Initialize the repo
@@ -97,6 +131,26 @@ jobs:
         run: task -v publish
         env:
           PLATFORM: all
+      - name: Generate the SBOMs
+        run: task -v sbom
+        env:
+          PLATFORM: all
+      - name: Upload the SBOMs to GitHub
+        uses: actions/upload-artifact@v3
+        with:
+          name: SBOM
+          path: sbom.*.json
+          if-no-files-found: error
+      - name: Generate vuln scan results
+        run: task -v vulnscan
+        env:
+          PLATFORM: all
+      - name: Upload the vuln scan results to GitHub
+        uses: actions/upload-artifact@v3
+        with:
+          name: Vulns
+          path: vulns.*.json
+          if-no-files-found: error
       - name: Publish the release README to Docker Hub
         uses: peter-evans/dockerhub-description@v3
         with:
@@ -115,5 +169,9 @@ jobs:
         with:
           name: ${{ env.TAG }}
           tag_name: ${{ env.TAG }}
+          generate_release_notes: true
+          files: |
+            vulns.*.json
+            sbom.*.json
           draft: false
           prerelease: false
