@@ -120,7 +120,7 @@ tasks:
       DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
       DOCKER_BUILDX_DOCKERFILE: '{{.DOCKER_BUILDX_DOCKERFILE | default "."}}'
       DOCKER_BUILDX_BUILDARGS: '{{.DOCKER_BUILDX_BUILDARGS | default "--build-arg VERSION=\"{{.BUILD_VERSION}}\" --build-arg COMMIT_HASH=\"{{.COMMIT_HASH}}\""}}'
-      DOCKER_BUILDX_TAGS: '{{.DOCKER_BUILDX_TAGS | default "--tag \"{{.IMAGE_NAME}}:latest\" --tag \"{{.IMAGE_NAME}}:{{.BUILD_VERSION}}\""}}'
+      DOCKER_BUILDX_TAGS: '{{.DOCKER_BUILDX_TAGS | default "--tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}}"}}'
     cmds:
       # We only load when the provided platform equals the detected local platform. This is for two reasons:
       # 1. We assume you don't want to load a cross-platform build
