@@ -289,14 +289,14 @@ tasks:
         task: build
         vars:
           PLATFORM: '{{.platform}}'
-          DOCKER_BUILDX_TAGS: '--tag {{.IMAGE_AND_TAG}}-{{.platform | replace "/" "_"}}'
+          DOCKER_BUILDX_CUSTOM_TAGS: '--tag {{.IMAGE_AND_TAG}}-{{.platform | replace "/" "_"}}'
       - for:
           var: PLATFORM
           split: ','
           as: platform
         cmd: |
           export base_name='{{.SANITIZED_IMAGE_AND_TAG}}_{{.platform | replace "/" "_" }}' \
-          && export syft_command="{{if ne .platform .LOCAL_PLATFORM}}oci-archive:${base_name}.tar{{else}}docker:{{.IMAGE_AND_TAG}}{{end}}" \
+          && export syft_command="{{if ne .platform .LOCAL_PLATFORM}}oci-archive:${base_name}.tar{{else}}docker:{{.IMAGE_AND_TAG}}-{{.platform | replace "/" "_"}}{{end}}" \
           && syft "${syft_command}" {{if eq .PLATFORM .LOCAL_PLATFORM}}--platform {{.platform}}{{end}} \
                                     -o json=sbom.${base_name}.syft.json \
                                     -o spdx-json=sbom.${base_name}.spdx.json \
