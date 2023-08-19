@@ -116,7 +116,7 @@ tasks:
           else:
               build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
           print(build_version)'
-      OUTPUT_FILE: '{{.IMAGE_NAME | replace "/" "_"}}_{{.BUILD_VERSION}}_{{.PLATFORM | replace "/" "_"}}.tar'
+      OUTPUT_FILE: '{{.IMAGE_NAME | replace "/" "_"}}_{{.BUILD_VERSION}}_{{.PLATFORM | replace "/" "_" | replace "," "_"}}.tar'
       DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
       DOCKER_BUILDX_CUSTOM_DOCKERFILE: '{{.DOCKER_BUILDX_CUSTOM_DOCKERFILE | default "."}}'
     cmds:
