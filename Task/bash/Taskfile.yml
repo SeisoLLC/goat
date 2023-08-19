@@ -41,7 +41,7 @@ tasks:
       - task: base:build
         vars:
           VERSION: '{{.VERSION}}'
-          PLATFORM: '{{.PLATFORM | default ""}}'
+          PLATFORM: '{{.PLATFORM}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 
   update:
@@ -65,7 +65,7 @@ tasks:
       - task: base:publish
         vars:
           VERSION: '{{.VERSION}}'
-          PLATFORM: '{{.PLATFORM | default ""}}'
+          PLATFORM: '{{.PLATFORM}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 
   clean:

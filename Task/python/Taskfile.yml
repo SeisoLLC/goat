@@ -47,7 +47,7 @@ tasks:
           # Unable to make this global due to https://taskfile.dev/usage/#variables see https://github.com/go-task/task/issues/1295
           VERSION:
             sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
-          PLATFORM: '{{.PLATFORM | default ""}}'
+          PLATFORM: '{{.PLATFORM}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 
   update:
@@ -71,7 +71,7 @@ tasks:
           # Unable to make this global due to https://taskfile.dev/usage/#variables see https://github.com/go-task/task/issues/1295
           VERSION:
             sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
-          PLATFORM: '{{.PLATFORM | default ""}}'
+          PLATFORM: '{{.PLATFORM}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 
   clean:
