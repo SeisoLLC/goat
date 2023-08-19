@@ -244,7 +244,7 @@ tasks:
       - find {{.ROOT_DIR}} -type d -name '.task' -exec rm -rf {} +
       - find {{.ROOT_DIR}} -type f -name 'sbom.*.json' -delete
       - find {{.ROOT_DIR}} -type f -name 'vulns.*.json' -delete
-      - find {{.ROOT_DIR}} -type f -name 'seiso_*:*.tar' -delete
+      - find {{.ROOT_DIR}} -type f -name 'seiso_*_*.tar' -delete
 
   sbom:
     desc: Generate project SBOMs
