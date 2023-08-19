@@ -296,11 +296,11 @@ tasks:
           as: platform
         cmd: |
           export base_name='{{.SANITIZED_IMAGE_AND_TAG}}_{{.platform | replace "/" "_" | replace ":" "_"}}' \
-                                                                                                         && export syft_command="{{if ne .platform .LOCAL_PLATFORM}}oci-archive:${base_name}.tar{{else}}docker:{{.IMAGE_AND_TAG}}-{{.platform | replace "/" "_" | replace ":" "_"}}{{end}}" \
+          && export syft_command="{{if ne .platform .LOCAL_PLATFORM}}oci-archive:${base_name}.tar{{else}}docker:{{.IMAGE_AND_TAG}}-{{.platform | replace "/" "_" | replace ":" "_"}}{{end}}" \
           && syft "${syft_command}" {{if eq .PLATFORM .LOCAL_PLATFORM}}--platform {{.platform}}{{end}} \
-                                    -o json=sbom.${base_name}.syft.json \
-                                    -o spdx-json=sbom.${base_name}.spdx.json \
-                                    -o cyclonedx-json=sbom.${base_name}.cyclonedx.json
+               -o json=sbom.${base_name}.syft.json \
+               -o spdx-json=sbom.${base_name}.spdx.json \
+               -o cyclonedx-json=sbom.${base_name}.cyclonedx.json
 
 
   vulnscan:
