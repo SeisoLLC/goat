@@ -3,7 +3,7 @@
 .task/*
 sbom.*.json
 vulns.*.json
-seiso_goat:*.tar
+seiso_goat_*.tar
 
 # Created by https://www.toptal.com/developers/gitignore/api/vim,emacs,vs,python,node,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=vim,emacs,vs,python,node,macos
