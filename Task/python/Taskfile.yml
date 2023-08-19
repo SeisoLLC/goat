@@ -73,7 +73,7 @@ tasks:
             sh: pipenv run python -c 'from {{.PROJECT_SLUG}} import __version__; print(__version__)'
           PLATFORM: '{{.PLATFORM}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
-          DOCKER_BUILDX_CUSTOM_DOCKERFILE: '{{.DOCKER_BUILDX_CUSTOM_DOCKERFILE}}'
+          DOCKER_BUILDX_CUSTOM_CONTEXT: '{{.DOCKER_BUILDX_CUSTOM_CONTEXT}}'
 
   clean:
     desc: Clean up build artifacts, cache files/directories, temp files, etc.
