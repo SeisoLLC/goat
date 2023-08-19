@@ -67,6 +67,7 @@ tasks:
           VERSION: '{{.VERSION}}'
           PLATFORM: '{{.PLATFORM}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
+          DOCKER_BUILDX_CUSTOM_DOCKERFILE: '{{.DOCKER_BUILDX_CUSTOM_DOCKERFILE}}'
 
   clean:
     desc: Clean up build artifacts, cache files/directories, temp files, etc.
