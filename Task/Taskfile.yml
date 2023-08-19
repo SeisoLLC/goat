@@ -199,6 +199,7 @@ tasks:
           VERSION: '{{.VERSION}}'
           PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
+          DOCKER_BUILDX_CUSTOM_DOCKERFILE: '{{.DOCKER_BUILDX_CUSTOM_DOCKERFILE}}'
 
   update:
     desc: >
