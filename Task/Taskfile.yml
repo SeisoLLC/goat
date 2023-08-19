@@ -118,9 +118,7 @@ tasks:
           print(build_version)'
       OUTPUT_FILE: '{{.IMAGE_NAME | replace "/" "_"}}:{{.BUILD_VERSION}}_{{.PLATFORM | replace "/" "_"}}.tar'
       DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
-      DOCKER_BUILDX_DOCKERFILE: '{{.DOCKER_BUILDX_DOCKERFILE | default "."}}'
-      DOCKER_BUILDX_BUILDARGS: '{{.DOCKER_BUILDX_BUILDARGS | default "--build-arg VERSION=\"{{.BUILD_VERSION}}\" --build-arg COMMIT_HASH=\"{{.COMMIT_HASH}}\""}}'
-      DOCKER_BUILDX_TAGS: '{{.DOCKER_BUILDX_TAGS | default "--tag {{.IMAGE_NAME}}:latest --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}}"}}'
+      DOCKER_BUILDX_CUSTOM_DOCKERFILE: '{{.DOCKER_BUILDX_CUSTOM_DOCKERFILE | default "."}}'
     cmds:
       # We only load when the provided platform equals the detected local platform. This is for two reasons:
       # 1. We assume you don't want to load a cross-platform build
@@ -134,11 +132,11 @@ tasks:
       # tags and artisanally craft the multi-platform manifest with a tool like `crane`, `docker manifest`, or similar
       - |
         docker buildx build --platform="{{.PLATFORM}}" \
-                            {{if eq .PUBLISH "true"}}--push{{else if eq .PLATFORM .LOCAL_PLATFORM}}--load{{else}}-o type=oci,dest="{{.OUTPUT_FILE}}"{{end}} \
-                            {{if .DOCKER_BUILDX_CUSTOM_ARGS}}{{.DOCKER_BUILDX_CUSTOM_ARGS}}{{end}} \
-                            {{.DOCKER_BUILDX_BUILDARGS}} \
-                            {{.DOCKER_BUILDX_TAGS}} \
-                            "{{.DOCKER_BUILDX_DOCKERFILE}}"
+          {{if eq .PUBLISH "true"}}--push{{else if eq .PLATFORM .LOCAL_PLATFORM}}--load{{else}}-o type=oci,dest="{{.OUTPUT_FILE}}"{{end}} \
+          {{if .DOCKER_BUILDX_CUSTOM_ARGS}}{{.DOCKER_BUILDX_CUSTOM_ARGS}}{{end}} \
+          {{if .DOCKER_BUILDX_CUSTOM_TAGS}}{{.DOCKER_BUILDX_CUSTOM_TAGS}}{{else}}--tag "{{.IMAGE_NAME}}:latest" --tag "{{.IMAGE_NAME}}:{{.BUILD_VERSION}}"{{end}} \
+          {{if .DOCKER_BUILDX_CUSTOM_BUILDARGS}}{{.DOCKER_BUILDX_CUSTOM_BUILDARGS}}{{else}}--build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}"{{end}} \
+          "{{.DOCKER_BUILDX_CUSTOM_DOCKERFILE}}"
       - '{{if ne .PLATFORM .LOCAL_PLATFORM}}{{if ne .PUBLISH "true"}}echo "WARNING: Avoided loading {{.IMAGE_NAME}}:latest and {{.IMAGE_NAME}}:{{.BUILD_VERSION}} into your docker daemon because you built a cross-platform image of {{.PLATFORM}}.{{if ne .PUBLISH "true"}} See {{.OUTPUT_FILE}} for the OCI artifact.{{end}}"{{end}}{{end}}'
 
   release:
