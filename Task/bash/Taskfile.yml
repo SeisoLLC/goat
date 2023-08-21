@@ -41,7 +41,7 @@ tasks:
       - task: base:build
         vars:
           VERSION: '{{.VERSION}}'
-          PLATFORM: '{{.PLATFORM | default ""}}'
+          PLATFORM: '{{.PLATFORM}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 
   update:
@@ -65,8 +65,9 @@ tasks:
       - task: base:publish
         vars:
           VERSION: '{{.VERSION}}'
-          PLATFORM: '{{.PLATFORM | default ""}}'
+          PLATFORM: '{{.PLATFORM}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
+          DOCKER_BUILDX_CUSTOM_CONTEXT: '{{.DOCKER_BUILDX_CUSTOM_CONTEXT}}'
 
   clean:
     desc: Clean up build artifacts, cache files/directories, temp files, etc.

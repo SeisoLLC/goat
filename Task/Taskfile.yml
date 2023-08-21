@@ -9,6 +9,7 @@ set:
   - pipefail
 
 vars:
+  # Inspired by https://github.com/containerd/containerd/blob/e0912c068b131b33798ae45fd447a1624a6faf0a/platforms/database.go#L76
   LOCAL_PLATFORM:
     sh: |
       os="linux"
@@ -91,7 +92,6 @@ tasks:
       VERSION: '{{.VERSION}}'
       PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
       PUBLISH: '{{.PUBLISH | default "false"}}'
-      DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
       TAG_COMMIT_HASH:
         sh: git rev-list -1 "v{{.VERSION}}"
       COMMIT_HASH:
@@ -116,6 +116,9 @@ tasks:
           else:
               build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
           print(build_version)'
+      OUTPUT_FILE: '{{.IMAGE_NAME | replace "/" "_"}}_{{.BUILD_VERSION}}_{{.PLATFORM | replace "/" "_" | replace "," "_"}}.tar'
+      DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
+      DOCKER_BUILDX_CUSTOM_CONTEXT: '{{.DOCKER_BUILDX_CUSTOM_CONTEXT | default "."}}'
     cmds:
       # We only load when the provided platform equals the detected local platform. This is for two reasons:
       # 1. We assume you don't want to load a cross-platform build
@@ -123,18 +126,18 @@ tasks:
       #
       # Also, we make load and push mutually exclusive because docker says "ERROR: push and load may not be set together at the moment"
       #
-      # Finally, we combine this all together in one `docker buildx build` with `--push` when {{.PUBLISH}} is true so that it handles the multi-platform
-      # manifest creation for us. Otherwise we'd need to push per-platform tags and artisanally craft the manifest with `crane`, `docker manifest`, or similar
+      # If we aren't loading or pushing, we dump an OCI-formatted artifact out to disk
+      #
+      # We leverage `docker buildx build` with `--push` to make a multi-platform manifest when {{.PUBLISH}} is true. Otherwise we'd need to push per-platform
+      # tags and artisanally craft the multi-platform manifest with a tool like `crane`, `docker manifest`, or similar
       - |
         docker buildx build --platform="{{.PLATFORM}}" \
-                            {{if eq .PUBLISH "true"}}--push{{else if eq .PLATFORM .LOCAL_PLATFORM}}--load{{end}} \
-                            {{if .DOCKER_BUILDX_CUSTOM_ARGS}}{{.DOCKER_BUILDX_CUSTOM_ARGS}}{{end}} \
-                            --build-arg VERSION="{{.BUILD_VERSION}}" \
-                            --build-arg COMMIT_HASH="{{.COMMIT_HASH}}" \
-                            --tag {{.IMAGE_NAME}}:latest \
-                            --tag {{.IMAGE_NAME}}:{{.BUILD_VERSION}} \
-                            "${PWD}/."
-      - '{{if ne .PLATFORM .LOCAL_PLATFORM}}{{if ne .PUBLISH "true"}}echo "WARNING: Avoided loading {{.IMAGE_NAME}}:latest and {{.IMAGE_NAME}}:{{.BUILD_VERSION}} into your docker daemon because you built a cross-platform image of {{.PLATFORM}}"{{end}}{{end}}'
+          {{if eq .PUBLISH "true"}}--push{{else if eq .PLATFORM .LOCAL_PLATFORM}}--load{{else}}-o type=oci,dest="{{.OUTPUT_FILE}}"{{end}} \
+          {{if .DOCKER_BUILDX_CUSTOM_ARGS}}{{.DOCKER_BUILDX_CUSTOM_ARGS}}{{end}} \
+          {{if .DOCKER_BUILDX_CUSTOM_TAGS}}{{.DOCKER_BUILDX_CUSTOM_TAGS}}{{else}}--tag "{{.IMAGE_NAME}}:latest" --tag "{{.IMAGE_NAME}}:{{.BUILD_VERSION}}"{{end}} \
+          {{if .DOCKER_BUILDX_CUSTOM_BUILDARGS}}{{.DOCKER_BUILDX_CUSTOM_BUILDARGS}}{{else}}--build-arg VERSION="{{.BUILD_VERSION}}" --build-arg COMMIT_HASH="{{.COMMIT_HASH}}"{{end}} \
+          "{{.DOCKER_BUILDX_CUSTOM_CONTEXT}}"
+      - '{{if ne .PLATFORM .LOCAL_PLATFORM}}{{if ne .PUBLISH "true"}}echo "WARNING: Avoided loading {{.IMAGE_NAME}}:latest and {{.IMAGE_NAME}}:{{.BUILD_VERSION}} into your docker daemon because you built a cross-platform image of {{.PLATFORM}}.{{if ne .PUBLISH "true"}} See {{.OUTPUT_FILE}} for the OCI artifact.{{end}}"{{end}}{{end}}'
 
   release:
     desc: Cut a project release
@@ -196,6 +199,7 @@ tasks:
           VERSION: '{{.VERSION}}'
           PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
+          DOCKER_BUILDX_CUSTOM_CONTEXT: '{{.DOCKER_BUILDX_CUSTOM_CONTEXT}}'
 
   update:
     desc: >
@@ -241,6 +245,7 @@ tasks:
       - find {{.ROOT_DIR}} -type d -name '.task' -exec rm -rf {} +
       - find {{.ROOT_DIR}} -type f -name 'sbom.*.json' -delete
       - find {{.ROOT_DIR}} -type f -name 'vulns.*.json' -delete
+      - find {{.ROOT_DIR}} -type f -name 'seiso_*_*.tar' -delete
 
   sbom:
     desc: Generate project SBOMs
@@ -249,25 +254,90 @@ tasks:
       - sh: which syft
         msg: "Syft must be installed and reasonably current"
     vars:
-      IMAGE_AND_TAG: '{{.IMAGE_NAME}}:{{.VERSION}}'
       PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
+      # This duplicates some build logic; consider centralizing
+      TAG_COMMIT_HASH:
+        sh: git rev-list -1 "v{{.VERSION}}"
+      COMMIT_HASH:
+        sh: git rev-parse HEAD
+      COMMIT_HASH_SHORT:
+        sh: git rev-parse --short HEAD
+      REPO_TAGS:
+        sh: git tag -l
+      BUILD_VERSION:
+        sh: |
+          pipenv run python -c '
+          version_string = "v{{.VERSION}}"
+          repo_tags = []
+          {{range $tag := .REPO_TAGS | splitLines -}}
+          repo_tags.append("{{$tag}}")
+          {{end}}
+          if (
+              version_string in repo_tags
+              and "{{.TAG_COMMIT_HASH}}" == "{{.COMMIT_HASH}}"
+          ):
+              build_version = "{{.VERSION}}"
+          else:
+              build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
+          print(build_version)'
+      IMAGE_AND_TAG: '{{.IMAGE_NAME}}:{{.BUILD_VERSION}}'
+      SANITIZED_IMAGE_AND_TAG: '{{.IMAGE_AND_TAG | replace "/" "_" | replace ":" "_"}}'
     cmds:
       - for:
           var: PLATFORM
           split: ','
           as: platform
+        task: build
+        vars:
+          PLATFORM: '{{.platform}}'
+          # This is necessary in order to have a separate tag per platform, and ensure there is only one manifest in the image index due to current
+          # syft/stereoscope limitations
+          DOCKER_BUILDX_CUSTOM_TAGS: '--tag {{.IMAGE_AND_TAG}}-{{.platform | replace "/" "_"}}'
+      - for:
+          var: PLATFORM
+          split: ','
+          as: platform
         cmd: |
-          export sanitized_platform=$(echo "{{.platform}}" | sed "s%/%_%g")                                               \
-          && syft docker:{{.IMAGE_AND_TAG}} --platform {{.platform}}                                                      \
-                                         -o json=sbom.{{.PROJECT_SLUG}}.{{.VERSION}}.${sanitized_platform}.json           \
-                                         -o spdx-json=sbom.{{.PROJECT_SLUG}}.{{.VERSION}}.${sanitized_platform}.spdx.json \
-                                         -o cyclonedx-json=sbom.{{.PROJECT_SLUG}}.{{.VERSION}}.${sanitized_platform}.cyclonedx.json
+          export base_name='{{.SANITIZED_IMAGE_AND_TAG}}_{{.platform | replace "/" "_"}}' \
+          && export syft_command="{{if ne .platform .LOCAL_PLATFORM}}oci-archive:${base_name}.tar{{else}}docker:{{.IMAGE_AND_TAG}}-{{.platform | replace "/" "_"}}{{end}}" \
+          && syft "${syft_command}" {{if eq .PLATFORM .LOCAL_PLATFORM}}--platform {{.platform}}{{end}} \
+               -o json=sbom.${base_name}.syft.json \
+               -o spdx-json=sbom.${base_name}.spdx.json \
+               -o cyclonedx-json=sbom.${base_name}.cyclonedx.json
+
 
   vulnscan:
     desc: Vuln scan the SBOM
     dir: ../../..
     vars:
       PLATFORM: '{{if eq .PLATFORM "all"}}{{.SUPPORTED_PLATFORMS}}{{else if .PLATFORM}}{{.PLATFORM}}{{else}}{{.LOCAL_PLATFORM}}{{end}}'
+      # This duplicates some build logic; consider centralizing
+      TAG_COMMIT_HASH:
+        sh: git rev-list -1 "v{{.VERSION}}"
+      COMMIT_HASH:
+        sh: git rev-parse HEAD
+      COMMIT_HASH_SHORT:
+        sh: git rev-parse --short HEAD
+      REPO_TAGS:
+        sh: git tag -l
+      BUILD_VERSION:
+        sh: |
+          pipenv run python -c '
+          version_string = "v{{.VERSION}}"
+          repo_tags = []
+          {{range $tag := .REPO_TAGS | splitLines -}}
+          repo_tags.append("{{$tag}}")
+          {{end}}
+          if (
+              version_string in repo_tags
+              and "{{.TAG_COMMIT_HASH}}" == "{{.COMMIT_HASH}}"
+          ):
+              build_version = "{{.VERSION}}"
+          else:
+              build_version = f"{{.VERSION}}-{{.COMMIT_HASH_SHORT}}"
+          print(build_version)'
+      IMAGE_AND_TAG: '{{.IMAGE_NAME}}:{{.BUILD_VERSION}}'
+      SANITIZED_IMAGE_AND_TAG: '{{.IMAGE_AND_TAG | replace "/" "_" | replace ":" "_"}}'
     preconditions:
       - sh: which grype
         msg: "Grype must be installed and reasonably current"
@@ -277,7 +347,7 @@ tasks:
           split: ','
           as: platform
         cmd: |
-          export sanitized_platform=$(echo "{{.platform}}" | sed "s%/%_%g")            \
-          && grype sbom:sbom.{{.PROJECT_SLUG}}.{{.VERSION}}.${sanitized_platform}.json \
-               --output json                                                           \
-               --file vulns.{{.PROJECT_SLUG}}.{{.VERSION}}.${sanitized_platform}.json
+          export base_name='{{.SANITIZED_IMAGE_AND_TAG}}_{{.platform | replace "/" "_"}}' \
+          && grype "sbom:sbom.${base_name}.syft.json" \
+            --output json \
+            --file "vulns.${base_name}.json"
