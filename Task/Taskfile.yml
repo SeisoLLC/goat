@@ -185,8 +185,8 @@ tasks:
       - task: pipeline-git-init
       # Better conditional syntax is pending https://github.com/go-task/task/issues/608
       - >
-        {{if eq .VERSIONING "CalVer"}}pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}}
-        unusedpart{{else if eq .VERSIONING "SemVer"}}pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}{{end}}
+        '{{if eq .VERSIONING "CalVer"}}pipenv run bumpversion --config-file setup.cfg --new-version {{.RELEASE_VERSION}}
+        unusedpart{{else if eq .VERSIONING "SemVer"}}pipenv run bumpversion --config-file setup.cfg {{.RELEASE_TYPE}}{{else}}echo "Invalid VERSIONING var"; exit 1{{end}}'
 
   publish:
     desc: Publish the project artifacts; docker images, compiled binaries, etc.
