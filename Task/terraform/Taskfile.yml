@@ -1,0 +1,21 @@
+---
+# https://taskfile.dev
+
+version: "3"
+
+set:
+  - nounset
+  - errexit
+  - pipefail
+
+includes:
+  base:
+    taskfile: ../Taskfile.yml
+    internal: true
+
+tasks:
+  clean:
+    desc: Clean up build artifacts, cache files/directories, temp files, etc.
+    cmds:
+      - task: base:clean
+      - find "{{.ROOT_DIR}}" -type d -name '.terraform' -exec rm -rf {} +
