@@ -303,8 +303,9 @@ tasks:
           split: ','
           as: platform
         cmd: |
-          export base_name='{{.SANITIZED_IMAGE_AND_TAG}}_{{.platform | replace "/" "_"}}' \
-          && export syft_command="{{if ne .platform .LOCAL_PLATFORM}}oci-archive:${base_name}.tar{{else}}docker:{{.IMAGE_AND_TAG}}-{{.platform | replace "/" "_"}}{{end}}" \
+          # Use double quotes so the SANITIZED_IMAGE_AND_TAG can be dynamic, like $(echo example)
+          export base_name="{{.SANITIZED_IMAGE_AND_TAG}}_{{.platform | replace '/' '_'}}" \
+          && export syft_command="{{if ne .platform .LOCAL_PLATFORM}}oci-archive:${base_name}.tar{{else}}docker:{{.IMAGE_AND_TAG}}-{{.platform | replace '/' '_'}}{{end}}" \
           && syft "${syft_command}" {{if eq .PLATFORM .LOCAL_PLATFORM}}--platform {{.platform}}{{end}} \
                -o json=sbom.${base_name}.syft.json \
                -o spdx-json=sbom.${base_name}.spdx.json \
@@ -352,7 +353,8 @@ tasks:
           split: ','
           as: platform
         cmd: |
-          export base_name='{{.SANITIZED_IMAGE_AND_TAG}}_{{.platform | replace "/" "_"}}' \
+          # Use double quotes so the SANITIZED_IMAGE_AND_TAG can be dynamic, like $(echo example)
+          export base_name="{{.SANITIZED_IMAGE_AND_TAG}}_{{.platform | replace '/' '_'}}" \
           && grype "sbom:sbom.${base_name}.syft.json" \
             --output json \
             --file "vulns.${base_name}.json"
