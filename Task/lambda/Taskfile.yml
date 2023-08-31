@@ -26,7 +26,7 @@ tasks:
                    -w /usr/src/app/ \
                    python:{{.PYTHON_TAG}} /bin/bash -c \
                    "apt-get update \
-                   && apt-get -y --no-install-recommends zip \
+                   && apt-get install -y --no-install-recommends zip \
                    && zip {{.OUTPUT_FILE}} {{.ENTRYPOINT}} \
                    && zip -r {{.OUTPUT_FILE}} {{.PROJECT_SLUG}} \
                    && python -m pip install --upgrade pipenv \
