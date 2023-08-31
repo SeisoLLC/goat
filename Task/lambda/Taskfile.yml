@@ -18,7 +18,7 @@ tasks:
     desc: Build the project; docker images, compiled binaries, etc.
     platforms: [linux, darwin]
     vars:
-      ENTRYPOINT: {{.ENTRYPOINT | default "main.py"}}
+      ENTRYPOINT: '{{.ENTRYPOINT | default "main.py"}}'
     cmds:
       - |
         docker run --rm \
