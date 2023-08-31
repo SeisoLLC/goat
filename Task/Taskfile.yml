@@ -44,6 +44,8 @@ tasks:
       - '{{if eq .GITHUB_ACTIONS "true"}}exit 1{{end}}'
     requires:
       vars: [TOOLS]
+    preconditions:
+      - sudo apt-get update
     platforms: [linux]
     cmds:
       - for:
