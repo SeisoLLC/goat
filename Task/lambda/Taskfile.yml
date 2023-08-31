@@ -59,3 +59,4 @@ tasks:
     cmds:
       - task: base:clean
       - find {{.ROOT_DIR}} -type f -name '{{.OUTPUT_FILE}}' -delete
+      - find {{.ROOT_DIR}} -type f -name '.venv' -delete
