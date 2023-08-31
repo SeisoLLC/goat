@@ -37,6 +37,57 @@ tasks:
     cmds:
       - pipenv lock
 
+  runner-apt-install:
+    desc: Install something on a GitHub Actions runner via apt
+    internal: true
+    status:
+      - '{{if eq .GITHUB_ACTIONS "true"}}exit 1{{end}}'
+    requires:
+      vars: [TOOLS]
+    preconditions:
+      - sudo apt-get update
+    platforms: [linux]
+    cmds:
+      - for:
+          var: TOOLS
+          split: ','
+          as: tool
+        cmd: apt-get install -y --no-install-recommends {{.tool}}
+
+  runner-curl-install:
+    desc: Install something on a GitHub Actions runner via curl
+    internal: true
+    status:
+      - '{{if eq .GITHUB_ACTIONS "true"}}exit 1{{end}}'
+    preconditions:
+      - test -d "${RUNNER_TEMP}/bin" || mkdir "${RUNNER_TEMP}/bin"
+      - |
+        case ${GITHUB_PATH} in
+          *${RUNNER_TEMP}/bin*) exit 0 ;;
+          *) echo "${RUNNER_TEMP}/bin" >> "${GITHUB_PATH}" ;;
+        esac
+    requires:
+      vars:
+        - INSTALL_URL
+        - TOOL
+    platforms: [linux]
+    cmds:
+      - curl -sSfL {{.INSTALL_URL}} | sh -s -- -b "${RUNNER_TEMP}/bin"
+      - chmod +x "${RUNNER_TEMP}/bin/{{.TOOL}}"
+
+  mac-brew-install:
+    desc: Install something on a mac via brew
+    internal: true
+    platforms: [darwin]
+    requires:
+      vars: [TOOLS]
+    cmds:
+      - for:
+          var: TOOLS
+          split: ','
+          as: tool
+        cmd: brew install {{.tool}}
+
   lint:
     desc: Run the linter(s); paved road projects use the Seiso goat 🐐
     platforms: [linux, darwin]

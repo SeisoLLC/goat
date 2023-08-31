@@ -19,6 +19,11 @@ includes:
       PYTHON_VERSION: 3.11
       VERSION: '{{.VERSION}}'
 
+  base:
+    taskfile: ./goat/Task/Taskfile.yml
+    internal: true
+    optional: true
+
 vars:
   # This unfortunately needs to be duplicated, pending https://github.com/go-task/task/issues/1295
   IMAGE_NAME: seiso/goat
@@ -53,6 +58,8 @@ tasks:
     internal: true
     sources:
       - Pipfile.lock
+    preconditions:
+      - which pipenv || python -m pip install --upgrade pipenv
     cmds:
       - pipenv install --deploy --ignore-pipfile --dev
 
@@ -81,12 +88,29 @@ tasks:
       # Don't run this in pipelines
       - '{{if ne .GITHUB_ACTIONS "true"}}pipenv run pre-commit install{{end}}'
 
+  init-install-tools:
+    desc: Install required tools
+    internal: true
+    cmds:
+      - task: base:mac-brew-install
+        vars:
+          TOOLS: syft,grype
+      - task: base:runner-curl-install
+        vars:
+          INSTALL_URL: https://raw.githubusercontent.com/anchore/syft/main/install.sh
+          TOOL: syft
+      - task: base:runner-curl-install
+        vars:
+          INSTALL_URL: https://raw.githubusercontent.com/anchore/grype/main/install.sh
+          TOOL: grype
+
   init:
     desc: Initialize the repo for local use; intended to be run after git clone
     cmds:
       - task: init-pipenv
       - task: init-submodules
       - task: init-pre-commit
+      - task: init-install-tools
 
   lint:
     desc: Run the linter(s); paved road projects use the Seiso goat 🐐

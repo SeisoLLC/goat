@@ -1,0 +1,62 @@
+---
+# https://taskfile.dev
+
+version: "3"
+
+set:
+  - nounset
+  - errexit
+  - pipefail
+
+includes:
+  base:
+    taskfile: ../Taskfile.yml
+    internal: true
+
+vars:
+  EASY_INFRA_TAG: 2023.08.17-cloudformation
+  PYTHON_TAG: 3.11
+  OUTPUT_FILE: '{{.PROJECT_SLUG}}.zip'
+
+tasks:
+  build:
+    desc: Build the project; docker images, compiled binaries, etc.
+    platforms: [linux, darwin]
+    vars:
+      ENTRYPOINT: '{{.ENTRYPOINT | default "main.py"}}'
+    cmds:
+      - |
+        docker run --rm \
+                   -v "$(pwd)":/usr/src/app/ \
+                   -w /usr/src/app/ \
+                   python:{{.PYTHON_TAG}} /bin/bash -c \
+                   "apt-get update \
+                   && apt-get install -y --no-install-recommends zip \
+                   && zip {{.OUTPUT_FILE}} {{.ENTRYPOINT}} \
+                   && zip -r {{.OUTPUT_FILE}} {{.PROJECT_SLUG}} \
+                   && python -m pip install --upgrade pipenv \
+                   && PIPENV_VENV_IN_PROJECT=true pipenv install --deploy --ignore-pipfile \
+                   && zip -r9 {{.OUTPUT_FILE}} .venv"
+
+
+  publish:
+    desc: Publish the function code with the project zip
+    platforms: [linux, darwin]
+    requires:
+      vars: [FUNCTION_NAME]
+    cmds:
+      - |
+        docker run --rm \
+                   --env-file <(env | grep ^AWS_) \
+                   -v "$(pwd)":/usr/src/app/ \
+                   -v "${HOME}/.aws":/home/easy_infra/.aws \
+                   seiso/easy_infra:{{.EASY_INFRA_TAG}} \
+                   aws lambda update-function-code --function-name {{.FUNCTION_NAME}} \
+                                                   --zip-file fileb:///usr/src/app/{{.OUTPUT_FILE}}
+
+  clean:
+    desc: Clean up build artifacts, cache files/directories, temp files, etc.
+    cmds:
+      - task: base:clean
+      - find {{.ROOT_DIR}} -type f -name '{{.OUTPUT_FILE}}' -delete
+      - find {{.ROOT_DIR}} -type f -name '.venv' -delete
