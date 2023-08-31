@@ -8,6 +8,11 @@ set:
   - errexit
   - pipefail
 
+includes:
+  base:
+    taskfile: ../Taskfile.yml
+    internal: true
+
 vars:
   EASY_INFRA_TAG: 2023.08.17-cloudformation
   PYTHON_TAG: 3.11
