@@ -36,7 +36,8 @@ tasks:
                    && zip -r {{.OUTPUT_FILE}} {{.PROJECT_SLUG}} \
                    && python -m pip install --upgrade pipenv \
                    && PIPENV_VENV_IN_PROJECT=true pipenv install --deploy --ignore-pipfile \
-                   && zip -r9 {{.OUTPUT_FILE}} .venv"
+                   && zip -r9 {{.OUTPUT_FILE}} .venv \
+                   && rm -rf .venv"
 
 
   publish:
