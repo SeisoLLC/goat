@@ -86,6 +86,8 @@ tasks:
     desc: Generate project SBOMs
     cmds:
       - task: base:sbom
+        vars:
+          DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
 
   vulnscan:
     desc: Vuln scan the SBOM
