@@ -43,6 +43,8 @@ tasks:
           VERSION: '{{.VERSION}}'
           PLATFORM: '{{.PLATFORM}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
+          DOCKER_BUILDX_CUSTOM_CONTEXT: '{{.DOCKER_BUILDX_CUSTOM_CONTEXT}}'
+          DOCKER_BUILDX_CUSTOM_TAGS: '{{.DOCKER_BUILDX_CUSTOM_TAGS | default ""}}'
 
   update:
     desc: >
@@ -68,6 +70,7 @@ tasks:
           PLATFORM: '{{.PLATFORM}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
           DOCKER_BUILDX_CUSTOM_CONTEXT: '{{.DOCKER_BUILDX_CUSTOM_CONTEXT}}'
+          DOCKER_BUILDX_CUSTOM_TAGS: '{{.DOCKER_BUILDX_CUSTOM_TAGS | default ""}}'
 
   clean:
     desc: Clean up build artifacts, cache files/directories, temp files, etc.
@@ -78,6 +81,10 @@ tasks:
     desc: Generate project SBOMs
     cmds:
       - task: base:sbom
+        vars:
+          DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
+          DOCKER_BUILDX_CUSTOM_CONTEXT: '{{.DOCKER_BUILDX_CUSTOM_CONTEXT}}'
+          DOCKER_BUILDX_CUSTOM_TAGS: '{{.DOCKER_BUILDX_CUSTOM_TAGS | default ""}}'
 
   vulnscan:
     desc: Vuln scan the SBOM
