@@ -170,6 +170,7 @@ tasks:
       OUTPUT_FILE: '{{.IMAGE_NAME | replace "/" "_"}}_{{.BUILD_VERSION}}_{{.PLATFORM | replace "/" "_" | replace "," "_"}}.tar'
       DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
       DOCKER_BUILDX_CUSTOM_CONTEXT: '{{.DOCKER_BUILDX_CUSTOM_CONTEXT | default "."}}'
+      DOCKER_BUILDX_CUSTOM_TAGS: '{{.DOCKER_BUILDX_CUSTOM_TAGS | default ""}}'
     cmds:
       # We only load when the provided platform equals the detected local platform. This is for two reasons:
       # 1. We assume you don't want to load a cross-platform build
@@ -255,6 +256,7 @@ tasks:
           VERSION: '{{.VERSION}}'
           PLATFORM: '{{.PLATFORM | default .LOCAL_PLATFORM}}'
           DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
+          DOCKER_BUILDX_CUSTOM_TAGS: '{{.DOCKER_BUILDX_CUSTOM_TAGS | default ""}}'
           DOCKER_BUILDX_CUSTOM_CONTEXT: '{{.DOCKER_BUILDX_CUSTOM_CONTEXT}}'
 
   update:
@@ -349,6 +351,8 @@ tasks:
           # This is necessary in order to have a separate tag per platform, and ensure there is only one manifest in the image index due to current
           # syft/stereoscope limitations
           DOCKER_BUILDX_CUSTOM_TAGS: '--tag {{.IMAGE_AND_TAG}}-{{.platform | replace "/" "_"}}'
+          DOCKER_BUILDX_CUSTOM_ARGS: '{{.DOCKER_BUILDX_CUSTOM_ARGS | default ""}}'
+          DOCKER_BUILDX_CUSTOM_CONTEXT: '{{.DOCKER_BUILDX_CUSTOM_CONTEXT}}'
       - for:
           var: PLATFORM
           split: ','
