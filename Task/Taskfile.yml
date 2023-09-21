@@ -101,7 +101,6 @@ tasks:
           docker pull seiso/goat:latest || \
             echo "Failed to pull the goat, continuing anyway..."
     cmds:
-      - pwd
       - |
         docker run --env INPUT_AUTO_FIX="{{.INPUT_AUTO_FIX}}" \
                    --env INPUT_DISABLE_MYPY="{{.INPUT_DISABLE_MYPY}}" \
