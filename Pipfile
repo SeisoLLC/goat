@@ -9,8 +9,13 @@ mypy = "*"
 cfn-lint = "*"
 black = "*"
 yamllint = "*"
+<<<<<<< HEAD
 pygithub = "*"
 openai = "*"
+=======
+openai = "*"
+pygithub = "*"
+>>>>>>> 66f2589 (adding code reviews)
 
 [dev-packages]
 pre-commit = "*"
