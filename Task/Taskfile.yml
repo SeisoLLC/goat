@@ -52,7 +52,7 @@ tasks:
           var: TOOLS
           split: ','
           as: tool
-        cmd: apt-get install -y --no-install-recommends {{.tool}}
+        cmd: sudo apt-get install -y --no-install-recommends {{.tool}}
 
   runner-curl-install:
     desc: Install something on a GitHub Actions runner via curl
