@@ -58,6 +58,9 @@ function setup_environment() {
   elif [[ -n "${GITHUB_WORKSPACE:+x}" ]]; then
     # GitHub Actions
     RELATIVE_PATH="${GITHUB_WORKSPACE}"
+  elif [[ -n "${BITBUCKET_CLONE_DIR:+x}" ]]; then
+    # BitBucket Pipelines
+    RELATIVE_PATH="${BITBUCKET_CLONE_DIR}"
   elif [[ -d "/src/.git" ]]; then
     # Pre-commit
     RELATIVE_PATH="/src"
@@ -66,7 +69,15 @@ function setup_environment() {
     exit 1
   fi
 
-  export REPO_DICTIONARY="${RELATIVE_PATH}/.github/etc/dictionary.txt"
+  if [[ -r "${RELATIVE_PATH}/.github/etc/dictionary.txt" ]]; then
+    # GitHub
+    export REPO_DICTIONARY="${RELATIVE_PATH}/.github/etc/dictionary.txt"
+  elif [[ -r "${RELATIVE_PATH}/dictionary.txt" ]]; then
+    export REPO_DICTIONARY="${RELATIVE_PATH}/dictionary.txt"
+  else
+    feedback ERROR "Unable to find the dictionary file"
+    exit 1
+  fi
 
   if [[ -n ${JSCPD_CONFIG:+x} ]]; then
     feedback WARNING "JSCPD_CONFIG is set; not auto ignoring the goat submodule..."
@@ -125,13 +136,21 @@ function setup_environment() {
 }
 
 function check_environment() {
-  # Check the GITHUB_BASE_REF (PRs only)
-  if [[ ${GITHUB_ACTIONS:-false} == "true" && -n ${GITHUB_BASE_REF:+x} ]]; then
+  # Check PRs for the main branch
+  local wrong_destination_branch="false"
+
+  if [[ -n ${BITBUCKET_PR_DESTINATION_BRANCH:+x} && "${BITBUCKET_PR_DESTINATION_BRANCH}" != "main" ]]; then
+    wrong_destination_branch="true"
+  elif [[ ${GITHUB_ACTIONS:-false} == "true" && -n ${GITHUB_BASE_REF:+x} ]]; then
     mainline="${GITHUB_BASE_REF##*/}"
     if [[ ${mainline} != "main" ]]; then
-      feedback ERROR "Base branch name is not main"
-      exit 1
+      wrong_destination_branch="true"
     fi
+  fi
+
+  if [[ "${wrong_destination_branch}" == "true" ]]; then
+    feedback ERROR "Base branch name is not main"
+    exit 1
   fi
 
   # Ensure there is a repo dictionary
@@ -213,8 +232,13 @@ function get_files_matching_filetype() {
         fi
       fi
       if [ "$linter_name" == "actionlint" ]; then
-        local action_path="${GITHUB_WORKSPACE:-.}/.github/workflows/"
-        if [[ "${file}" != "${action_path}"* ]]; then
+        if [[ -n "${GITHUB_WORKSPACE:+x}" ]]; then
+          local action_path="${GITHUB_WORKSPACE:-.}/.github/workflows/"
+          if [[ "${file}" != "${action_path}"* ]]; then
+            continue
+          fi
+        else
+          # Skip actionlint if not running in a GitHub Action
           continue
         fi
       fi
@@ -303,15 +327,26 @@ function lint_files() {
 function seiso_lint() {
   echo -e "\nRunning Seiso Linter\n--------------------------\n"
 
-  if [[ -n ${GITHUB_WORKSPACE:-} ]]; then
-    echo "Setting ${GITHUB_WORKSPACE} as safe directory"
-    git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+  if [[ -n ${GITHUB_WORKSPACE:+x} ]]; then
+    # GitHub Actions
+    local safe_directory="${GITHUB_WORKSPACE}"
+  elif [[ -n ${BITBUCKET_CLONE_DIR:+x} ]]; then
+    # BitBucket Pipelines
+    local safe_directory="${BITBUCKET_CLONE_DIR}"
+  else
+    feedback ERROR "Unable to identify a directory to set as safe"
+    exit 1
   fi
+
+  echo "Setting ${safe_directory} as safe directory"
+  git config --global --add safe.directory "${safe_directory}"
 
   # When run in a pipeline, move per-repo configurations into the right location at runtime so the goat finds them, overwriting the defaults.
   # This will handle hidden and non-hidden files, as well as sym links
   if [[ -d "${GITHUB_WORKSPACE:-.}/.github/linters" ]]; then
     cp -p "${GITHUB_WORKSPACE:-.}/.github/linters/"* "${GITHUB_WORKSPACE:-.}/.github/linters/".* /etc/opt/goat/ 2>/dev/null || true
+  elif [[ -d "${BITBUCKET_CLONE_DIR:-.}/linters" ]]; then
+    cp -p "${BITBUCKET_CLONE_DIR:-.}/linters/"* "${BITBUCKET_CLONE_DIR:-.}/linters/".* /etc/opt/goat/ 2>/dev/null || true
   fi
 
   excluded=()
