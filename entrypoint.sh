@@ -59,7 +59,7 @@ function setup_environment() {
     # GitHub Actions
     RELATIVE_PATH="${GITHUB_WORKSPACE}"
   elif [[ -n "${BITBUCKET_CLONE_DIR:+x}" ]]; then
-    # BitBucket Pipelines
+    # Bitbucket Pipelines
     RELATIVE_PATH="${BITBUCKET_CLONE_DIR}"
   elif [[ -d "/src/.git" ]]; then
     # Pre-commit
@@ -327,19 +327,22 @@ function lint_files() {
 function seiso_lint() {
   echo -e "\nRunning Seiso Linter\n--------------------------\n"
 
+  local skip_safe="false"
   if [[ -n ${GITHUB_WORKSPACE:+x} ]]; then
     # GitHub Actions
     local safe_directory="${GITHUB_WORKSPACE}"
   elif [[ -n ${BITBUCKET_CLONE_DIR:+x} ]]; then
-    # BitBucket Pipelines
+    # Bitbucket Pipelines
     local safe_directory="${BITBUCKET_CLONE_DIR}"
   else
-    feedback ERROR "Unable to identify a directory to set as safe"
-    exit 1
+    feedback WARNING "Unable to identify a directory to set as safe, skipping that step..."
+    local skip_safe="true"
   fi
 
-  echo "Setting ${safe_directory} as safe directory"
-  git config --global --add safe.directory "${safe_directory}"
+  if [[ "${skip_safe}" == "false" ]]; then
+    feedback INFO "Setting ${safe_directory} as safe directory"
+    git config --global --add safe.directory "${safe_directory}"
+  fi
 
   # When run in a pipeline, move per-repo configurations into the right location at runtime so the goat finds them, overwriting the defaults.
   # This will handle hidden and non-hidden files, as well as sym links
@@ -383,14 +386,14 @@ function seiso_lint() {
     linter[logfile]="/opt/goat/log/${linter[name]}.log"
 
     if [[ -v VALIDATE_PYTHON_MYPY && "${VALIDATE_PYTHON_MYPY,,}" == "false" && "${linter[name]}" == "mypy" ]]; then
-      echo "mypy linter has been disabled"
+      feedback WARNING "mypy linter has been disabled"
       linter_skipped+=("${linter[name]}")
       continue
     fi
 
-    echo "===============================" >>"${linter[logfile]}"
-    echo "Running linter: ${linter[name]}"
-    echo "${linter[name]^^}" >>"${linter[logfile]}"
+    feedback INFO "===============================" >>"${linter[logfile]}"
+    feedback INFO "Running linter: ${linter[name]}"
+    feedback INFO "${linter[name]^^}" >>"${linter[logfile]}"
 
     # The string "linter" gets dereferenced back into a variable on the receiving end
     lint_files linter "${linter_filetypes[@]}" &
