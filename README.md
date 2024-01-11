@@ -119,6 +119,11 @@ jobs:
 - textlint
 - yamllint
 
+#### Supported Pipelines
+
+- GitHub Actions
+- Bitbucket Pipelines
+
 #### Debugging
 
 To debug an issue with the goat, configure the log level to either `ERROR`, `WARN`, `INFO`, or `DEBUG`.

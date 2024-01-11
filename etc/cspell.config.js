@@ -1,5 +1,16 @@
 'use strict'
 
+let per_repo_dictionary_file;
+
+if (process.env.GITHUB_WORKSPACE) {
+  per_repo_dictionary_file = `${process.env.GITHUB_WORKSPACE}/.github/etc/dictionary.txt`;
+} else if (process.env.BITBUCKET_CLONE_DIR) {
+  per_repo_dictionary_file = `${process.env.BITBUCKET_CLONE_DIR}/dictionary.txt`;
+} else {
+  /** Assume it's running local and use .github **/
+  per_repo_dictionary_file = '/goat/.github/etc/dictionary.txt';
+}
+
 /** @type { import("@cspell/cspell-types").CSpellUserSettings } */
 const cspell = {
   language: 'en',
@@ -28,7 +39,7 @@ const cspell = {
   dictionaryDefinitions: [
     {
       name: 'per-repository dictionary',
-      path: `${process.env.GITHUB_WORKSPACE ? process.env.GITHUB_WORKSPACE : '.'}/.github/etc/dictionary.txt`
+      path: per_repo_dictionary_file,
     },
     {
       name: 'seiso global dictionary',
