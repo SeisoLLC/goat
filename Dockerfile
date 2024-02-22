@@ -46,6 +46,7 @@ RUN pip install pipenv \
                           tini \
                           bash \
                           git \
+                          # Added to build supporting binaries
                           libffi-dev \
                           build-base \
                           # The following apk package is necessary for pyenv functionality
@@ -70,8 +71,11 @@ RUN pip install pipenv \
     # The following commands are necessary because pre-commit adds -u os.uid():os.gid() to the docker run
     && chmod o+w /opt/goat/log \
     && mkdir -p /.local \
-    && chmod o+w /.local
+    && chmod o+w /.local \
     #####################################################################################################
+    # Remove unnecessary packages
+    && apk del libffi-dev \
+                  build-base  
 
 WORKDIR /goat/
 
