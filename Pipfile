@@ -10,12 +10,18 @@ cfn-lint = "*"
 black = "*"
 yamllint = "*"
 <<<<<<< HEAD
+<<<<<<< HEAD
 pygithub = "*"
 openai = "*"
 =======
 openai = "*"
 pygithub = "*"
 >>>>>>> 66f2589 (adding code reviews)
+=======
+pygithub = "*"
+openai = "*"
+wheel = "*"
+>>>>>>> 020471e (Adding dependencies)
 
 [dev-packages]
 pre-commit = "*"
