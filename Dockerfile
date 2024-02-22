@@ -40,15 +40,17 @@ COPY --from=actionlint /usr/local/bin/actionlint /usr/bin/
 
 # hadolint ignore=DL3016,DL3018,DL3013
 RUN pip install pipenv \
-    && pipenv install --system --deploy --ignore-pipfile \
     && apk upgrade \
     && apk --no-cache add jq \
                           npm \
                           tini \
                           bash \
                           git \
+                          libffi-dev \
+                          build-base \
                           # The following apk package is necessary for pyenv functionality
                           tk-dev \
+    && pipenv install --system --deploy --ignore-pipfile \
     && npm install --save-dev --no-cache -g dockerfile_lint \
                                             markdownlint-cli \
                                             textlint \
