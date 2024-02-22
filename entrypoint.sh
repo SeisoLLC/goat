@@ -454,10 +454,18 @@ function rerun_lint() {
   echo "-------------------------------" >>"${rerun_linter[logfile]}"
 }
 
+function initiate_code_review() {
+  if [ -n "$GITHUB_ACTIONS" ]; then
+    # Run the Python script
+    python code_review.py
+  fi
+}
+
 start=$(date +%s)
 setup_environment
 check_environment
 seiso_lint
+initiate_code_review
 end=$(date +%s)
 runtime=$((end - start))
 
