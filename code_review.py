@@ -8,7 +8,7 @@ import json
 import ast
 import openai
 from github import Github, PullRequest, GithubException
-
+from openai import OpenAI
 from code_reviews import config, constants
 
 
@@ -22,17 +22,18 @@ def get_github_session() -> Github:
     return Github(os.getenv("GITHUB_TOKEN"))
 
 
-def set_openai_key() -> None:
+def get_openai_session() -> OpenAI:
     log.info("Setting up OpenAI Session...")
 
     if not os.getenv("OPENAI_API_KEY"):
         log.error("Please provide a valid OPENAI_API_KEY environment variable!")
         raise SystemExit(1)
 
-    openai.api_key = os.getenv("OPENAI_API_KEY")
+    return OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 def get_repo_and_pr() -> dict:
+    repo_and_pr: dict[str, list[object]] = {}
     repo_and_pr = {"repo": [], "pr": []}
 
     log.info("Getting repo and pull request from runner environment...")
@@ -51,7 +52,7 @@ def get_repo_and_pr() -> dict:
     return repo_and_pr
 
 
-def do_code_review(gh_session: Github, repo_and_pr: dict):
+def do_code_review(gh_session: Github, repo_and_pr: dict, ai_client: OpenAI):
     comments = []
     skipped_files = []
     repo = gh_session.get_repo(repo_and_pr["repo"][0])
@@ -74,7 +75,8 @@ def do_code_review(gh_session: Github, repo_and_pr: dict):
                 skipped_files.append(item.filename)
             else:
                 diff_comment = submit_to_gpt(
-                    f"filename: {item.filename} ** {item.patch}"
+                    f"filename: {item.filename} ** {item.patch}",
+                    ai_client=ai_client,
                 )
                 if "comments" in diff_comment:
                     comments.append(json.dumps(diff_comment["comments"]))
@@ -84,7 +86,8 @@ def do_code_review(gh_session: Github, repo_and_pr: dict):
                         f"Salacious has failed review of {item.filename} trying again..."
                     )
                     diff_comment = submit_to_gpt(
-                        f"filename: {item.filename} ** {item.patch}"
+                        f"filename: {item.filename} ** {item.patch}",
+                        ai_client=ai_client,
                     )
                     if "comments" in diff_comment:
                         comments.append(json.dumps(diff_comment["comments"]))
@@ -121,19 +124,25 @@ def submit_review(
 
     log.debug(f"{comments=}")
 
-    comments_object = [comment for comment in ast.literal_eval(comments[0])]
-
     try:
+        if not comments:
+            raise ValueError("The comments list is empty.")
+
+        comments_object = [comment for comment in ast.literal_eval(comments[0])]
         pr.create_review(body=review_body, event="COMMENT", comments=comments_object)
+
+    except ValueError as err:
+        log.error(f"Failed to submit review due to the following error: {err}!")
+
     except GithubException as err:
         log.error(f"Failed to submit review due the following error: {err}!")
 
     log.info("Submitted pull request review, Salacious B. Crumb signing off!")
 
 
-def submit_to_gpt(code: str) -> dict:
+def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
     try:
-        completion = openai.ChatCompletion.create(
+        completion = ai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": constants.PROMPT},
@@ -141,7 +150,9 @@ def submit_to_gpt(code: str) -> dict:
             ],
         )
     except openai.APIError as err:
-        log.error(f"Salacious failed due to API error: {err.user_message}")
+        log.error(f"Salacious failed due to API error: {err}")
+    except openai.RateLimitError as err:
+        log.error(f"Salacious failed due to an exceeded rate limit: {err}")
 
     review = {}
 
@@ -155,10 +166,10 @@ def submit_to_gpt(code: str) -> dict:
 
 
 def main():
-    set_openai_key()
+    ai_client = get_openai_session()
     gh_session = get_github_session()
     repo_and_pr = get_repo_and_pr()
-    do_code_review(gh_session=gh_session, repo_and_pr=repo_and_pr)
+    do_code_review(gh_session=gh_session, repo_and_pr=repo_and_pr, ai_client=ai_client)
 
 
 if __name__ == "__main__":
