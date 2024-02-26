@@ -35,6 +35,7 @@ tasks:
   test:
     desc: Run the project tests
     cmds:
+      - env | cut -d "=" -f 1
       - pipenv run pytest --cov={{.PROJECT_SLUG}} tests
 
   build:
