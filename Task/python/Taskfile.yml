@@ -35,7 +35,7 @@ tasks:
   test:
     desc: Run the project tests
     cmds:
-      - pipenv run pytest --cov={{.PROJECT_SLUG}} tests
+      - OPENAI_API_KEY='{{.OPENAI_API_KEY}}' pipenv run pytest --cov={{.PROJECT_SLUG}} tests
 
   build:
     desc: Build the project; docker images, compiled binaries, etc.

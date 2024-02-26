@@ -49,8 +49,9 @@ jobs:
         env:
           PLATFORM: ${{ matrix.platform }}
       - name: Run the tests
-        run: task OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} -v test -- debug
+        run: task -v test -- debug
         env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           PLATFORM: ${{ matrix.platform }}
       - name: Generate the SBOMs
         run: task -v sbom
