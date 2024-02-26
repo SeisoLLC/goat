@@ -166,8 +166,8 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
 
 
 def main():
-    gh_session = get_github_session()
     ai_client = get_openai_session()
+    gh_session = get_github_session()
     repo_and_pr = get_repo_and_pr()
     do_code_review(gh_session=gh_session, repo_and_pr=repo_and_pr, ai_client=ai_client)
 
