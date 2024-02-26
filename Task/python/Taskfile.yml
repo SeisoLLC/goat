@@ -34,8 +34,6 @@ tasks:
 
   test:
     desc: Run the project tests
-    vars:
-      OPENAI_API_KEY: '{{.OPENAI_API_KEY}}'
     cmds:
       - pipenv run pytest --cov={{.PROJECT_SLUG}} tests
 
