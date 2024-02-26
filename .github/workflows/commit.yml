@@ -20,8 +20,6 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-22.04
-    env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     strategy:
       fail-fast: false
       matrix:
