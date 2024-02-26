@@ -48,11 +48,11 @@ jobs:
         run: task -v build
         env:
           PLATFORM: ${{ matrix.platform }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       - name: Run the tests
         run: task -v test -- debug
         env:
           PLATFORM: ${{ matrix.platform }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       - name: Generate the SBOMs
         run: task -v sbom
         env:
