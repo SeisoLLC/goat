@@ -17,7 +17,6 @@ ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 
 ARG COMMIT_HASH
-ARG OPENAI_API_KEY
 
 LABEL org.opencontainers.image.title="goat"
 LABEL org.opencontainers.image.description="The Grand Opinionated AutoTester (GOAT) automatically applies Seiso's policy as code"
@@ -33,7 +32,6 @@ ENV PIP_NO_CACHE_DIR=1
 ENV WORKON_HOME=/tmp
 ENV PYENV_ROOT="/root/.pyenv"
 ENV PATH="$PYENV_ROOT/bin:$PATH"
-ENV OPENAI_API_KEY=${OPENAI_API_KEY}
 COPY Pipfile Pipfile.lock ./
 COPY --from=kubeconform /kubeconform /usr/bin/
 COPY --from=hadolint /bin/hadolint /usr/bin/
