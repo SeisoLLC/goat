@@ -457,7 +457,7 @@ function rerun_lint() {
 function initiate_code_review() {
   if [ -n "$GITHUB_ACTIONS" ]; then
     # Run the Python script
-    python code_review.py
+    python /opt/goat/bin/code_review.py
   fi
 }
 

@@ -75,11 +75,13 @@ RUN pip install pipenv \
     #####################################################################################################
     # Remove unnecessary packages
     && apk del libffi-dev \
-                  build-base  
+                  build-base
 
 WORKDIR /goat/
 
 COPY etc/ /etc/opt/goat/
 COPY entrypoint.sh /opt/goat/bin/entrypoint.sh
+COPY code_review.py /opt/goat/bin/code_review.py
+COPY code_reviews/ /opt/goat/bin/code_reviews/
 
 ENTRYPOINT ["tini", "-g", "--", "/opt/goat/bin/entrypoint.sh"]
