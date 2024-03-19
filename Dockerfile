@@ -40,15 +40,18 @@ COPY --from=actionlint /usr/local/bin/actionlint /usr/bin/
 
 # hadolint ignore=DL3016,DL3018,DL3013
 RUN pip install pipenv \
-    && pipenv install --system --deploy --ignore-pipfile \
     && apk upgrade \
     && apk --no-cache add jq \
                           npm \
                           tini \
                           bash \
                           git \
+                          # Added to build supporting binaries
+                          libffi-dev \
+                          build-base \
                           # The following apk package is necessary for pyenv functionality
                           tk-dev \
+    && pipenv install --system --deploy --ignore-pipfile \
     && npm install --save-dev --no-cache -g dockerfile_lint \
                                             markdownlint-cli \
                                             textlint \
@@ -68,12 +71,17 @@ RUN pip install pipenv \
     # The following commands are necessary because pre-commit adds -u os.uid():os.gid() to the docker run
     && chmod o+w /opt/goat/log \
     && mkdir -p /.local \
-    && chmod o+w /.local
+    && chmod o+w /.local \
     #####################################################################################################
+    # Remove unnecessary packages
+    && apk del libffi-dev \
+                  build-base
 
 WORKDIR /goat/
 
 COPY etc/ /etc/opt/goat/
 COPY entrypoint.sh /opt/goat/bin/entrypoint.sh
+COPY code_review.py /opt/goat/bin/code_review.py
+COPY code_reviews/ /opt/goat/bin/code_reviews/
 
 ENTRYPOINT ["tini", "-g", "--", "/opt/goat/bin/entrypoint.sh"]
