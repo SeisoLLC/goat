@@ -18,4 +18,4 @@ inputs:
     default: "true"
 runs:
   using: "docker"
-  image: "docker://docker.io/seiso/goat:2024.04.01"
+  image: "docker://docker.io/seiso/goat:2024.04.02"
