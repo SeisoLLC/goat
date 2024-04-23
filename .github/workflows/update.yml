@@ -18,22 +18,22 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+        uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.python_version }}
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ~/.local/share/virtualenvs
           key: ${{ runner.os }}-python-${{ env.python_version }}-pipenv-${{ hashFiles('Pipfile.lock') }}
       - name: Install Task
-        uses: arduino/setup-task@v1
+        uses: arduino/setup-task@v2
       - name: Initialize the repo
         run: task -v init
       - name: Update the repository
         run: task -v update
       - name: Create or update a pull request
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v6
         with:
           title: Automated update to primary components
           commit-message: Automated update to primary components
