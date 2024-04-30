@@ -20,7 +20,7 @@ PLATFORM='all' task build
 ```
 
 To build a docker image for a specific platform, set `PLATFORM` to either `linux/arm64` or `linux/amd64`. In order for this to work, you must have QEMU or a
-similar emulation package setup (which is usually there by default); this is why we use `docker/setup-qemu-action@v2` in the GitHub Actions pipeline.
+similar emulation package setup (which is usually there by default); this is why we use `docker/setup-qemu-action@v3` in the GitHub Actions pipeline.
 
 ## Running the goat against the goat project locally
 
