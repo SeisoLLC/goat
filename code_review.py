@@ -64,6 +64,7 @@ def do_code_review(gh_session: Github, repo_and_pr: dict, ai_client: OpenAI):
 
     for item in changed_files:
         log.info(f"Having Salacious review diff for {item.filename}...")
+        contents = repo.get_contents(item.filename).decoded_content
         if not type(item) == "str":
             if item.patch is None:
                 log.warning(f"Skipping empty source file {item.filename}...")
@@ -75,9 +76,7 @@ def do_code_review(gh_session: Github, repo_and_pr: dict, ai_client: OpenAI):
                 skipped_files.append(item.filename)
             else:
                 diff_comment = submit_to_gpt(
-                    str(
-                        repo.get_contents(item.filename)
-                    ),  # f"filename: {item.filename} ** {item.patch}",
+                    contents,  # f"filename: {item.filename} ** {item.patch}",
                     ai_client=ai_client,
                 )
                 if "comments" in diff_comment:
@@ -88,7 +87,7 @@ def do_code_review(gh_session: Github, repo_and_pr: dict, ai_client: OpenAI):
                         f"Salacious has failed review of {item.filename} trying again..."
                     )
                     diff_comment = submit_to_gpt(
-                        str(repo.get_contents(item.filename)),
+                        contents,
                         ai_client=ai_client,
                     )
                     if "comments" in diff_comment:
