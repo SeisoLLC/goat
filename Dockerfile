@@ -46,10 +46,7 @@ RUN pip install pipenv \
                           tini \
                           bash \
                           git \
-<<<<<<< HEAD
                           # Added to build supporting binaries
-=======
->>>>>>> 020471e (Adding dependencies)
                           libffi-dev \
                           build-base \
                           # The following apk package is necessary for pyenv functionality
