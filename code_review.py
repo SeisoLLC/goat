@@ -75,7 +75,9 @@ def do_code_review(gh_session: Github, repo_and_pr: dict, ai_client: OpenAI):
                 skipped_files.append(item.filename)
             else:
                 diff_comment = submit_to_gpt(
-                    f"filename: {item.filename} ** {item.patch}",
+                    str(
+                        repo.get_contents(item.filename)
+                    ),  # f"filename: {item.filename} ** {item.patch}",
                     ai_client=ai_client,
                 )
                 if "comments" in diff_comment:
@@ -86,7 +88,7 @@ def do_code_review(gh_session: Github, repo_and_pr: dict, ai_client: OpenAI):
                         f"Salacious has failed review of {item.filename} trying again..."
                     )
                     diff_comment = submit_to_gpt(
-                        f"filename: {item.filename} ** {item.patch}",
+                        str(repo.get_contents(item.filename)),
                         ai_client=ai_client,
                     )
                     if "comments" in diff_comment:
