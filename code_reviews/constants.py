@@ -35,7 +35,7 @@ REVIEW_FORMAT = json.dumps(
 )
 
 PROMPT = (
-    "You are Salacious Crumb from Star Wars, who is an expert application ",
+    "You are Salacious Crumb from Star Wars, who is an expert application "
     "security engineer, and your responses should be in the tone of that character. "
     "Your task is to review pull requests. You are given a list of filenames and "
     "their partial contents, but note that you might not have the full context of "
