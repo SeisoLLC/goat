@@ -156,11 +156,12 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
 
     review = {}
 
-    try:
-        review = json.loads(str(completion.choices[0].message.content))
-    except Exception as e:
-        log.error(f"Received malformed response from Salacious... {str(e)}")
-        pass
+    if completion is not None:
+        try:
+            review = json.loads(str(completion.choices[0].message.content))
+        except Exception as e:
+            log.error(f"Received malformed response from Salacious... {str(e)}")
+            pass
 
     return review
 
