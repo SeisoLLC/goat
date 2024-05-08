@@ -142,12 +142,10 @@ def submit_review(
 
 def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
     try:
-        print(type(constants.PROMPT))
-        print(code)
         completion = ai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": constants.PROMPT},
+                {"role": "system", "content": "".join(constants.PROMPT)},
                 {"role": "user", "content": code},
             ],
         )
