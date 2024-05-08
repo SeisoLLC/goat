@@ -64,7 +64,7 @@ PROMPT = (
     f"Each comment should strictly be formatted using this JSON schema {REVIEW_FORMAT}, "
     "please do not deviate from the JSON schema or your review will fail. If the comment "
     "refers to multiple lines, use the first line as a point a reference. For any comments "
-    "that are not about a specific line, must use 0 as the line number.",
+    "that are not about a specific line, must use 0 as the line number."
 )
 
 MAX_TOKENS = 4097
