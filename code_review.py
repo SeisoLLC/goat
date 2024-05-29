@@ -158,7 +158,7 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
 
     if completion is not None:
         try:
-            print(completion.choices[0])
+            print(completion.choices[0].message)
             review = json.loads(str(completion.choices[0].message.content))
         except Exception as e:
             log.error(f"Received malformed response from Salacious... {str(e)}")
