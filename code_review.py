@@ -142,27 +142,6 @@ def submit_review(
 
 
 def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
-    # try:
-    #     completion = ai_client.chat.completions.create(
-    #         model="gpt-3.5-turbo",
-    #         messages=[
-    #             {"role": "system", "content": "".join(constants.PROMPT)},
-    #             {"role": "user", "content": code},
-    #         ],
-    #     )
-    # except openai.APIError as err:
-    #     log.error(f"Salacious failed due to API error: {err}")
-    # except openai.RateLimitError as err:
-    #     log.error(f"Salacious failed due to an exceeded rate limit: {err}")
-
-    # review = {}
-
-    # if completion is not None:
-    #     try:
-    #         review = json.loads(str(completion.choices[0].message.content))
-    #     except Exception as e:
-    #         log.error(f"Received malformed response from Salacious... {str(e)}")
-    #         pass
     review = {}
 
     def sanitize_json_string(json_string):
@@ -212,7 +191,7 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
                 log.error(f"Unexpected error when parsing JSON: {str(e)}")
         else:
             log.error(
-                "Completion object does not contain expected 'choices' or 'message' structure"
+                "ChatCompletion object does not contain expected 'choices' or 'message' structure"
             )
 
     except openai.APIError as err:
@@ -220,7 +199,7 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
     except openai.RateLimitError as err:
         log.error(f"Salacious failed due to an exceeded rate limit: {err}")
     except Exception as e:
-        log.error(f"Unexpected error during API call: {str(e)}")
+        log.error(f"Salacious failed due to unexpected error during API call: {str(e)}")
 
     return review
 
