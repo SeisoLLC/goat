@@ -174,7 +174,7 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
         )
 
         # Log the entire completion object for debugging
-        log.error(f"Completion object: {completion}")
+        log.debug(f"Completion object: {completion}")
 
         # Ensure the structure of the response
         if (
@@ -184,6 +184,11 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
         ):
             content = completion.choices[0].message.content
             log.debug(f"Completion message content: {content}")
+
+            # Strip triple backticks if they exist
+            if content.startswith("```") and content.endswith("```"):
+                content = content.strip("```").strip()
+                log.debug(f"Stripped content: {content}")
 
             try:
                 review = json.loads(content)
@@ -202,9 +207,7 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
     except openai.RateLimitError as err:
         log.error(f"Salacious failed due to an exceeded rate limit: {err}")
     except Exception as e:
-        log.error(
-            f"Salacious failed due to an unexpected error during API call: {str(e)}"
-        )
+        log.error(f"Unexpected error during API call: {str(e)}")
 
     return review
 
