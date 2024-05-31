@@ -164,6 +164,19 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
     #         pass
     review = {}
 
+    def sanitize_json_string(json_string):
+        """Sanitize the JSON string to ensure it can be parsed."""
+        # Strip surrounding backticks and 'json' identifier
+        if json_string.startswith("```") and json_string.endswith("```"):
+            json_string = json_string.strip("```").strip()
+        if json_string.startswith("json"):
+            json_string = json_string[4:].strip()
+
+        # Remove any trailing commas
+        json_string = json_string.sub(r",\s*([\]}])", r"\1", json_string)
+
+        return json_string
+
     try:
         completion = ai_client.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -185,20 +198,14 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
             content = completion.choices[0].message.content
             log.debug(f"Completion message content: {content}")
 
-            # Strip triple backticks if they exist
-            if content.strip().startswith("```") and content.strip().endswith("```"):
-                content = content.strip().strip("```")
-                log.debug(f"Stripped content: {content}")
-
-            # Remove the `json` identifier if it exists
-            if content.startswith("json"):
-                content = content[4:].strip()
-                log.debug(f"Stripped content (json identifier): {content}")
+            # Sanitize the content to ensure it's valid JSON
+            sanitized_content = sanitize_json_string(content)
+            log.debug(f"Sanitized content: {sanitized_content}")
 
             try:
-                review = json.loads(content)
+                review = json.loads(sanitized_content)
             except json.JSONDecodeError as e:
-                log.error(f"Received malformed JSON response: {content}")
+                log.error(f"Received malformed JSON response: {sanitized_content}")
                 log.error(f"JSONDecodeError: {str(e)}")
             except Exception as e:
                 log.error(f"Unexpected error when parsing JSON: {str(e)}")
