@@ -9,6 +9,9 @@ mypy = "*"
 cfn-lint = "*"
 black = "*"
 yamllint = "*"
+pygithub = "*"
+openai = "*"
+wheel = "*"
 
 [dev-packages]
 pre-commit = "*"

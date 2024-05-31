@@ -147,12 +147,14 @@ tasks:
           repo="${GITHUB_WORKSPACE}"
           docker run --rm --env-file <(env | grep ^GITHUB_) \
                           --env-file <(env | grep ^INPUT_) \
+                          --env-file <(env | grep ^OPENAI_) \
                           -v "${repo}:/goat" \
                           -v "${HOME}:${HOME}" \
                           seiso/goat:latest
         else
           docker run --rm --env-file <(env | grep ^GITHUB_) \
                           --env-file <(env | grep ^INPUT_) \
+                          --env-file <(env | grep ^OPENAI_) \
                           -v "{{.ROOT_DIR}}:/goat" \
                           seiso/goat:latest
         fi

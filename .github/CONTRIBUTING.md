@@ -20,7 +20,7 @@ PLATFORM='all' task build
 ```
 
 To build a docker image for a specific platform, set `PLATFORM` to either `linux/arm64` or `linux/amd64`. In order for this to work, you must have QEMU or a
-similar emulation package setup (which is usually there by default); this is why we use `docker/setup-qemu-action@v2` in the GitHub Actions pipeline.
+similar emulation package setup (which is usually there by default); this is why we use `docker/setup-qemu-action@v3` in the GitHub Actions pipeline.
 
 ## Running the goat against the goat project locally
 
@@ -100,6 +100,19 @@ There are two ways of running the `goat` locally:
 4. Autofix is available for certain linters and is enabled by default. To disable autofix, use one of these approaches:
    1. `docker run -e INPUT_AUTO_FIX="false" -v "$PWD:/goat/" --rm <hash>` or
    2. `INPUT_AUTO_FIX=false task test`
+
+5. The goat features AI code reviews on pull requests by leveraging OpenAI's ChatGPT API. To perform an AI augmented code review, follow these steps:
+   1. Export a GH PAT for access to the GH API: `export GITHUB_TOKEN='<GitHub Personal Access Token>'`
+   2. Export an open pull request: `export GITHUB_REF=goat/pull/178`
+   3. Export the repository name: `export GITHUB_REPOSITORY=seisollc/goat`
+   4. Export a variable to simulate a GitHub Action locally: `export GITHUB_ACTIONS=true`
+   5. Export an OpenAI API key: `export OPENAI_API_KEY='<OpenAI API Key>'`
+   6. Run the goat against your code:
+
+   ```bash
+    docker run --rm --env OPENAI_API_KEY=$OPENAI_API_KEY --env GITHUB_TOKEN=$GITHUB_TOKEN --env 
+    GITHUB_REF=$GITHUB_REF --env GITHUB_REPOSITORY=$GITHUB_REPOSITORY --env GITHUB_ACTIONS=$GITHUB_ACTIONS -v ".:/goat/" seiso/goat:latest
+   ```
 
 ### Linter Update Considerations
 

@@ -15,7 +15,7 @@ than other open source multi-linter projects, and easily extended to enforce Sei
 1. Ensure your code is checked out during the GitHub action.
 
     ```bash
-    uses: actions/checkout@v2
+    uses: actions/checkout@v4
     ```
 
 1. Add the goat to your GitHub Actions workflows.
@@ -41,7 +41,7 @@ jobs:
     runs-on: Ubuntu-20.04
     name: Test the project
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: seisollc/goat@main
 ```
 
