@@ -4,6 +4,7 @@ salacious-code-reviews script entrypoint
 """
 
 import os
+import re
 import json
 import ast
 import openai
@@ -173,7 +174,7 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
             json_string = json_string[4:].strip()
 
         # Remove any trailing commas
-        json_string = json_string.sub(r",\s*([\]}])", r"\1", json_string)
+        json_string = re.sub(r",\s*([\]}])", r"\1", json_string)
 
         return json_string
 
