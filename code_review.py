@@ -141,6 +141,29 @@ def submit_review(
 
 
 def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
+    # try:
+    #     completion = ai_client.chat.completions.create(
+    #         model="gpt-3.5-turbo",
+    #         messages=[
+    #             {"role": "system", "content": "".join(constants.PROMPT)},
+    #             {"role": "user", "content": code},
+    #         ],
+    #     )
+    # except openai.APIError as err:
+    #     log.error(f"Salacious failed due to API error: {err}")
+    # except openai.RateLimitError as err:
+    #     log.error(f"Salacious failed due to an exceeded rate limit: {err}")
+
+    # review = {}
+
+    # if completion is not None:
+    #     try:
+    #         review = json.loads(str(completion.choices[0].message.content))
+    #     except Exception as e:
+    #         log.error(f"Received malformed response from Salacious... {str(e)}")
+    #         pass
+    review = {}
+
     try:
         completion = ai_client.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -149,20 +172,33 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
                 {"role": "user", "content": code},
             ],
         )
+
+        # Log the entire completion object for debugging
+        log.debug(f"Completion object: {completion}")
+
+        # Ensure the structure of the response
+        if completion and "choices" in completion and len(completion.choices) > 0:
+            content = completion.choices[0].message.content
+            log.debug(f"Completion message content: {content}")
+
+            try:
+                review = json.loads(content)
+            except json.JSONDecodeError as e:
+                log.error(f"Received malformed JSON response: {content}")
+                log.error(f"JSONDecodeError: {str(e)}")
+            except Exception as e:
+                log.error(f"Unexpected error when parsing JSON: {str(e)}")
+        else:
+            log.error(
+                "Completion object does not contain expected 'choices' or 'message' structure"
+            )
+
     except openai.APIError as err:
         log.error(f"Salacious failed due to API error: {err}")
     except openai.RateLimitError as err:
         log.error(f"Salacious failed due to an exceeded rate limit: {err}")
-
-    review = {}
-
-    if completion is not None:
-        try:
-            print(json.loads(str(completion.choices[0].message.content)))
-            review = json.loads(str(completion.choices[0].message.content))
-        except Exception as e:
-            log.error(f"Received malformed response from Salacious... {str(e)}")
-            pass
+    except Exception as e:
+        log.error(f"Unexpected error during API call: {str(e)}")
 
     return review
 
