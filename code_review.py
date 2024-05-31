@@ -36,19 +36,34 @@ def get_openai_session() -> OpenAI:
 def get_repo_and_pr() -> dict:
     repo_and_pr: dict[str, list[object]] = {}
     repo_and_pr = {"repo": [], "pr": []}
+    github_ref = os.getenv("GITHUB_REF")
+    github_repo = os.getenv("GITHUB_REPOSITORY")
 
     log.info("Getting repo and pull request from runner environment...")
 
-    if not os.getenv("GITHUB_REF"):
+    if not github_ref:
         log.error("Cannot find pull request, exiting!")
         raise SystemExit(1)
 
-    if not os.getenv("GITHUB_REPOSITORY"):
+    # If the split from GITHUB_REF is not an int, exit
+    parts = github_ref.split("/")
+    if "pull" in parts:
+        try:
+            pr_index = parts.index("pull") + 1
+            pr_number = int(parts[pr_index])
+            repo_and_pr["pr"].append(pr_number)
+        except (ValueError, IndexError):
+            log.error(f"GITHUB_REF does not contain a valid PR number: {github_ref}")
+            raise SystemExit(1)
+    else:
+        log.error("GITHUB_REF does not reference a pull request")
+        raise SystemExit(1)
+
+    if not github_repo:
         log.error("Cannot get repository name, exiting!")
         raise SystemExit(1)
 
-    repo_and_pr["repo"].append(os.getenv("GITHUB_REPOSITORY"))
-    repo_and_pr["pr"].append(int(os.getenv("GITHUB_REF").split("/")[2]))
+    repo_and_pr["repo"].append(github_repo)
 
     return repo_and_pr
 
