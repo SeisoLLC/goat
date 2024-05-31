@@ -177,7 +177,11 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
         log.error(f"Completion object: {completion}")
 
         # Ensure the structure of the response
-        if completion and "choices" in completion and len(completion.choices) > 0:
+        if (
+            completion
+            and hasattr(completion, "choices")
+            and len(completion.choices) > 0
+        ):
             content = completion.choices[0].message.content
             log.debug(f"Completion message content: {content}")
 
@@ -198,7 +202,9 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
     except openai.RateLimitError as err:
         log.error(f"Salacious failed due to an exceeded rate limit: {err}")
     except Exception as e:
-        log.error(f"Unexpected error during API call: {str(e)}")
+        log.error(
+            f"Salacious failed due to an unexpected error during API call: {str(e)}"
+        )
 
     return review
 
