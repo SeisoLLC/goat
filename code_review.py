@@ -174,7 +174,7 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
         )
 
         # Log the entire completion object for debugging
-        log.debug(f"Completion object: {completion}")
+        log.error(f"Completion object: {completion}")
 
         # Ensure the structure of the response
         if completion and "choices" in completion and len(completion.choices) > 0:
