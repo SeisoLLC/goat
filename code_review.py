@@ -186,9 +186,14 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
             log.debug(f"Completion message content: {content}")
 
             # Strip triple backticks if they exist
-            if content.startswith("```json") and content.endswith("```"):
-                content = content.strip("```json").strip("```").strip()
+            if content.startswith("```") and content.endswith("```"):
+                content = content.strip("```").strip()
                 log.debug(f"Stripped content: {content}")
+
+            # Remove the `json` identifier if it exists
+            if content.startswith("json"):
+                content = content[4:].strip()
+                log.debug(f"Stripped content (json identifier): {content}")
 
             try:
                 review = json.loads(content)
