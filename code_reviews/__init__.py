@@ -4,4 +4,4 @@ salacious-code-reviews init
 
 __maintainer__ = "Seiso"
 __project_name__ = "goat_code_reviews"
-__version__ = "2024.04.04"
+__version__ = "2024.06.01"
