@@ -163,6 +163,7 @@ tasks:
     desc: Clean up build artifacts, cache files/directories, temp files, etc.
     cmds:
       - task: bash:clean
+      - rm -rf {{.ROOT_DIR}}/node_modules
 
   release:
     desc: Cut a project release
