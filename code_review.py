@@ -3,13 +3,15 @@
 salacious-code-reviews script entrypoint
 """
 
+import ast
+import json
 import os
 import re
-import json
-import ast
+
 import openai
-from github import Github, PullRequest, GithubException
+from github import Github, GithubException, PullRequest
 from openai import OpenAI
+
 from code_reviews import config, constants
 
 
@@ -17,8 +19,8 @@ def get_github_session() -> Github:
     log.info("Creating GitHub Session...")
 
     if not os.getenv("GITHUB_TOKEN"):
-        log.error("Please provide a valid GITHUB_TOKEN environment variable!")
-        raise SystemExit(1)
+        log.error("No GITHUB_TOKEN environment variable was detected")
+        raise SystemExit(0)
 
     return Github(os.getenv("GITHUB_TOKEN"))
 
@@ -27,8 +29,8 @@ def get_openai_session() -> OpenAI:
     log.info("Setting up OpenAI Session...")
 
     if not os.getenv("OPENAI_API_KEY"):
-        log.error("Please provide a valid OPENAI_API_KEY environment variable!")
-        raise SystemExit(1)
+        log.error("No OPENAI_API_KEY environment variable was detected")
+        raise SystemExit(0)
 
     return OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -36,19 +38,34 @@ def get_openai_session() -> OpenAI:
 def get_repo_and_pr() -> dict:
     repo_and_pr: dict[str, list[object]] = {}
     repo_and_pr = {"repo": [], "pr": []}
+    github_ref = os.getenv("GITHUB_REF")
+    github_repo = os.getenv("GITHUB_REPOSITORY")
 
     log.info("Getting repo and pull request from runner environment...")
 
-    if not os.getenv("GITHUB_REF"):
-        log.error("Cannot find pull request, exiting!")
+    if not github_ref:
+        log.error("Failed to find the GITHUB_REF environment variable")
         raise SystemExit(1)
 
-    if not os.getenv("GITHUB_REPOSITORY"):
+    # If the split from GITHUB_REF is not an int, exit
+    parts = github_ref.split("/")
+    if "pull" in parts:
+        try:
+            pr_index = parts.index("pull") + 1
+            pr_number = int(parts[pr_index])
+            repo_and_pr["pr"].append(pr_number)
+        except (ValueError, IndexError):
+            log.error(f"GITHUB_REF does not contain a valid PR number: {github_ref}")
+            raise SystemExit(1)
+    else:
+        log.warn("Not running on a pull request; skipping the Salacious code review...")
+        raise SystemExit(0)
+
+    if not github_repo:
         log.error("Cannot get repository name, exiting!")
         raise SystemExit(1)
 
-    repo_and_pr["repo"].append(os.getenv("GITHUB_REPOSITORY"))
-    repo_and_pr["pr"].append(int(os.getenv("GITHUB_REF").split("/")[2]))
+    repo_and_pr["repo"].append(github_repo)
 
     return repo_and_pr
 
@@ -194,10 +211,10 @@ def submit_to_gpt(code: str, ai_client: OpenAI) -> dict:
                 "ChatCompletion object does not contain expected 'choices' or 'message' structure"
             )
 
-    except openai.APIError as err:
-        log.error(f"Salacious failed due to API error: {err}")
     except openai.RateLimitError as err:
         log.error(f"Salacious failed due to an exceeded rate limit: {err}")
+    except openai.APIError as err:
+        log.error(f"Salacious failed due to API error: {err}")
     except Exception as e:
         log.error(f"Salacious failed due to unexpected error during API call: {str(e)}")
 
