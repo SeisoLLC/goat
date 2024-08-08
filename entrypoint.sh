@@ -150,7 +150,6 @@ function check_environment() {
 
   if [[ "${wrong_destination_branch}" == "true" ]]; then
     feedback WARNING "Base branch name is not main"
-    exit 1
   fi
 
   # Ensure there is a repo dictionary
