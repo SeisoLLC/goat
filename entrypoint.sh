@@ -149,7 +149,7 @@ function check_environment() {
   fi
 
   if [[ "${wrong_destination_branch}" == "true" ]]; then
-    feedback ERROR "Base branch name is not main"
+    feedback WARNING "Base branch name is not main"
     exit 1
   fi
 
