@@ -38,18 +38,18 @@ function setup_environment() {
   shopt -s globstar
 
   # Set the default branch
-  export DEFAULT_BRANCH="main"
+  export DEFAULT_BRANCH="${DEFAULT_BRANCH:-main}"
 
   # Set workspace to /goat for local runs
-  export DEFAULT_WORKSPACE="/goat"
+  export DEFAULT_WORKSPACE="${DEFAULT_WORKSPACE:-/goat}"
 
   # Set default values for autofix
   export AUTO_FIX="true"
   export CURRENT_LINT_ROUND=1
 
   # Create variables for the various dictionary file paths
-  export GLOBAL_DICTIONARY="/etc/opt/goat/seiso_global_dictionary.txt"
-  export LINTER_CONFIG="/etc/opt/goat/linters.json"
+  export GLOBAL_DICTIONARY="${GLOBAL_DICTIONARY:-/etc/opt/goat/seiso_global_dictionary.txt}"
+  export LINTER_CONFIG="${LINTER_CONFIG:-/etc/opt/goat/linters.json}"
 
   # Identify the correct relative path to use
   if [[ -d "${DEFAULT_WORKSPACE}/.git" ]]; then

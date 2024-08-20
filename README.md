@@ -5,14 +5,14 @@ than other open source multi-linter projects, and easily extended to enforce Sei
 
 ## Getting Started
 
-1. Create a per-repository dictionary (relative to the root of your git repository).
+1. Create a per-repository dictionary (relative to the root of your Git repository).
 
     ```bash
     mkdir -p .github/etc/
     touch .github/etc/dictionary.txt
     ```
 
-1. Ensure your code is checked out during the GitHub action.
+1. Ensure your code is checked out during the GitHub Action.
 
     ```bash
     uses: actions/checkout@v4
@@ -92,7 +92,7 @@ jobs:
     ```
 
 1. Autofix code formatting errors using those linters with a built-in `fix` option. Note, this is enabled by default
-   when running locally and can create a `dirty` git directory. You will need to manage committing and pushing any
+   when running locally and can create a `dirty` Git directory. You will need to manage committing and pushing any
    changes.
 
     ```bash
