@@ -82,7 +82,7 @@ def do_code_review(gh_session: Github, repo_and_pr: dict, ai_client: OpenAI):
 
     for item in changed_files:
         log.info(f"Having Salacious review diff for {item.filename}...")
-        if not type(item) == "str":
+        if type(item) is not str:
             if item.patch is None:
                 log.warning(f"Skipping empty source file {item.filename}...")
             elif len(item.patch) > constants.MAX_TOKENS:

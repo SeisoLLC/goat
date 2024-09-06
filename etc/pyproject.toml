@@ -3,8 +3,8 @@
 line-length = 160
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.
-fixable = ["E", "F", "I"]
-unfixable = []
+lint.fixable = ["E", "F", "I"]
+lint.unfixable = []
 
 [tool.black]
 line-length = 160
