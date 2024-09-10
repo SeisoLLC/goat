@@ -54,6 +54,7 @@ jobs:
           PLATFORM: ${{ matrix.platform }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_DISABLE_CODE_REVIEW: true
       - name: Generate the SBOMs
         run: task -v sbom
         env:
