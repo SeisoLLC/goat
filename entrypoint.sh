@@ -116,6 +116,10 @@ function setup_environment() {
     export ACTIONS_RUNNER_DEBUG="true"
   fi
 
+  if [[ ${INPUT_DISABLE_CODE_REVIEW:-false} == "true" ]]; then
+    export DISABLE_CODE_REVIEW="true"
+  fi
+
   feedback DEBUG "Looking in ${REPO_DICTIONARY} for the dictionary.txt"
   feedback DEBUG "INPUT_AUTO_FIX is ${INPUT_AUTO_FIX:-not set}"
   feedback DEBUG "AUTO_FIX is ${AUTO_FIX:-not set}"
@@ -125,6 +129,8 @@ function setup_environment() {
   feedback DEBUG "FILTER_REGEX_EXCLUDE is ${FILTER_REGEX_EXCLUDE:-not set}"
   feedback DEBUG "INPUT_LOG_LEVEL is ${INPUT_LOG_LEVEL:-not set}"
   feedback DEBUG "LOG_LEVEL is ${LOG_LEVEL:-not set}"
+  feedback DEBUG "INPUT_DISABLE_CODE_REVIEW is ${INPUT_DISABLE_CODE_REVIEW:-not set}"
+  feedback DEBUG "DISABLE_CODE_REVIEW is ${DISABLE_CODE_REVIEW:-not set}"
 
   # Sets up pyenv so that any linters ran via pipenv run can have an arbitrary python version
   # More details in https://github.com/pyenv/pyenv/tree/7b713a88c40f39139e1df4ed0ceb764f73767dac#advanced-configuration
@@ -454,9 +460,11 @@ function rerun_lint() {
 }
 
 function initiate_code_review() {
-  if [[ -n ${GITHUB_ACTIONS:+x} ]]; then
+  if [[ -n ${GITHUB_ACTIONS:+x} && ${DISABLE_CODE_REVIEW:-false} != "true" ]]; then
     # Run the Python script
     python /opt/goat/bin/code_review.py
+  else
+    feedback DEBUG "Code review is disabled or not running in GitHub Actions"
   fi
 }
 

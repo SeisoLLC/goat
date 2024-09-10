@@ -114,6 +114,8 @@ There are two ways of running the `goat` locally:
     GITHUB_REF=$GITHUB_REF --env GITHUB_REPOSITORY=$GITHUB_REPOSITORY --env GITHUB_ACTIONS=$GITHUB_ACTIONS -v ".:/goat/" seiso/goat:latest
    ```
 
+Optional: To disable the code reviews, set `INPUT_DISABLE_CODE_REVIEW=true`
+
 ### Linter Update Considerations
 
 1. If adding linters to `linters.json`, the `executor` is an optional member of the linter object.
