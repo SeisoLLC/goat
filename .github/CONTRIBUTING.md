@@ -56,7 +56,6 @@ There are two ways of running the `goat` locally:
     Running linter: hadolint
     Running linter: kubeconform
     Running linter: dockerfile_lint
-    Running linter: markdown-link-check
     Running linter: cspell
     Running linter: cfn-lint
     Running linter: jscpd
@@ -87,7 +86,6 @@ There are two ways of running the `goat` locally:
     INFO:  ruff completed successfully
     INFO:  cspell completed successfully
     INFO:  actionlint completed successfully
-    INFO:  markdown-link-check completed successfully
     INFO:  yamllint completed successfully
     ERROR:  black found errors
     ERROR:  Linting failed

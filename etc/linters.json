@@ -35,13 +35,12 @@
         "env": "DOCKERFILE_LINT_CONFIG"
     },
     {
-        "name": "markdown-link-check",
-        "args": "--config /etc/opt/goat/links.json --verbose",
+        "name": "linkspector",
+        "args": "check -c /etc/opt/goat/.linkspector.yml",
         "filetype": [
             ".md"
         ],
-        "executor": "npx",
-        "env": "MARKDOWN_LINK_CHECK_CONFIG"
+        "env": "LINKSPRECTOR_CONFIG"
     },
     {
         "name": "cspell",
