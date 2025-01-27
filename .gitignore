@@ -762,7 +762,3 @@ MigrationBackup/
 .ionide/
 
 # End of https://www.toptal.com/developers/gitignore/api/vim,emacs,vs,python,node,macos
-
-# Temporary to fix markdown-link-check issue
-README.md
-.github/CONTRIBUTING.md
