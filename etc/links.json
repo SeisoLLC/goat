@@ -1,0 +1,17 @@
+{
+    "ignorePatterns": [
+        {
+            "pattern": "^https://github.com/SeisoLLC/"
+        },
+        {
+            "pattern": "^https://raw.githubusercontent.com/SeisoLLC/"
+        },
+        {
+            "pattern": "^https://seiso.sharepoint.com/"
+        }
+    ],
+    "timeout": "20s",
+    "retryOn429": true,
+    "retryCount": 3,
+    "fallbackRetryDelay": "5s"
+}

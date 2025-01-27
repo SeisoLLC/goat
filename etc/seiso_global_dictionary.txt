@@ -82,7 +82,6 @@ kerberoast
 kerberoasted
 kerberoasting
 kubeconform
-linkspector
 llmnr
 lm
 lsass

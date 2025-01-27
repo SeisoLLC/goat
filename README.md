@@ -111,7 +111,7 @@ jobs:
 - hadolint
 - jscpd
 - kubeconform
-- linkspector
+- markdown-link-check
 - markdownlint
 - mypy
 - ruff
