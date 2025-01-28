@@ -60,7 +60,7 @@ RUN pip install pipenv \
                                             textlint-rule-terminology \
                                             cspell \
                                             jscpd \
-                                            markdown-link-check@3.13.4 \
+                                            markdown-link-check@v3.13.4 \
     && git clone https://github.com/pyenv/pyenv.git --depth=1 "${PYENV_ROOT}" \
     && echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile \
     && echo 'eval "$(pyenv init -)"' >> ~/.profile \
