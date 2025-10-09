@@ -3,6 +3,26 @@
         "comments": true
     },
     "rules": {
-        "terminology": true
+        "terminology": {
+            "defaultTerms": true,
+            "terms": [
+                {
+                    "name": "Docker",
+                    "ignoreCase": true,
+                    "preferred": "Docker",
+                    "from": "\\bdocker\\b"
+                }
+            ],
+            "skip": [
+                {
+                    "pattern": "`[^`]*`",
+                    "flags": "g"
+                },
+                {
+                    "pattern": "```[\\s\\S]*?```",
+                    "flags": "g"
+                }
+            ]
+        }
     }
 }
