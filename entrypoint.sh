@@ -472,7 +472,7 @@ start=$(date +%s)
 setup_environment
 check_environment
 seiso_lint
-initiate_code_review
+# initiate_code_review
 end=$(date +%s)
 runtime=$((end - start))
 

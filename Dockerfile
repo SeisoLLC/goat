@@ -2,16 +2,16 @@
 
 # TARGETPLATFORM is special cased by docker and doesn't need the initial ARG
 # https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
-FROM --platform=$TARGETPLATFORM ghcr.io/yannh/kubeconform:v0.6.7-alpine as kubeconform
+FROM --platform=$TARGETPLATFORM ghcr.io/yannh/kubeconform:v0.6.7-alpine AS kubeconform
 ARG TARGETPLATFORM
-FROM --platform=$TARGETPLATFORM hadolint/hadolint:v2.12.0-alpine as hadolint
+FROM --platform=$TARGETPLATFORM hadolint/hadolint:v2.12.0-alpine AS hadolint
 ARG TARGETPLATFORM
-FROM --platform=$TARGETPLATFORM koalaman/shellcheck:v0.10.0 as shellcheck
+FROM --platform=$TARGETPLATFORM koalaman/shellcheck:v0.10.0 AS shellcheck
 ARG TARGETPLATFORM
-FROM --platform=$TARGETPLATFORM rhysd/actionlint:1.7.1 as actionlint
+FROM --platform=$TARGETPLATFORM rhysd/actionlint:1.7.1 AS actionlint
 
 ARG TARGETPLATFORM
-FROM --platform=$TARGETPLATFORM python:3.11-alpine3.20 as base_image
+FROM --platform=$TARGETPLATFORM python:3.11-alpine3.20 AS base_image
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -60,7 +60,7 @@ RUN pip install pipenv \
                                             textlint-rule-terminology \
                                             cspell \
                                             jscpd \
-                                            markdown-link-check \
+                                            markdown-link-check@3.11.2 \
     && git clone https://github.com/pyenv/pyenv.git --depth=1 "${PYENV_ROOT}" \
     && echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile \
     && echo 'eval "$(pyenv init -)"' >> ~/.profile \
