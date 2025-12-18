@@ -52,7 +52,8 @@ RUN pip install pipenv \
                           # The following apk package is necessary for pyenv functionality
                           tk-dev \
     && pipenv install --system --deploy --ignore-pipfile \
-    && npm install --save-dev --no-cache -g dockerfile_lint \
+    && npm install --save-dev --no-cache -g marked@4 \
+                                            dockerfile_lint \
                                             markdownlint-cli \
                                             textlint \
                                             textlint-filter-rule-allowlist \
