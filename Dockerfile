@@ -52,8 +52,7 @@ RUN pip install pipenv \
                           # The following apk package is necessary for pyenv functionality
                           tk-dev \
     && pipenv install --system --deploy --ignore-pipfile \
-    && npm install --save-dev --no-cache -g marked@4 \
-                                            dockerfile_lint \
+    && npm install --save-dev --no-cache -g dockerfile_lint \
                                             markdownlint-cli \
                                             textlint \
                                             textlint-filter-rule-allowlist \
@@ -61,7 +60,7 @@ RUN pip install pipenv \
                                             textlint-rule-terminology \
                                             cspell \
                                             jscpd \
-                                            markdown-link-check@3.13.7 \
+                                            markdown-link-check@3.8.7 \
     && git clone https://github.com/pyenv/pyenv.git --depth=1 "${PYENV_ROOT}" \
     && echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile \
     && echo 'eval "$(pyenv init -)"' >> ~/.profile \
