@@ -1,6 +1,6 @@
 {
     "dependencies": {
         "dockerfile_lint": "^0.3.4",
-        "lodash": "^4.17.23"
+        "lodash": "^4.18.1"
     }
 }
