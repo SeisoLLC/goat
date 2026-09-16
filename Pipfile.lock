@@ -487,6 +487,7 @@
                 "sha256:f89831ef99dd7dd169ab06d63a831adb9e20a87aac6d380266bbda5823349169",
                 "sha256:fd9192b7b70c573d7f214eb1ae35e00d359f6f5e4b27c7e21e30de1fc6204645"
             ],
+            "index": "pypi",
             "markers": "python_version >= '3.9' and python_full_version not in '3.9.0, 3.9.1'",
             "version": "==50.0.0"
         },
