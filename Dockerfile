@@ -74,10 +74,10 @@ RUN pip install pipenv \
     && mkdir -p /.local \
     && chmod o+w /.local \
     #####################################################################################################
-    # Remove unnecessary packages
-    && apk del libffi-dev \
-                  build-base \
-                  python3-dev
+    # Remove unnecessary build packages - must be after npm install completes
+    && apk del --purge libffi-dev \
+                      build-base \
+                      python3-dev
 
 WORKDIR /goat/
 
