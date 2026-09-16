@@ -49,6 +49,7 @@ RUN pip install pipenv \
                           # Added to build supporting binaries
                           libffi-dev \
                           build-base \
+                          python3-dev \
                           # The following apk package is necessary for pyenv functionality
                           tk-dev \
     && pipenv install --system --deploy --ignore-pipfile \
@@ -75,7 +76,8 @@ RUN pip install pipenv \
     #####################################################################################################
     # Remove unnecessary packages
     && apk del libffi-dev \
-                  build-base
+                  build-base \
+                  python3-dev
 
 WORKDIR /goat/
 
