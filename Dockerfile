@@ -11,7 +11,7 @@ ARG TARGETPLATFORM
 FROM --platform=$TARGETPLATFORM rhysd/actionlint:1.7.1 AS actionlint
 
 ARG TARGETPLATFORM
-FROM --platform=$TARGETPLATFORM python:3.11-alpine3.20 AS base_image
+FROM --platform=$TARGETPLATFORM python:3.11-alpine3.24 AS base_image
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -42,6 +42,7 @@ COPY --from=actionlint /usr/local/bin/actionlint /usr/bin/
 RUN pip install pipenv \
     && apk upgrade \
     && apk --no-cache add jq \
+                          nodejs \
                           npm \
                           tini \
                           bash \
@@ -61,7 +62,7 @@ RUN pip install pipenv \
                                             textlint-rule-terminology \
                                             cspell \
                                             jscpd \
-                                            markdown-link-check@3.11.2 \
+                                            markdown-link-check \
     && git clone https://github.com/pyenv/pyenv.git --depth=1 "${PYENV_ROOT}" \
     && echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile \
     && echo 'eval "$(pyenv init -)"' >> ~/.profile \

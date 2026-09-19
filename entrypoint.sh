@@ -311,11 +311,6 @@ function lint_files() {
     fi
 
     for file in "${files_to_lint[@]}"; do
-      if [[ ! -f "${file}" ]]; then
-        feedback WARNING "File ${file} does not exist, skipping..."
-        continue
-      fi
-
       if [[ "${linter_array[executor]+x}" ]]; then
         cmd="${linter_array[executor]} ${linter_array[name]} $linter_args ${file}"
       else
